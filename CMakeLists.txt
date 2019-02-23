@@ -39,7 +39,7 @@ include(CMSetupVersion)
 cm_project(${CMAKE_WORKSPACE_NAME} storage)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-     include/public/nil/storage/engine/virtual_engine.hpp
+     include/public/nil/storage/engine/basic_engine.hpp
      include/public/nil/storage/engine/wal.hpp
 
      include/public/nil/storage/layer.hpp
