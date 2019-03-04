@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include <nil/storage/engine.hpp>
+#include <nil/storage/engine/basic_engine.hpp>
 
 namespace nil {
     namespace storage {
