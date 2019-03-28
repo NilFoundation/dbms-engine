@@ -26,7 +26,7 @@
 #include <memory>
 #include <string>
 
-#include <nil/dcdb/memory_allocator.hpp>
+#include <nil/storage/memory_allocator.hpp>
 #include <nil/dcdb/slice.hpp>
 #include <nil/dcdb/statistics.hpp>
 #include <nil/dcdb/status.hpp>
