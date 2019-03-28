@@ -7,10 +7,10 @@
 
 #ifndef ROCKSDB_LITE
 
-#include <nil/dcdb/iterator.hpp>
-#include <nil/dcdb/options.hpp>
-#include <nil/dcdb/slice.hpp>
-#include <nil/dcdb/table_properties.hpp>
+#include <nil/storage/iterator.hpp>
+#include <nil/storage/options.hpp>
+#include <nil/storage/slice.hpp>
+#include <nil/storage/table_properties.hpp>
 
 namespace nil {
     namespace dcdb {

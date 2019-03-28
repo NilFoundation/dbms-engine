@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <nil/dcdb/status.hpp>
+#include <nil/storage/status.hpp>
 
 namespace nil {
     namespace dcdb {

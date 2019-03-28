@@ -8,8 +8,8 @@
 #include <string>
 #include <vector>
 
-#include <nil/dcdb/db.hpp>
-#include <nil/dcdb/options.hpp>
+#include <nil/storage/db.hpp>
+#include <nil/storage/options.hpp>
 
 namespace nil {
     namespace dcdb {

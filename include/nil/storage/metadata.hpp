@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include <nil/dcdb/types.hpp>
+#include <nil/storage/types.hpp>
 
 namespace nil {
     namespace dcdb {

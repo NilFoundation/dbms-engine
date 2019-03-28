@@ -16,13 +16,13 @@
 #include <limits>
 #include <unordered_map>
 
-#include <nil/dcdb/advanced_options.hpp>
-#include <nil/dcdb/comparator.hpp>
-#include <nil/dcdb/env.hpp>
-#include <nil/dcdb/listener.hpp>
-#include <nil/dcdb/universal_compaction.hpp>
-#include <nil/dcdb/version.hpp>
-#include <nil/dcdb/write_buffer_manager.hpp>
+#include <nil/storage/advanced_options.hpp>
+#include <nil/storage/comparator.hpp>
+#include <nil/storage/env.hpp>
+#include <nil/storage/listener.hpp>
+#include <nil/storage/universal_compaction.hpp>
+#include <nil/storage/version.hpp>
+#include <nil/storage/write_buffer_manager.hpp>
 
 #ifdef max
 #undef max

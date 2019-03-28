@@ -7,8 +7,8 @@
 #include <map>
 #include <string>
 
-#include <nil/dcdb/status.hpp>
-#include <nil/dcdb/types.hpp>
+#include <nil/storage/status.hpp>
+#include <nil/storage/types.hpp>
 
 namespace nil {
     namespace dcdb {

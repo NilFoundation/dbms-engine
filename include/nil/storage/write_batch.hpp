@@ -29,8 +29,8 @@
 #include <string>
 #include <cstdint>
 
-#include <nil/dcdb/status.hpp>
-#include <nil/dcdb/write_batch_base.hpp>
+#include <nil/storage/status.hpp>
+#include <nil/storage/write_batch_base.hpp>
 
 namespace nil {
     namespace dcdb {

@@ -10,10 +10,10 @@
 #include <memory>
 #include <string>
 
-#include <nil/dcdb/env.hpp>
-#include <nil/dcdb/options.hpp>
-#include <nil/dcdb/table_properties.hpp>
-#include <nil/dcdb/types.hpp>
+#include <nil/storage/env.hpp>
+#include <nil/storage/options.hpp>
+#include <nil/storage/table_properties.hpp>
+#include <nil/storage/types.hpp>
 
 #if defined(__GNUC__) || defined(__clang__)
 #define ROCKSDB_DEPRECATED_FUNC __attribute__((__deprecated__))

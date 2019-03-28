@@ -10,8 +10,8 @@
 
 #include <memory>
 
-#include <nil/dcdb/memtablerep.hpp>
-#include <nil/dcdb/universal_compaction.hpp>
+#include <nil/storage/memtablerep.hpp>
+#include <nil/storage/universal_compaction.hpp>
 
 namespace nil {
     namespace dcdb {

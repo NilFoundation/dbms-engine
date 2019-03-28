@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <nil/dcdb/db.hpp>
-#include <nil/dcdb/status.hpp>
+#include <nil/storage/db.hpp>
+#include <nil/storage/status.hpp>
 
 namespace nil {
     namespace dcdb {

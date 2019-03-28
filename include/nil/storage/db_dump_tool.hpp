@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include <nil/dcdb/db.hpp>
+#include <nil/storage/db.hpp>
 
 namespace nil {
     namespace dcdb {

@@ -15,7 +15,7 @@
 #include <atomic>
 #include <cstddef>
 
-#include <nil/dcdb/cache.hpp>
+#include <nil/storage/cache.hpp>
 
 namespace nil {
     namespace dcdb {

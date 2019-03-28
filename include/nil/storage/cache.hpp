@@ -27,9 +27,9 @@
 #include <string>
 
 #include <nil/storage/memory_allocator.hpp>
-#include <nil/dcdb/slice.hpp>
-#include <nil/dcdb/statistics.hpp>
-#include <nil/dcdb/status.hpp>
+#include <nil/storage/slice.hpp>
+#include <nil/storage/statistics.hpp>
+#include <nil/storage/status.hpp>
 
 namespace nil {
     namespace dcdb {

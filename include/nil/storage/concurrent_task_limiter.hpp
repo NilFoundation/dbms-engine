@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include <nil/dcdb/env.hpp>
-#include <nil/dcdb/statistics.hpp>
+#include <nil/storage/env.hpp>
+#include <nil/storage/statistics.hpp>
 
 namespace nil {
     namespace dcdb {

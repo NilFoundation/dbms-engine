@@ -21,11 +21,11 @@
 #include <string>
 #include <unordered_map>
 
-#include <nil/dcdb/cache.hpp>
-#include <nil/dcdb/env.hpp>
-#include <nil/dcdb/iterator.hpp>
-#include <nil/dcdb/options.hpp>
-#include <nil/dcdb/status.hpp>
+#include <nil/storage/cache.hpp>
+#include <nil/storage/env.hpp>
+#include <nil/storage/iterator.hpp>
+#include <nil/storage/options.hpp>
+#include <nil/storage/status.hpp>
 
 namespace nil {
     namespace dcdb {

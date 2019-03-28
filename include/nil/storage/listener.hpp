@@ -10,9 +10,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include <nil/dcdb/compaction_job_stats.hpp>
-#include <nil/dcdb/status.hpp>
-#include <nil/dcdb/table_properties.hpp>
+#include <nil/storage/compaction_job_stats.hpp>
+#include <nil/storage/status.hpp>
+#include <nil/storage/table_properties.hpp>
 
 namespace nil {
     namespace dcdb {

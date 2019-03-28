@@ -28,7 +28,7 @@
 #include <string_view>
 #endif
 
-#include <nil/dcdb/cleanable.hpp>
+#include <nil/storage/cleanable.hpp>
 
 namespace nil {
     namespace dcdb {

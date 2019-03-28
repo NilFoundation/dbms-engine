@@ -9,9 +9,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include <nil/dcdb/db.hpp>
-#include <nil/dcdb/options.hpp>
-#include <nil/dcdb/table.hpp>
+#include <nil/storage/db.hpp>
+#include <nil/storage/options.hpp>
+#include <nil/storage/table.hpp>
 
 namespace nil {
     namespace dcdb {

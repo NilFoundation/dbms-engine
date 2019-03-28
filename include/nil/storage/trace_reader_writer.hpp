@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <nil/dcdb/env.hpp>
+#include <nil/storage/env.hpp>
 
 namespace nil {
     namespace dcdb {

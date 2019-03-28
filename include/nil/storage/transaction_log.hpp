@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <nil/dcdb/status.hpp>
-#include <nil/dcdb/types.hpp>
-#include <nil/dcdb/write_batch.hpp>
+#include <nil/storage/status.hpp>
+#include <nil/storage/types.hpp>
+#include <nil/storage/write_batch.hpp>
 
 #include <memory>
 #include <vector>

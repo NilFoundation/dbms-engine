@@ -9,7 +9,7 @@
 #include <cstdint>
 #include <string>
 
-#include <nil/dcdb/perf_level.hpp>
+#include <nil/storage/perf_level.hpp>
 
 namespace nil {
     namespace dcdb {

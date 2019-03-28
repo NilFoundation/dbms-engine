@@ -7,7 +7,7 @@
 
 #include <string>
 
-#include <nil/dcdb/table.hpp>
+#include <nil/storage/table.hpp>
 
 namespace nil {
     namespace dcdb {

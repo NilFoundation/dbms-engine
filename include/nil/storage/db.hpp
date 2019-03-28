@@ -16,16 +16,16 @@
 #include <unordered_map>
 #include <vector>
 
-#include <nil/dcdb/iterator.hpp>
-#include <nil/dcdb/listener.hpp>
-#include <nil/dcdb/metadata.hpp>
-#include <nil/dcdb/options.hpp>
-#include <nil/dcdb/snapshot.hpp>
-#include <nil/dcdb/sst_file_writer.hpp>
-#include <nil/dcdb/thread_status.hpp>
-#include <nil/dcdb/transaction_log.hpp>
-#include <nil/dcdb/types.hpp>
-#include <nil/dcdb/version.hpp>
+#include <nil/storage/iterator.hpp>
+#include <nil/storage/listener.hpp>
+#include <nil/storage/metadata.hpp>
+#include <nil/storage/options.hpp>
+#include <nil/storage/snapshot.hpp>
+#include <nil/storage/sst_file_writer.hpp>
+#include <nil/storage/thread_status.hpp>
+#include <nil/storage/transaction_log.hpp>
+#include <nil/storage/types.hpp>
+#include <nil/storage/version.hpp>
 
 #ifdef _WIN32
 // Windows API macro interference

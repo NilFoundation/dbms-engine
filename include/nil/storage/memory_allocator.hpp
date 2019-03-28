@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <nil/dcdb/status.hpp>
+#include <nil/storage/status.hpp>
 
 #include <memory>
 

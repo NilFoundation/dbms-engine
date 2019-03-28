@@ -5,7 +5,7 @@
 #ifndef ROCKSDB_LITE
 #pragma once
 
-#include <nil/dcdb/options.hpp>
+#include <nil/storage/options.hpp>
 
 namespace nil {
     namespace dcdb {

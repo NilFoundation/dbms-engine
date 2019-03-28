@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-#include <nil/dcdb/slice.hpp>
+#include <nil/storage/slice.hpp>
 
 namespace nil {
     namespace dcdb {

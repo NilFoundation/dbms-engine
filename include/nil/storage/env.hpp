@@ -24,8 +24,8 @@
 #include <string>
 #include <vector>
 
-#include <nil/dcdb/status.hpp>
-#include <nil/dcdb/thread_status.hpp>
+#include <nil/storage/status.hpp>
+#include <nil/storage/thread_status.hpp>
 
 #ifdef _WIN32
 // Windows API macro interference

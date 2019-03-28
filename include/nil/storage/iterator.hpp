@@ -20,9 +20,9 @@
 
 #include <string>
 
-#include <nil/dcdb/cleanable.hpp>
-#include <nil/dcdb/slice.hpp>
-#include <nil/dcdb/status.hpp>
+#include <nil/storage/cleanable.hpp>
+#include <nil/storage/slice.hpp>
+#include <nil/storage/status.hpp>
 
 namespace nil {
     namespace dcdb {
