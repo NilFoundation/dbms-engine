@@ -289,11 +289,11 @@ namespace nil {
             // Dynamically changeable through SetOptions() API
             bool disable_auto_compactions = false;
 
-            // This is a factory that provides TableFactory objects.
+            // This is a factory that provides table_factory objects.
             // Default: a block-based table factory that provides a default
             // implementation of table_builder and TableReader with default
             // BlockBasedTableOptions.
-            std::shared_ptr<TableFactory> table_factory;
+            std::shared_ptr<table_factory> table_factory;
 
             // A list of paths where SST files for this column family
             // can be put into, with its target size. Similar to db_paths,

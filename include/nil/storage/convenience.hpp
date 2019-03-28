@@ -85,7 +85,7 @@ namespace nil {
 //   multiple option assignments.  Each assignment is of the form
 //   "variable_name=value;".
 //
-//   Currently we support the following types of TableFactory:
+//   Currently we support the following types of table_factory:
 //   - BlockBasedTableFactory:
 //     Use name "block_based_table_factory" to initialize table_factory with
 //     BlockBasedTableFactory.  Its BlockBasedTableFactoryOptions can be

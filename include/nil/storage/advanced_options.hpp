@@ -24,7 +24,7 @@ namespace nil {
 
         class table_properties_collector_factory;
 
-        class TableFactory;
+        class table_factory;
 
         struct Options;
 

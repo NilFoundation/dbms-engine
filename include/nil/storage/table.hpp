@@ -279,7 +279,7 @@ namespace nil {
         };
 
 // Create default block based table factory.
-        extern TableFactory *NewBlockBasedTableFactory(
+        extern table_factory *NewBlockBasedTableFactory(
                 const BlockBasedTableOptions &table_options = BlockBasedTableOptions());
 
 #ifndef ROCKSDB_LITE
@@ -367,7 +367,7 @@ namespace nil {
 // hash bucket found, a binary search is executed for hash conflicts. Finally,
 // a linear search is used.
 
-        extern TableFactory *NewPlainTableFactory(const PlainTableOptions &options = PlainTableOptions());
+        extern table_factory *NewPlainTableFactory(const PlainTableOptions &options = PlainTableOptions());
 
         struct CuckooTablePropertyNames {
             // The key that is used to fill empty buckets.
@@ -431,16 +431,16 @@ namespace nil {
         };
 
 // Cuckoo Table Factory for SST table format using cache Friendly Cuckoo Hashing
-        extern TableFactory *NewCuckooTableFactory(const CuckooTableOptions &table_options = CuckooTableOptions());
+        extern table_factory *NewCuckooTableFactory(const CuckooTableOptions &table_options = CuckooTableOptions());
 
 #endif  // ROCKSDB_LITE
 
         class RandomAccessFileReader;
 
 // A base class for table factories.
-        class TableFactory {
+        class table_factory {
         public:
-            virtual ~TableFactory() {
+            virtual ~table_factory() {
             }
 
             // The type of the table.
@@ -510,17 +510,17 @@ namespace nil {
             }
 
             // Returns the raw pointer of the table options that is used by this
-            // TableFactory, or nullptr if this function is not supported.
-            // Since the return value is a raw pointer, the TableFactory owns the
+            // table_factory, or nullptr if this function is not supported.
+            // Since the return value is a raw pointer, the table_factory owns the
             // pointer and the caller should not delete the pointer.
             //
             // In certain case, it is desirable to alter the underlying options when the
-            // TableFactory is not used by any open DB by casting the returned pointer
+            // table_factory is not used by any open DB by casting the returned pointer
             // to the right class.   For instance, if BlockBasedTableFactory is used,
             // then the pointer can be casted to BlockBasedTableOptions.
             //
-            // Note that changing the underlying TableFactory options while the
-            // TableFactory is currently used by any open DB is undefined behavior.
+            // Note that changing the underlying table_factory options while the
+            // table_factory is currently used by any open DB is undefined behavior.
             // Developers should use DB::SetOption() instead to dynamically change
             // options while the DB is open.
             virtual void *GetOptions() {
@@ -543,10 +543,10 @@ namespace nil {
 //                              a default one.
 // @plain_table_factory: plain table factory to use. If NULL, use a default one.
 // @cuckoo_table_factory: cuckoo table factory to use. If NULL, use a default one.
-        extern TableFactory *NewAdaptiveTableFactory(std::shared_ptr<TableFactory> table_factory_to_write = nullptr,
-                                                     std::shared_ptr<TableFactory> block_based_table_factory = nullptr,
-                                                     std::shared_ptr<TableFactory> plain_table_factory = nullptr,
-                                                     std::shared_ptr<TableFactory> cuckoo_table_factory = nullptr);
+        extern table_factory *NewAdaptiveTableFactory(std::shared_ptr<table_factory> table_factory_to_write = nullptr,
+                                                     std::shared_ptr<table_factory> block_based_table_factory = nullptr,
+                                                     std::shared_ptr<table_factory> plain_table_factory = nullptr,
+                                                     std::shared_ptr<table_factory> cuckoo_table_factory = nullptr);
 
 #endif  // ROCKSDB_LITE
 
