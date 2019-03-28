@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8.11)
 
 cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0028 NEW)
-cmake_policy(SET CMP0048 OLD)
 cmake_policy(SET CMP0057 NEW)
 cmake_policy(SET CMP0079 OLD)
 

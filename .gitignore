@@ -630,4 +630,3 @@ callgrind.*
 /*.gpg
 /*.pub
 /*.crt
-/*.txt
