@@ -9,7 +9,7 @@
 #pragma once
 
 #include <stddef.h>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <memory>
 #include <vector>

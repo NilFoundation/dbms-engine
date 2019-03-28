@@ -27,7 +27,7 @@
 #include <atomic>
 #include <stack>
 #include <string>
-#include <stdint.h>
+#include <cstdint>
 
 #include <nil/dcdb/status.hpp>
 #include <nil/dcdb/write_batch_base.hpp>

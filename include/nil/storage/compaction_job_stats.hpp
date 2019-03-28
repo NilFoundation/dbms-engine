@@ -6,7 +6,7 @@
 #pragma once
 
 #include <stddef.h>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 namespace nil {

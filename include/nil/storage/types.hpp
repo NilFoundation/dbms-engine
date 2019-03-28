@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <nil/dcdb/slice.hpp>
 
