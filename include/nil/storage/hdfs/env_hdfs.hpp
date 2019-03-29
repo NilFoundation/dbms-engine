@@ -60,7 +60,7 @@ class HdfsEnv : public environment_type {
                                    const environment_options& options);
 
   virtual status_type NewRandomAccessFile(const std::string& fname,
-                                     std::unique_ptr<RandomAccessFile>* result,
+                                     std::unique_ptr<random_access_file>* result,
                                      const environment_options& options);
 
   virtual status_type NewWritableFile(const std::string& fname,
@@ -260,7 +260,7 @@ namespace nil {
                                                   const environment_options &options) override;
 
             virtual status_type NewRandomAccessFile(const std::string & /*fname*/,
-                                                    std::unique_ptr<RandomAccessFile> * /*result*/,
+                                                    std::unique_ptr<random_access_file> * /*result*/,
                                                     const environment_options & /*options*/) override {
                 return notsup;
             }

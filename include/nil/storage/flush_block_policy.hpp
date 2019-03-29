@@ -30,7 +30,7 @@ namespace nil {
             }
         };
 
-        class FlushBlockPolicyFactory {
+        class flush_block_policy_factory {
         public:
             // Return the name of the flush block policy.
             virtual const char *Name() const = 0;
@@ -41,14 +41,14 @@ namespace nil {
             //
             // Callers must delete the result after any database that is using the
             // result has been closed.
-            virtual FlushBlockPolicy *NewFlushBlockPolicy(const BlockBasedTableOptions &table_options,
+            virtual FlushBlockPolicy *NewFlushBlockPolicy(const block_based_table_options &table_options,
                                                           const BlockBuilder &data_block_builder) const = 0;
 
-            virtual ~FlushBlockPolicyFactory() {
+            virtual ~flush_block_policy_factory() {
             }
         };
 
-        class FlushBlockBySizePolicyFactory : public FlushBlockPolicyFactory {
+        class FlushBlockBySizePolicyFactory : public flush_block_policy_factory {
         public:
             FlushBlockBySizePolicyFactory() {
             }
@@ -57,7 +57,7 @@ namespace nil {
                 return "FlushBlockBySizePolicyFactory";
             }
 
-            FlushBlockPolicy *NewFlushBlockPolicy(const BlockBasedTableOptions &table_options,
+            FlushBlockPolicy *NewFlushBlockPolicy(const block_based_table_options &table_options,
                                                   const BlockBuilder &data_block_builder) const override;
 
             static FlushBlockPolicy *NewFlushBlockPolicy(const uint64_t size, const int deviation,

@@ -31,18 +31,18 @@ namespace nil {
     namespace dcdb {
 
 // -- Block-based Table
-        class FlushBlockPolicyFactory;
+        class flush_block_policy_factory;
 
-        class PersistentCache;
+        class persistent_cache;
 
-        class RandomAccessFile;
+        class random_access_file;
 
-        struct TableReaderOptions;
-        struct TableBuilderOptions;
+        struct table_reader_options;
+        struct table_builder_options;
 
         class table_builder;
 
-        class TableReader;
+        class table_reader;
 
         class writable_file_writer;
 
@@ -51,18 +51,18 @@ namespace nil {
 
         using std::unique_ptr;
 
-        enum ChecksumType : char {
+        enum checksum_type : char {
             kNoChecksum = 0x0, kCRC32c = 0x1, kxxHash = 0x2, kxxHash64 = 0x3,
         };
 
 // For advanced user only
-        struct BlockBasedTableOptions {
+        struct block_based_table_options {
             // @flush_block_policy_factory creates the instances of flush block policy.
             // which provides a configurable way to determine when to flush a block in
             // the block based tables.  If not set, table builder will use the default
             // block flush policy, which cut blocks by block size (please refer to
             // `FlushBlockBySizePolicy`).
-            std::shared_ptr<FlushBlockPolicyFactory> flush_block_policy_factory;
+            std::shared_ptr<flush_block_policy_factory> flush_block_policy_factory;
 
             // TODO(kailiu) Temporarily disable this feature by making the default value
             // to be false.
@@ -130,7 +130,7 @@ namespace nil {
             // Use the specified checksum type. Newly created table files will be
             // protected with this checksum type. Old table files will still be readable,
             // even though they have different checksum type.
-            ChecksumType checksum = kCRC32c;
+            checksum_type checksum = kCRC32c;
 
             // Disable block cache. If this is set to true,
             // then no block cache should be used, and the block_cache should
@@ -143,7 +143,7 @@ namespace nil {
 
             // If non-NULL use the specified cache for pages read from device
             // IF NULL, no page cache is used
-            std::shared_ptr<PersistentCache> persistent_cache = nullptr;
+            std::shared_ptr<persistent_cache> persistent_cache = nullptr;
 
             // If non-NULL use the specified cache for compressed blocks.
             // If NULL, rocksdb will not use a compressed block cache.
@@ -200,7 +200,7 @@ namespace nil {
             // If non-nullptr, use the specified filter policy to reduce disk reads.
             // Many applications will benefit from passing the result of
             // NewBloomFilterPolicy() here.
-            std::shared_ptr<const FilterPolicy> filter_policy = nullptr;
+            std::shared_ptr<const filter_policy> filter_policy = nullptr;
 
             // If true, place whole keys in the filter (not just prefixes).
             // This must generally be true for gets to be efficient.
@@ -240,7 +240,7 @@ namespace nil {
             // checksum (default is CRC32).
             // 1 -- Can be read by RocksDB's versions since 3.0. Supports non-default
             // checksum, like xxHash. It is written by RocksDB when
-            // BlockBasedTableOptions::checksum is something other than kCRC32c. (version
+            // block_based_table_options::checksum is something other than kCRC32c. (version
             // 0 is silently upconverted)
             // 2 -- Can be read by RocksDB's versions since 3.10. Changes the way we
             // encode compressed blocks with LZ4, BZip2 and Zlib compression. If you
@@ -280,7 +280,7 @@ namespace nil {
 
 // Create default block based table factory.
         extern table_factory *NewBlockBasedTableFactory(
-                const BlockBasedTableOptions &table_options = BlockBasedTableOptions());
+                const block_based_table_options &table_options = block_based_table_options());
 
 #ifndef ROCKSDB_LITE
 
@@ -309,7 +309,7 @@ namespace nil {
 
         const uint32_t kPlainTableVariableLength = 0;
 
-        struct PlainTableOptions {
+        struct plain_table_options {
             // @user_key_len: plain table has optimization for fix-sized keys, which can
             //                be specified via user_key_len.  Alternatively, you can pass
             //                `kPlainTableVariableLength` if your keys have variable
@@ -367,9 +367,9 @@ namespace nil {
 // hash bucket found, a binary search is executed for hash conflicts. Finally,
 // a linear search is used.
 
-        extern table_factory *NewPlainTableFactory(const PlainTableOptions &options = PlainTableOptions());
+        extern table_factory *new_plain_table_factory(const plain_table_options &options = plain_table_options());
 
-        struct CuckooTablePropertyNames {
+        struct cuckoo_table_property_names {
             // The key that is used to fill empty buckets.
             static const std::string kEmptyKey;
             // Fixed length of value.
@@ -401,7 +401,7 @@ namespace nil {
             static const std::string kUserKeyLength;
         };
 
-        struct CuckooTableOptions {
+        struct cuckoo_table_options {
             // Determines the utilization of hash tables. Smaller values
             // result in larger hash tables with fewer collisions.
             double hash_table_ratio = 0.9;
@@ -431,11 +431,12 @@ namespace nil {
         };
 
 // Cuckoo Table Factory for SST table format using cache Friendly Cuckoo Hashing
-        extern table_factory *NewCuckooTableFactory(const CuckooTableOptions &table_options = CuckooTableOptions());
+        extern table_factory *new_cuckoo_table_factory(
+                const cuckoo_table_options &table_options = cuckoo_table_options());
 
 #endif  // ROCKSDB_LITE
 
-        class RandomAccessFileReader;
+        class random_access_file_reader;
 
 // A base class for table factories.
         class table_factory {
@@ -459,19 +460,19 @@ namespace nil {
             // NewTableReader() is called in three places:
             // (1) get_table_cache::FindTable() calls the function when table cache miss
             //     and cache the table object returned.
-            // (2) SstFileDumper (for SST Dump) opens the table and dump the table
+            // (2) SstFileDumper (for SST dump) opens the table and dump the table
             //     contents using the iterator of the table.
             // (3) DBImpl::IngestExternalFile() calls this function to read the contents
             //     of the sst file it's attempting to add
             //
-            // table_reader_options is a TableReaderOptions which contain all the
+            // table_reader_options is a table_reader_options which contain all the
             //    needed parameters and configuration to open the table.
             // file is a file handler to handle the file for the table.
             // file_size is the physical file size of the file.
             // table_reader is the output table reader.
-            virtual status_type NewTableReader(const TableReaderOptions &table_reader_options,
-                                               std::unique_ptr<RandomAccessFileReader> &&file, uint64_t file_size,
-                                               std::unique_ptr<TableReader> *table_reader,
+            virtual status_type NewTableReader(const table_reader_options &table_reader_options,
+                                               std::unique_ptr<random_access_file_reader> &&file, uint64_t file_size,
+                                               std::unique_ptr<table_reader> *table_reader,
                                                bool prefetch_index_and_filter_in_cache = true) const = 0;
 
             // Return a table builder to write to a file for this table type.
@@ -492,14 +493,15 @@ namespace nil {
             // It is the caller's responsibility to keep the file open and close the file
             // after closing the table builder. comp_type is the compression type
             // to use in this table.
-            virtual table_builder *NewTableBuilder(const TableBuilderOptions &table_builder_options,
+            virtual table_builder *NewTableBuilder(const table_builder_options &table_builder_options,
                                                    uint32_t column_family_id, writable_file_writer *file) const = 0;
 
-            // Sanitizes the specified DB Options and ColumnFamilyOptions.
+            // Sanitizes the specified DB Options and column_family_options.
             //
             // If the function cannot find a way to sanitize the input DB Options,
             // a non-ok status_type will be returned.
-            virtual status_type SanitizeOptions(const DBOptions &db_opts, const ColumnFamilyOptions &cf_opts) const = 0;
+            virtual status_type SanitizeOptions(const db_options &db_opts,
+                                                const column_family_options &cf_opts) const = 0;
 
             // Return a string that contains printable format of table configurations.
             // RocksDB prints configurations at DB Open().
@@ -517,7 +519,7 @@ namespace nil {
             // In certain case, it is desirable to alter the underlying options when the
             // table_factory is not used by any open DB by casting the returned pointer
             // to the right class.   For instance, if BlockBasedTableFactory is used,
-            // then the pointer can be casted to BlockBasedTableOptions.
+            // then the pointer can be casted to block_based_table_options.
             //
             // Note that changing the underlying table_factory options while the
             // table_factory is currently used by any open DB is undefined behavior.
@@ -544,9 +546,10 @@ namespace nil {
 // @plain_table_factory: plain table factory to use. If NULL, use a default one.
 // @cuckoo_table_factory: cuckoo table factory to use. If NULL, use a default one.
         extern table_factory *NewAdaptiveTableFactory(std::shared_ptr<table_factory> table_factory_to_write = nullptr,
-                                                     std::shared_ptr<table_factory> block_based_table_factory = nullptr,
-                                                     std::shared_ptr<table_factory> plain_table_factory = nullptr,
-                                                     std::shared_ptr<table_factory> cuckoo_table_factory = nullptr);
+                                                      std::shared_ptr<
+                                                              table_factory> block_based_table_factory = nullptr,
+                                                      std::shared_ptr<table_factory> plain_table_factory = nullptr,
+                                                      std::shared_ptr<table_factory> cuckoo_table_factory = nullptr);
 
 #endif  // ROCKSDB_LITE
 

@@ -101,7 +101,7 @@ namespace nil {
             //   It is guaranteed to always return "1" if
             //      - Iterator created with ReadOptions::pin_data = true
             //      - DB tables were created with
-            //        BlockBasedTableOptions::use_delta_encoding = false.
+            //        block_based_table_options::use_delta_encoding = false.
             // Property "rocksdb.iterator.super-version-number":
             //   LSM version used by the iterator. The same format as DB Property
             //   kCurrentSuperVersionNumber. See its comment for more information.

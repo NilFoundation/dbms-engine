@@ -25,7 +25,6 @@
 #include <nil/storage/thread_status.hpp>
 #include <nil/storage/transaction_log.hpp>
 #include <nil/storage/types.hpp>
-#include <nil/storage/version.hpp>
 
 #ifdef _WIN32
 // Windows API macro interference
@@ -42,7 +41,7 @@ namespace nil {
     namespace dcdb {
 
         struct Options;
-        struct DBOptions;
+        struct db_options;
         struct ReadOptions;
         struct WriteOptions;
         struct FlushOptions;
@@ -71,12 +70,12 @@ namespace nil {
 
         struct ColumnFamilyDescriptor {
             std::string name;
-            ColumnFamilyOptions options;
+            column_family_options options;
 
-            ColumnFamilyDescriptor() : name(kDefaultColumnFamilyName), options(ColumnFamilyOptions()) {
+            ColumnFamilyDescriptor() : name(kDefaultColumnFamilyName), options(column_family_options()) {
             }
 
-            ColumnFamilyDescriptor(const std::string &_name, const ColumnFamilyOptions &_options) : name(_name),
+            ColumnFamilyDescriptor(const std::string &_name, const column_family_options &_options) : name(_name),
                     options(_options) {
             }
         };
@@ -106,8 +105,8 @@ namespace nil {
             virtual const Comparator *GetComparator() const = 0;
         };
 
-        static const int kMajorVersion = __ROCKSDB_MAJOR__;
-        static const int kMinorVersion = __ROCKSDB_MINOR__;
+        static const int kMajorVersion = 0;//__ROCKSDB_MAJOR__;
+        static const int kMinorVersion = 0;//__ROCKSDB_MINOR__;
 
 // A range of keys
         struct Range {
@@ -173,7 +172,7 @@ namespace nil {
             //
             // Not supported in ROCKSDB_LITE, in which case the function will
             // return status_type::NotSupported.
-            static status_type OpenForReadOnly(const DBOptions &db_options, const std::string &name,
+            static status_type OpenForReadOnly(const db_options &db_options, const std::string &name,
                                                const std::vector<ColumnFamilyDescriptor> &column_families,
                                                std::vector<column_family_handle *> *handles, DB **dbptr,
                                                bool error_if_log_file_exist = false);
@@ -192,7 +191,7 @@ namespace nil {
             // will use to operate on column family column_family[i].
             // Before delete DB, you have to close All column families by calling
             // DestroyColumnFamilyHandle() with all the handles.
-            static status_type Open(const DBOptions &db_options, const std::string &name,
+            static status_type Open(const db_options &db_options, const std::string &name,
                                     const std::vector<ColumnFamilyDescriptor> &column_families,
                                     std::vector<column_family_handle *> *handles, DB **dbptr);
 
@@ -216,7 +215,7 @@ namespace nil {
             // and return the list of all column families in that DB
             // through column_families argument. The ordering of
             // column families in column_families is unspecified.
-            static status_type ListColumnFamilies(const DBOptions &db_options, const std::string &name,
+            static status_type ListColumnFamilies(const db_options &db_options, const std::string &name,
                                                   std::vector<std::string> *column_families);
 
             DB() {
@@ -226,7 +225,7 @@ namespace nil {
 
             // Create a column_family and return the handle of column family
             // through the argument handle.
-            virtual status_type CreateColumnFamily(const ColumnFamilyOptions &options,
+            virtual status_type CreateColumnFamily(const column_family_options &options,
                                                    const std::string &column_family_name,
                                                    column_family_handle **handle);
 
@@ -235,7 +234,7 @@ namespace nil {
             // In case of error, the request may succeed partially, and handles will
             // contain column family handles that it managed to create, and have size
             // equal to the number of created column families.
-            virtual status_type CreateColumnFamilies(const ColumnFamilyOptions &options,
+            virtual status_type CreateColumnFamilies(const column_family_options &options,
                                                      const std::vector<std::string> &column_family_names,
                                                      std::vector<column_family_handle *> *handles);
 
@@ -917,7 +916,7 @@ namespace nil {
                 return GetOptions(DefaultColumnFamily());
             }
 
-            virtual DBOptions GetDBOptions() const = 0;
+            virtual db_options GetDBOptions() const = 0;
 
             // Flush all mem-table data.
             // Flush a single column family, even when atomic flush is enabled. To flush
@@ -955,7 +954,7 @@ namespace nil {
             virtual SequenceNumber GetLatestSequenceNumber() const = 0;
 
             // Instructs DB to preserve deletes with sequence numbers >= passed seqnum.
-            // Has no effect if DBOptions.preserve_deletes is set to false.
+            // Has no effect if db_options.preserve_deletes is set to false.
             // This function assumes that user calls this function with monotonically
             // increasing seqnums (otherwise we can't guarantee that a particular delete
             // hasn't been already processed); returns true if the value was successfully
@@ -1263,14 +1262,14 @@ namespace nil {
 // specified in column_families.
 //
 // @param column_families Descriptors for known column families
-        status_type RepairDB(const std::string &dbname, const DBOptions &db_options,
+        status_type RepairDB(const std::string &dbname, const db_options &db_options,
                              const std::vector<ColumnFamilyDescriptor> &column_families);
 
 // @param unknown_cf_opts Options for column families encountered during the
 //                        repair that were not specified in column_families.
-        status_type RepairDB(const std::string &dbname, const DBOptions &db_options,
+        status_type RepairDB(const std::string &dbname, const db_options &db_options,
                              const std::vector<ColumnFamilyDescriptor> &column_families,
-                             const ColumnFamilyOptions &unknown_cf_opts);
+                             const column_family_options &unknown_cf_opts);
 
 // @param options These options will be used for the database and for ALL column
 //                families encountered during the repair

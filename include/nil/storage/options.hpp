@@ -21,7 +21,6 @@
 #include <nil/storage/env.hpp>
 #include <nil/storage/listener.hpp>
 #include <nil/storage/universal_compaction.hpp>
-#include <nil/storage/version.hpp>
 #include <nil/storage/write_buffer_manager.hpp>
 
 #ifdef max
@@ -47,7 +46,7 @@ namespace nil {
 
         class SstFileManager;
 
-        class FilterPolicy;
+        class filter_policy;
 
         class Logger;
 
@@ -97,23 +96,23 @@ namespace nil {
         struct Options;
         struct DbPath;
 
-        struct ColumnFamilyOptions : public advanced_column_family_options {
+        struct column_family_options : public advanced_column_family_options {
             // The function recovers options to a previous version. Only 4.6 or later
             // versions are supported.
-            ColumnFamilyOptions *OldDefaults(int rocksdb_major_version = 4, int rocksdb_minor_version = 6);
+            column_family_options *OldDefaults(int rocksdb_major_version = 4, int rocksdb_minor_version = 6);
 
             // Some functions that make it easier to optimize RocksDB
             // Use this if your DB is very small (like under 1GB) and you don't want to
             // spend lots of memory for memtables.
-            ColumnFamilyOptions *OptimizeForSmallDb();
+            column_family_options *OptimizeForSmallDb();
 
             // Use this if you don't need to keep the data sorted, i.e. you'll never use
             // an iterator, only Put() and Get() API calls
             //
             // Not supported in ROCKSDB_LITE
-            ColumnFamilyOptions *OptimizeForPointLookup(uint64_t block_cache_size_mb);
+            column_family_options *OptimizeForPointLookup(uint64_t block_cache_size_mb);
 
-            // Default values for some parameters in ColumnFamilyOptions are not
+            // Default values for some parameters in column_family_options are not
             // optimized for heavy workloads and big datasets, which means you might
             // observe write stalls under some conditions. As a starting point for tuning
             // RocksDB options, use the following two functions:
@@ -129,9 +128,9 @@ namespace nil {
             // write rate period
             //
             // OptimizeUniversalStyleCompaction is not supported in ROCKSDB_LITE
-            ColumnFamilyOptions *OptimizeLevelStyleCompaction(uint64_t memtable_memory_budget = 512 * 1024 * 1024);
+            column_family_options *OptimizeLevelStyleCompaction(uint64_t memtable_memory_budget = 512 * 1024 * 1024);
 
-            ColumnFamilyOptions *OptimizeUniversalStyleCompaction(uint64_t memtable_memory_budget = 512 * 1024 * 1024);
+            column_family_options *OptimizeUniversalStyleCompaction(uint64_t memtable_memory_budget = 512 * 1024 * 1024);
 
             // -------------------
             // Parameters that affect behavior
@@ -291,8 +290,8 @@ namespace nil {
 
             // This is a factory that provides table_factory objects.
             // Default: a block-based table factory that provides a default
-            // implementation of table_builder and TableReader with default
-            // BlockBasedTableOptions.
+            // implementation of table_builder and table_reader with default
+            // block_based_table_options.
             std::shared_ptr<table_factory> table_factory;
 
             // A list of paths where SST files for this column family
@@ -317,11 +316,11 @@ namespace nil {
             // Default: nullptr
             std::shared_ptr<ConcurrentTaskLimiter> compaction_thread_limiter = nullptr;
 
-            // Create ColumnFamilyOptions with default values for all fields
-            ColumnFamilyOptions();
+            // Create column_family_options with default values for all fields
+            column_family_options();
 
-            // Create ColumnFamilyOptions from Options
-            explicit ColumnFamilyOptions(const Options &options);
+            // Create column_family_options from Options
+            explicit column_family_options(const Options &options);
 
             void Dump(Logger *log) const;
         };
@@ -358,15 +357,15 @@ namespace nil {
         };
 
 
-        struct DBOptions {
+        struct db_options {
             // The function recovers options to the option as in version 4.6.
-            DBOptions *OldDefaults(int rocksdb_major_version = 4, int rocksdb_minor_version = 6);
+            db_options *OldDefaults(int rocksdb_major_version = 4, int rocksdb_minor_version = 6);
 
             // Some functions that make it easier to optimize RocksDB
 
             // Use this if your DB is very small (like under 1GB) and you don't want to
             // spend lots of memory for memtables.
-            DBOptions *OptimizeForSmallDb();
+            db_options *OptimizeForSmallDb();
 
 #ifndef ROCKSDB_LITE
 
@@ -375,7 +374,7 @@ namespace nil {
             // `total_threads` is used. Good value for `total_threads` is the number of
             // cores. You almost definitely want to call this function if your system is
             // bottlenecked by RocksDB.
-            DBOptions *IncreaseParallelism(int total_threads = 16);
+            db_options *IncreaseParallelism(int total_threads = 16);
 
 #endif  // ROCKSDB_LITE
 
@@ -750,7 +749,7 @@ namespace nil {
             // for indexes. This will allow file descriptor prefetch options
             // to be set for compaction input files and not to impact file
             // descriptors for the same file used by user queries.
-            // Suggest to enable BlockBasedTableOptions.cache_index_and_filter_blocks
+            // Suggest to enable block_based_table_options.cache_index_and_filter_blocks
             // for this mode if using block-based table.
             //
             // Default: false
@@ -804,11 +803,11 @@ namespace nil {
             // Default: false
             bool use_adaptive_mutex = false;
 
-            // Create DBOptions with default values for all fields
-            DBOptions();
+            // Create db_options with default values for all fields
+            db_options();
 
-            // Create DBOptions from Options
-            explicit DBOptions(const Options &options);
+            // Create db_options from Options
+            explicit db_options(const Options &options);
 
             void Dump(Logger *log) const;
 
@@ -1029,13 +1028,13 @@ namespace nil {
         };
 
 // Options to control the behavior of a database (passed to DB::Open)
-        struct Options : public DBOptions, public ColumnFamilyOptions {
+        struct Options : public db_options, public column_family_options {
             // Create an Options object with default values for all fields.
-            Options() : DBOptions(), ColumnFamilyOptions() {
+            Options() : db_options(), column_family_options() {
             }
 
-            Options(const DBOptions &db_options, const ColumnFamilyOptions &column_family_options) : DBOptions(
-                    db_options), ColumnFamilyOptions(column_family_options) {
+            Options(const db_options &input_db_options, const column_family_options &input_column_family_options) : db_options(
+                    input_db_options), column_family_options(input_column_family_options) {
             }
 
             // The function recovers options to the option as in version 4.6.
@@ -1170,7 +1169,7 @@ namespace nil {
 
             // Keep the blocks loaded by the iterator pinned in memory as long as the
             // iterator is not deleted, If used when reading from tables created with
-            // BlockBasedTableOptions::use_delta_encoding = false,
+            // block_based_table_options::use_delta_encoding = false,
             // Iterator's property "rocksdb.iterator.is-key-pinned" is guaranteed to
             // return 1.
             // Default: false
@@ -1277,8 +1276,8 @@ namespace nil {
             }
         };
 
-// Create a Logger from provided DBOptions
-        extern status_type CreateLoggerFromOptions(const std::string &dbname, const DBOptions &options,
+// Create a Logger from provided db_options
+        extern status_type CreateLoggerFromOptions(const std::string &dbname, const db_options &options,
                                                    std::shared_ptr<Logger> *logger);
 
 // CompactionOptions are used in CompactFiles() call.
@@ -1286,13 +1285,13 @@ namespace nil {
             // Compaction output compression type
             // Default: snappy
             // If set to `kDisableCompressionOption`, RocksDB will choose compression type
-            // according to the `ColumnFamilyOptions`, taking into account the output
+            // according to the `column_family_options`, taking into account the output
             // level if `compression_per_level` is specified.
             compression_type compression;
             // Compaction will create files of size `output_file_size_limit`.
             // Default: MAX, which means that compaction will create a single file
             uint64_t output_file_size_limit;
-            // If > 0, it will replace the option in the DBOptions for this compaction.
+            // If > 0, it will replace the option in the db_options for this compaction.
             uint32_t max_subcompactions;
 
             CompactionOptions() : compression(kSnappyCompression),
@@ -1330,7 +1329,7 @@ namespace nil {
             // If true, will execute immediately even if doing so would cause the DB to
             // enter write stall mode. Otherwise, it'll sleep until load is low enough.
             bool allow_write_stall = false;
-            // If > 0, it will replace the option in the DBOptions for this compaction.
+            // If > 0, it will replace the option in the db_options for this compaction.
             uint32_t max_subcompactions = 0;
         };
 

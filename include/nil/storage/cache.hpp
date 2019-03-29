@@ -60,7 +60,7 @@ namespace nil {
             // age out faster.
             //
             // See also
-            // BlockBasedTableOptions::cache_index_and_filter_blocks_with_high_priority.
+            // block_based_table_options::cache_index_and_filter_blocks_with_high_priority.
             double high_pri_pool_ratio = 0.0;
 
             // If non-nullptr will use this allocator instead of system allocator when
@@ -153,7 +153,7 @@ namespace nil {
             //
             // When the inserted entry is no longer needed, the key and
             // value will be passed to "deleter".
-            virtual status_type Insert(const slice &key, void *value, size_t charge,
+            virtual status_type insert(const slice &key, void *value, size_t charge,
                                        void (*deleter)(const slice &key, void *value), handle **input_handle = nullptr,
                                        priority priority = priority::LOW) = 0;
 
@@ -164,13 +164,13 @@ namespace nil {
             // longer needed.
             // If stats is not nullptr, relative tickers could be used inside the
             // function.
-            virtual handle *Lookup(const slice &key, Statistics *stats = nullptr) = 0;
+            virtual handle *lookup(const slice &key, Statistics *stats = nullptr) = 0;
 
             // Increments the reference count for the handle if it refers to an entry in
             // the cache. Returns true if refcount was incremented; otherwise, returns
             // false.
             // REQUIRES: handle must have been returned by a method on *this.
-            virtual bool Ref(handle *handle) = 0;
+            virtual bool ref(handle *handle) = 0;
 
             /**
              * Release a mapping returned by a previous Lookup(). A released entry might
@@ -184,7 +184,7 @@ namespace nil {
              */
             // REQUIRES: handle must not have been released yet.
             // REQUIRES: handle must have been returned by a method on *this.
-            virtual bool Release(handle *handle, bool force_erase = false) = 0;
+            virtual bool release(handle *handle, bool force_erase = false) = 0;
 
             // Return the value encapsulated in a handle returned by a
             // successful lookup().
@@ -195,13 +195,13 @@ namespace nil {
             // If the cache contains entry for key, erase it.  Note that the
             // underlying entry will be kept around until all existing handles
             // to it have been released.
-            virtual void Erase(const slice &key) = 0;
+            virtual void erase(const slice &key) = 0;
 
             // Return a new numeric id.  May be used by multiple clients who are
             // sharding the same cache to partition the key space.  Typically the
             // client will allocate a new id at startup and prepend the id to
             // its cache keys.
-            virtual uint64_t NewId() = 0;
+            virtual uint64_t new_id() = 0;
 
             // sets the maximum configured capacity of the cache. When the new
             // capacity is less than the old capacity and the existing usage is
@@ -215,19 +215,19 @@ namespace nil {
 
             // Get the flag whether to return error on insertion when cache reaches its
             // full capacity.
-            virtual bool HasStrictCapacityLimit() const = 0;
+            virtual bool has_strict_capacity_limit() const = 0;
 
             // returns the maximum configured capacity of the cache
-            virtual size_t GetCapacity() const = 0;
+            virtual size_t get_capacity() const = 0;
 
             // returns the memory size for the entries residing in the cache.
-            virtual size_t GetUsage() const = 0;
+            virtual size_t get_usage() const = 0;
 
             // returns the memory size for a specific entry in the cache.
-            virtual size_t GetUsage(handle *handle) const = 0;
+            virtual size_t get_usage(handle *handle) const = 0;
 
             // returns the memory size for the entries in use by the system
-            virtual size_t GetPinnedUsage() const = 0;
+            virtual size_t get_pinned_usage() const = 0;
 
             // Call this on shutdown if you want to speed it up. cache will disown
             // any underlying data and will not free it on delete. This call will leak
@@ -241,13 +241,13 @@ namespace nil {
             // Apply callback to all entries in the cache
             // If thread_safe is true, it will also lock the accesses. Otherwise, it will
             // access the cache without the lock held
-            virtual void ApplyToAllCacheEntries(void (*callback)(void *, size_t), bool thread_safe) = 0;
+            virtual void apply_to_all_cache_entries(void (*callback)(void *, size_t), bool thread_safe) = 0;
 
             // remove all entries.
             // Prerequisite: no entry is referenced.
-            virtual void EraseUnRefEntries() = 0;
+            virtual void erase_un_ref_entries() = 0;
 
-            virtual std::string GetPrintableOptions() const {
+            virtual std::string get_printable_options() const {
                 return "";
             }
 

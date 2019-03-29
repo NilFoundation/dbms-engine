@@ -19,15 +19,15 @@
 namespace nil {
     namespace dcdb {
 
-// PersistentCache
+// persistent_cache
 //
 // Persistent cache interface for caching IO pages on a persistent medium. The
 // cache interface is specifically designed for persistent read cache.
-        class PersistentCache {
+        class persistent_cache {
         public:
             typedef std::vector<std::map<std::string, double>> StatsType;
 
-            virtual ~PersistentCache() {
+            virtual ~persistent_cache() {
             }
 
             // insert to page cache
@@ -61,6 +61,6 @@ namespace nil {
 // Factor method to create a new persistent cache
         status_type NewPersistentCache(environment_type *const env, const std::string &path, const uint64_t size,
                                        const std::shared_ptr<Logger> &log, const bool optimized_for_nvm,
-                                       std::shared_ptr<PersistentCache> *cache);
+                                       std::shared_ptr<persistent_cache> *cache);
     }
 } // namespace nil

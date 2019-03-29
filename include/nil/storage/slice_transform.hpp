@@ -25,7 +25,7 @@ namespace nil {
  * A slice_transform is a generic pluggable way of transforming one string
  * to another. Its primary use-case is in configuring rocksdb
  * to store prefix blooms by setting prefix_extractor in
- * ColumnFamilyOptions.
+ * column_family_options.
  */
         class slice_transform {
         public:

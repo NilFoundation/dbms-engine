@@ -82,7 +82,7 @@ namespace nil {
         struct compression_options {
             // RocksDB's generic default compression level. Internally it'll be translated
             // to the default compression level specific to the library being used (see
-            // comment above `ColumnFamilyOptions::compression`).
+            // comment above `column_family_options::compression`).
             //
             // The default value is the max 16-bit int as it'll be written out in OPTIONS
             // file, which should be portable.
@@ -552,7 +552,7 @@ namespace nil {
             std::shared_ptr<mem_table_rep_factory> memtable_factory = std::shared_ptr<skip_list_factory>(
                     new skip_list_factory);
 
-            // Block-based table related options are moved to BlockBasedTableOptions.
+            // Block-based table related options are moved to block_based_table_options.
             // Related options that were originally here but now moved include:
             //   no_block_cache
             //   block_cache
@@ -641,10 +641,10 @@ namespace nil {
             // data is left uncompressed (unless compression is also requested).
             uint64_t sample_for_compression = 0;
 
-            // Create ColumnFamilyOptions with default values for all fields
+            // Create column_family_options with default values for all fields
             advanced_column_family_options();
 
-            // Create ColumnFamilyOptions from Options
+            // Create column_family_options from Options
             explicit advanced_column_family_options(const Options &options);
 
             // ---------------- OPTIONS NOT SUPPORTED ANYMORE ----------------

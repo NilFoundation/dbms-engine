@@ -69,9 +69,9 @@ namespace nil {
 //     "kCompactionStyleNone".
 //
 
-// Take a default ColumnFamilyOptions "base_options" in addition to a
+// Take a default column_family_options "base_options" in addition to a
 // map "opts_map" of option name to option value to construct the new
-// ColumnFamilyOptions "new_options".
+// column_family_options "new_options".
 //
 // Below are the instructions of how to config some non-primitive-typed
 // options in ColumnFOptions:
@@ -94,8 +94,8 @@ namespace nil {
 //     * {"block_based_table_factory", "{block_cache=1M;block_size=4k;}"}
 //       is equivalent to assigning table_factory with a BlockBasedTableFactory
 //       that has 1M LRU block-cache with block size equals to 4k:
-//         ColumnFamilyOptions cf_opt;
-//         BlockBasedTableOptions blk_opt;
+//         column_family_options cf_opt;
+//         block_based_table_options blk_opt;
 //         blk_opt.block_cache = NewLRUCache(1 * 1024 * 1024);
 //         blk_opt.block_size = 4 * 1024;
 //         cf_opt.table_factory.reset(NewBlockBasedTableFactory(blk_opt));
@@ -148,7 +148,7 @@ namespace nil {
 //    is of the form "<window_bits>:<level>:<strategy>:<max_dict_bytes>".
 //    [Example]:
 //    * {"compression_opts", "4:5:6:7"} is equivalent to setting:
-//        ColumnFamilyOptions cf_opt;
+//        column_family_options cf_opt;
 //        cf_opt.compression_opts.window_bits = 4;
 //        cf_opt.compression_opts.level = 5;
 //        cf_opt.compression_opts.strategy = 6;
@@ -166,17 +166,17 @@ namespace nil {
 //     instead of resulting in an unknown-option error.
 // @return status_type::OK() on success.  Otherwise, a non-ok status indicating
 //     error will be returned, and "new_options" will be set to "base_options".
-        status_type GetColumnFamilyOptionsFromMap(const ColumnFamilyOptions &base_options,
+        status_type GetColumnFamilyOptionsFromMap(const column_family_options &base_options,
                                                   const std::unordered_map<std::string, std::string> &opts_map,
-                                                  ColumnFamilyOptions *new_options, bool input_strings_escaped = false,
+                                                  column_family_options *new_options, bool input_strings_escaped = false,
                                                   bool ignore_unknown_options = false);
 
-// Take a default DBOptions "base_options" in addition to a
+// Take a default db_options "base_options" in addition to a
 // map "opts_map" of option name to option value to construct the new
-// DBOptions "new_options".
+// db_options "new_options".
 //
 // Below are the instructions of how to config some non-primitive-typed
-// options in DBOptions:
+// options in db_options:
 //
 // * rate_limiter_bytes_per_sec:
 //   RateLimiter can be configured directly by specifying its bytes_per_sec.
@@ -196,20 +196,20 @@ namespace nil {
 //     instead of resulting in an unknown-option error.
 // @return status_type::OK() on success.  Otherwise, a non-ok status indicating
 //     error will be returned, and "new_options" will be set to "base_options".
-        status_type GetDBOptionsFromMap(const DBOptions &base_options,
+        status_type GetDBOptionsFromMap(const db_options &base_options,
                                         const std::unordered_map<std::string, std::string> &opts_map,
-                                        DBOptions *new_options, bool input_strings_escaped = false,
+                                        db_options *new_options, bool input_strings_escaped = false,
                                         bool ignore_unknown_options = false);
 
-// Take a default BlockBasedTableOptions "table_options" in addition to a
+// Take a default block_based_table_options "table_options" in addition to a
 // map "opts_map" of option name to option value to construct the new
-// BlockBasedTableOptions "new_table_options".
+// block_based_table_options "new_table_options".
 //
 // Below are the instructions of how to config some non-primitive-typed
-// options in BlockBasedTableOptions:
+// options in block_based_table_options:
 //
 // * filter_policy:
-//   We currently only support the following FilterPolicy in the convenience
+//   We currently only support the following filter_policy in the convenience
 //   functions:
 //   - BloomFilter: use "bloomfilter:[bits_per_key]:[use_block_based_builder]"
 //     to specify BloomFilter.  The above string is equivalent to calling
@@ -239,15 +239,15 @@ namespace nil {
 // @return status_type::OK() on success.  Otherwise, a non-ok status indicating
 //     error will be returned, and "new_table_options" will be set to
 //     "table_options".
-        status_type GetBlockBasedTableOptionsFromMap(const BlockBasedTableOptions &table_options,
+        status_type GetBlockBasedTableOptionsFromMap(const block_based_table_options &table_options,
                                                      const std::unordered_map<std::string, std::string> &opts_map,
-                                                     BlockBasedTableOptions *new_table_options,
+                                                     block_based_table_options *new_table_options,
                                                      bool input_strings_escaped = false,
                                                      bool ignore_unknown_options = false);
 
-// Take a default PlainTableOptions "table_options" in addition to a
+// Take a default plain_table_options "table_options" in addition to a
 // map "opts_map" of option name to option value to construct the new
-// PlainTableOptions "new_table_options".
+// plain_table_options "new_table_options".
 //
 // @param table_options the default options of the output "new_table_options".
 // @param opts_map an option name to value map for specifying how
@@ -262,9 +262,9 @@ namespace nil {
 // @return status_type::OK() on success.  Otherwise, a non-ok status indicating
 //     error will be returned, and "new_table_options" will be set to
 //     "table_options".
-        status_type GetPlainTableOptionsFromMap(const PlainTableOptions &table_options,
+        status_type GetPlainTableOptionsFromMap(const plain_table_options &table_options,
                                                 const std::unordered_map<std::string, std::string> &opts_map,
-                                                PlainTableOptions *new_table_options,
+                                                plain_table_options *new_table_options,
                                                 bool input_strings_escaped = false,
                                                 bool ignore_unknown_options = false);
 
@@ -273,31 +273,31 @@ namespace nil {
 // following format:
 //   "write_buffer_size=1024;max_write_buffer_number=2"
 // Nested options config is also possible. For example, you can define
-// BlockBasedTableOptions as part of the string for block-based table factory:
+// block_based_table_options as part of the string for block-based table factory:
 //   "write_buffer_size=1024;block_based_table_factory={block_size=4k};"
 //   "max_write_buffer_num=2"
-        status_type GetColumnFamilyOptionsFromString(const ColumnFamilyOptions &base_options,
-                                                     const std::string &opts_str, ColumnFamilyOptions *new_options);
+        status_type GetColumnFamilyOptionsFromString(const column_family_options &base_options,
+                                                     const std::string &opts_str, column_family_options *new_options);
 
-        status_type GetDBOptionsFromString(const DBOptions &base_options, const std::string &opts_str,
-                                           DBOptions *new_options);
+        status_type GetDBOptionsFromString(const db_options &base_options, const std::string &opts_str,
+                                           db_options *new_options);
 
-        status_type GetStringFromDBOptions(std::string *opts_str, const DBOptions &db_options,
+        status_type GetStringFromDBOptions(std::string *opts_str, const db_options &db_options,
                                            const std::string &delimiter = ";  ");
 
-        status_type GetStringFromColumnFamilyOptions(std::string *opts_str, const ColumnFamilyOptions &cf_options,
+        status_type GetStringFromColumnFamilyOptions(std::string *opts_str, const column_family_options &cf_options,
                                                      const std::string &delimiter = ";  ");
 
         status_type GetStringFromCompressionType(std::string *compression_str, compression_type compression_type);
 
         std::vector<compression_type> GetSupportedCompressions();
 
-        status_type GetBlockBasedTableOptionsFromString(const BlockBasedTableOptions &table_options,
+        status_type GetBlockBasedTableOptionsFromString(const block_based_table_options &table_options,
                                                         const std::string &opts_str,
-                                                        BlockBasedTableOptions *new_table_options);
+                                                        block_based_table_options *new_table_options);
 
-        status_type GetPlainTableOptionsFromString(const PlainTableOptions &table_options, const std::string &opts_str,
-                                                   PlainTableOptions *new_table_options);
+        status_type GetPlainTableOptionsFromString(const plain_table_options &table_options, const std::string &opts_str,
+                                                   plain_table_options *new_table_options);
 
         status_type GetMemTableRepFactoryFromString(const std::string &opts_str,
                                                     std::unique_ptr<mem_table_rep_factory> *new_mem_factory);

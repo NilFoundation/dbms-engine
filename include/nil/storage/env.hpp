@@ -40,7 +40,7 @@ namespace nil {
 
         class Logger;
 
-        class RandomAccessFile;
+        class random_access_file;
 
         class SequentialFile;
 
@@ -54,8 +54,8 @@ namespace nil {
 
         class Directory;
 
-        struct DBOptions;
-        struct ImmutableDBOptions;
+        struct db_options;
+        struct immutable_db_options;
         struct MutableDBOptions;
 
         class RateLimiter;
@@ -76,7 +76,7 @@ namespace nil {
             environment_options();
 
             // Construct from Options
-            explicit environment_options(const DBOptions &options);
+            explicit environment_options(const db_options &options);
 
             // If true, then use mmap to read data
             bool use_mmap_reads = false;
@@ -110,13 +110,13 @@ namespace nil {
             // WAL writes
             bool fallocate_with_keep_size = true;
 
-            // See DBOptions doc
+            // See db_options doc
             size_t compaction_readahead_size;
 
-            // See DBOptions doc
+            // See db_options doc
             size_t random_access_max_buffer_size;
 
-            // See DBOptions doc
+            // See db_options doc
             size_t writable_file_max_buffer_size = 1024 * 1024;
 
             // If not nullptr, write rate limiting is enabled for flush and compaction
@@ -161,7 +161,7 @@ namespace nil {
             // status.
             //
             // The returned file may be concurrently accessed by multiple threads.
-            virtual status_type NewRandomAccessFile(const std::string &fname, std::unique_ptr<RandomAccessFile> *result,
+            virtual status_type NewRandomAccessFile(const std::string &fname, std::unique_ptr<random_access_file> *result,
                                                     const environment_options &options) = 0;
 
             // These values match Linux definition
@@ -451,7 +451,7 @@ namespace nil {
             // the environment_options in the parameters, but is optimized for writing log files.
             // Default implementation returns the copy of the same object.
             virtual environment_options OptimizeForLogWrite(const environment_options &env_options,
-                                                            const DBOptions &db_options) const;
+                                                            const db_options &db_options) const;
 
             // OptimizeForManifestWrite will create a new environment_options object that is a copy
             // of the environment_options in the parameters, but is optimized for writing manifest
@@ -462,13 +462,13 @@ namespace nil {
             // a copy of the environment_options in the parameters, but is optimized for writing
             // table files.
             virtual environment_options OptimizeForCompactionTableWrite(const environment_options &env_options,
-                                                                        const ImmutableDBOptions &immutable_ops) const;
+                                                                        const immutable_db_options &immutable_ops) const;
 
             // OptimizeForCompactionTableWrite will create a new environment_options object that
             // is a copy of the environment_options in the parameters, but is optimized for reading
             // table files.
             virtual environment_options OptimizeForCompactionTableRead(const environment_options &env_options,
-                                                                       const ImmutableDBOptions &db_options) const;
+                                                                       const immutable_db_options &db_options) const;
 
             // Returns the status of all threads that belong to the current environment_type.
             virtual status_type GetThreadList(std::vector<ThreadStatus> * /*thread_list*/) {
@@ -565,13 +565,13 @@ namespace nil {
         };
 
 // A file abstraction for randomly reading the contents of a file.
-        class RandomAccessFile {
+        class random_access_file {
         public:
 
-            RandomAccessFile() {
+            random_access_file() {
             }
 
-            virtual ~RandomAccessFile();
+            virtual ~random_access_file();
 
             // Read up to "n" bytes from the file starting at "offset".
             // "scratch[0..n-1]" may be written by this routine.  Sets "*result"
@@ -617,7 +617,7 @@ namespace nil {
             virtual void Hint(AccessPattern /*pattern*/) {
             }
 
-            // Indicates the upper layers if the current RandomAccessFile implementation
+            // Indicates the upper layers if the current random_access_file implementation
             // uses direct IO.
             virtual bool use_direct_io() const {
                 return false;
@@ -761,7 +761,7 @@ namespace nil {
                 *block_size = preallocation_block_size_;
             }
 
-            // For documentation, refer to RandomAccessFile::GetUniqueId()
+            // For documentation, refer to random_access_file::GetUniqueId()
             virtual size_t GetUniqueId(char * /*id*/, size_t /*max_size*/) const {
                 return 0; // Default implementation to prevent issues with backwards
             }
@@ -1084,7 +1084,7 @@ namespace nil {
                 return target_->NewSequentialFile(f, r, options);
             }
 
-            status_type NewRandomAccessFile(const std::string &f, std::unique_ptr<RandomAccessFile> *r,
+            status_type NewRandomAccessFile(const std::string &f, std::unique_ptr<random_access_file> *r,
                                             const environment_options &options) override {
                 return target_->NewRandomAccessFile(f, r, options);
             }
@@ -1281,7 +1281,7 @@ namespace nil {
             }
 
             environment_options OptimizeForLogWrite(const environment_options &env_options,
-                                                    const DBOptions &db_options) const override {
+                                                    const db_options &db_options) const override {
                 return target_->OptimizeForLogWrite(env_options, db_options);
             }
 
@@ -1290,12 +1290,12 @@ namespace nil {
             }
 
             environment_options OptimizeForCompactionTableWrite(const environment_options &env_options,
-                                                                const ImmutableDBOptions &immutable_ops) const override {
+                                                                const immutable_db_options &immutable_ops) const override {
                 return target_->OptimizeForCompactionTableWrite(env_options, immutable_ops);
             }
 
             environment_options OptimizeForCompactionTableRead(const environment_options &env_options,
-                                                               const ImmutableDBOptions &db_options) const override {
+                                                               const immutable_db_options &db_options) const override {
                 return target_->OptimizeForCompactionTableRead(env_options, db_options);
             }
 

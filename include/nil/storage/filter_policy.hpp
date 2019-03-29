@@ -6,7 +6,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// A database can be configured with a custom FilterPolicy object.
+// A database can be configured with a custom filter_policy object.
 // This object is responsible for creating a small filter from a set
 // of keys.  These filters are stored in rocksdb and are consulted
 // automatically by rocksdb to decide whether or not to read some
@@ -83,7 +83,7 @@ namespace nil {
 // For the full filter block, you can plug in your version by implement
 // the FilterBitsBuilder and FilterBitsReader
 //
-// There are two sets of interface in FilterPolicy
+// There are two sets of interface in filter_policy
 // Set 1: CreateFilter, KeyMayMatch: used for blockbased filter
 // Set 2: GetFilterBitsBuilder, GetFilterBitsReader, they are used for
 // full filter.
@@ -91,9 +91,9 @@ namespace nil {
 // RocksDB would first try using functions in Set 2. if they return nullptr,
 // it would use Set 1 instead.
 // You can choose filter type in NewBloomFilterPolicy
-        class FilterPolicy {
+        class filter_policy {
         public:
-            virtual ~FilterPolicy();
+            virtual ~filter_policy();
 
             // Return the name of this policy.  Note that if the filter encoding
             // changes in an incompatible way, the name returned by this method
@@ -124,7 +124,7 @@ namespace nil {
 
             // Get the FilterBitsReader, which is ONLY used for full filter block
             // It contains interface to tell if key can be in filter
-            // The input slice should NOT be deleted by FilterPolicy
+            // The input slice should NOT be deleted by filter_policy
             virtual FilterBitsReader *GetFilterBitsReader(const slice & /*contents*/) const {
                 return nullptr;
             }
@@ -143,11 +143,11 @@ namespace nil {
 //
 // Note: if you are using a custom comparator that ignores some parts
 // of the keys being compared, you must not use NewBloomFilterPolicy()
-// and must provide your own FilterPolicy that also ignores the
+// and must provide your own filter_policy that also ignores the
 // corresponding parts of the keys.  For example, if the comparator
 // ignores trailing spaces, it would be incorrect to use a
-// FilterPolicy (like NewBloomFilterPolicy) that does not ignore
+// filter_policy (like NewBloomFilterPolicy) that does not ignore
 // trailing spaces in keys.
-        extern const FilterPolicy *NewBloomFilterPolicy(int bits_per_key, bool use_block_based_builder = false);
+        extern const filter_policy *NewBloomFilterPolicy(int bits_per_key, bool use_block_based_builder = false);
     }
 }
