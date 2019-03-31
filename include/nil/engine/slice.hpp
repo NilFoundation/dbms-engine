@@ -7,8 +7,8 @@
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
 // slice is a simple structure containing a pointer into some external
-// storage and a size.  The user of a slice must ensure that the slice
-// is not used after the corresponding external storage has been
+// engine and a size.  The user of a slice must ensure that the slice
+// is not used after the corresponding external engine has been
 // deallocated.
 //
 // Multiple threads can invoke const methods on a slice without
@@ -60,7 +60,7 @@ namespace nil {
                 size_ = (s == nullptr) ? 0 : strlen(s);
             }
 
-            // Create a single slice from SliceParts using buf as storage.
+            // Create a single slice from SliceParts using buf as engine.
             // buf must exist as long as the returned slice exists.
             slice(const struct SliceParts &parts, std::string *buf);
 

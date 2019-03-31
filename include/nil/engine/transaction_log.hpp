@@ -119,7 +119,7 @@ namespace nil {
 
             // The read options for TransactionLogIterator.
             struct ReadOptions {
-                // If true, all data read from underlying storage will be
+                // If true, all data read from underlying engine will be
                 // verified against corresponding checksums.
                 // Default: true
                 bool verify_checksums_;

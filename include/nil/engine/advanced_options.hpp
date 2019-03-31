@@ -150,7 +150,7 @@ namespace nil {
         struct advanced_column_family_options {
             // The maximum number of write buffers that are built up in memory.
             // The default and the minimum number is 2, so that when 1 write buffer
-            // is being flushed to storage, new writes can continue to the other
+            // is being flushed to engine, new writes can continue to the other
             // write buffer.
             // If max_write_buffer_number > 3, writing will be slowed down to
             // options.delayed_write_rate if we are writing to the last write buffer
@@ -162,11 +162,11 @@ namespace nil {
             int max_write_buffer_number = 2;
 
             // The minimum number of write buffers that will be merged together
-            // before writing to storage.  If set to 1, then
+            // before writing to engine.  If set to 1, then
             // all write buffers are flushed to L0 as individual files and this increases
             // read amplification because a get request has to check in all of these
             // files. Also, an in-memory merge may result in writing lesser
-            // data to storage if there are duplicate records in each of these
+            // data to engine if there are duplicate records in each of these
             // individual write buffers.  Default: 1
             int min_write_buffer_number_to_merge = 1;
 

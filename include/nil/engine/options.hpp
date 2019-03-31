@@ -213,7 +213,7 @@ namespace nil {
             //    ~400-800MB/s decompression
             //
             // Note that these speeds are significantly faster than most
-            // persistent storage speeds, and therefore it is typically never
+            // persistent engine speeds, and therefore it is typically never
             // worth switching to kNoCompression.  Even if the input data is
             // incompressible, the kSnappyCompression implementation will
             // efficiently detect that and will switch to uncompressed mode.
@@ -469,7 +469,7 @@ namespace nil {
             // If non-null, then we should collect metrics about database operations
             std::shared_ptr<Statistics> statistics = nullptr;
 
-            // By default, writes to stable storage use fdatasync (on platforms
+            // By default, writes to stable engine use fdatasync (on platforms
             // where this function is available). If this option is true,
             // fsync is used instead.
             //
@@ -620,7 +620,7 @@ namespace nil {
             // manifest file is rolled over on reaching this limit.
             // The older manifest file be deleted.
             // The default value is 1GB so that the manifest file can grow, but not
-            // reach the limit of storage capacity.
+            // reach the limit of engine capacity.
             uint64_t max_manifest_file_size = 1024 * 1024 * 1024;
 
             // Number of shards used for table cache.
@@ -1067,9 +1067,9 @@ namespace nil {
 // level. For example, if an application specifies kBlockCacheTier then the
 // Get call will process data that is already processed in the memtable or
 // the block cache. It will not page in data from the OS cache or data that
-// resides in storage.
+// resides in engine.
         enum ReadTier {
-            kReadAllTier = 0x0,     // data in memtable, block cache, OS cache or storage
+            kReadAllTier = 0x0,     // data in memtable, block cache, OS cache or engine
             kBlockCacheTier = 0x1,  // data in memtable or block cache
             kPersistedTier = 0x2,   // persisted data.  When WAL is disabled, this option
             // will skip data in memtable.
@@ -1127,7 +1127,7 @@ namespace nil {
             // Default: kReadAllTier
             ReadTier read_tier;
 
-            // If true, all data read from underlying storage will be
+            // If true, all data read from underlying engine will be
             // verified against corresponding checksums.
             // Default: true
             bool verify_checksums;
@@ -1382,7 +1382,7 @@ namespace nil {
 
 // TraceOptions is used for StartTrace
         struct TraceOptions {
-            // To avoid the trace file size grows large than the storage space,
+            // To avoid the trace file size grows large than the engine space,
             // user can set the max trace file size in Bytes. Default is 64GB
             uint64_t max_trace_file_size = uint64_t{64} * 1024 * 1024 * 1024;
             // Specify trace sampling option, i.e. capture one per how many requests.

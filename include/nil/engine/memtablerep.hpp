@@ -151,7 +151,7 @@ namespace nil {
             virtual void MarkReadOnly() {
             }
 
-            // Notify this table rep that it has been flushed to stable storage.
+            // Notify this table rep that it has been flushed to stable engine.
             // By default, does nothing.
             //
             // Invariant: MarkReadOnly() is called, before MarkFlushed().

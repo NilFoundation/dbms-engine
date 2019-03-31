@@ -36,15 +36,15 @@ namespace nil {
             unsigned int max_merge_width;
 
             // The size amplification is defined as the amount (in percentage) of
-            // additional storage needed to store a single byte of data in the database.
+            // additional engine needed to store a single byte of data in the database.
             // For example, a size amplification of 2% means that a database that
             // contains 100 bytes of user-data may occupy upto 102 bytes of
-            // physical storage. By this definition, a fully compacted database has
+            // physical engine. By this definition, a fully compacted database has
             // a size amplification of 0%. Rocksdb uses the following heuristic
             // to calculate size amplification: it assumes that all files excluding
             // the earliest file contribute to the size amplification.
             // Default: 200, which means that a 100 byte database could require upto
-            // 300 bytes of storage.
+            // 300 bytes of engine.
             unsigned int max_size_amplification_percent;
 
             // If this option is set to be -1 (the default value), all the output files

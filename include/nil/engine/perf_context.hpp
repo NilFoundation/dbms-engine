@@ -59,7 +59,7 @@ namespace nil {
 
             std::string ToString(bool exclude_zero_counters = false) const;
 
-            // enable per level perf context and allocate storage for PerfContextByLevel
+            // enable per level perf context and allocate engine for PerfContextByLevel
             void EnablePerLevelPerfContext();
 
             // temporarily disable per level perf contxt by setting the flag to false

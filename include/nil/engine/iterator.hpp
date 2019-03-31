@@ -71,13 +71,13 @@ namespace nil {
             // REQUIRES: Valid()
             virtual void Prev() = 0;
 
-            // Return the key for the current entry.  The underlying storage for
+            // Return the key for the current entry.  The underlying engine for
             // the returned slice is valid only until the next modification of
             // the iterator.
             // REQUIRES: Valid()
             virtual slice key() const = 0;
 
-            // Return the value for the current entry.  The underlying storage for
+            // Return the value for the current entry.  The underlying engine for
             // the returned slice is valid only until the next modification of
             // the iterator.
             // REQUIRES: Valid()

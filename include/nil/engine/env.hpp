@@ -749,7 +749,7 @@ namespace nil {
             /*
              * Get and set the default pre-allocation block size for writes to
              * this file.  If non-zero, then Allocate will be used to extend the
-             * underlying storage of a file (generally via fallocate) if the environment_type
+             * underlying engine of a file (generally via fallocate) if the environment_type
              * instance supports it.
              */
             virtual void SetPreallocationBlockSize(size_t size) {
@@ -1406,7 +1406,7 @@ namespace nil {
         };
 
 // Returns a new environment that stores its data in memory and delegates
-// all non-file-storage tasks to base_env. The caller must delete the result
+// all non-file-engine tasks to base_env. The caller must delete the result
 // when it is no longer needed.
 // *base_env must remain live while the result is in use.
         environment_type *NewMemEnv(environment_type *base_env);

@@ -550,7 +550,7 @@ namespace nil {
                 static const std::string kNumDeletesImmMemTables;
 
                 //  "rocksdb.estimate-num-keys" - returns estimated number of total keys in
-                //      the active and unflushed immutable memtables and storage.
+                //      the active and unflushed immutable memtables and engine.
                 static const std::string kEstimateNumKeys;
 
                 //  "rocksdb.estimate-table-readers-mem" - returns estimated memory used for
@@ -779,7 +779,7 @@ namespace nil {
                 GetApproximateSizes(column_family, range, n, sizes, include_flags);
             }
 
-            // Compact the underlying storage for the key range [*begin,*end].
+            // Compact the underlying engine for the key range [*begin,*end].
             // The actual compaction interval might be superset of [*begin, *end].
             // In particular, deleted and overwritten versions are discarded,
             // and the data is rearranged to reduce the cost of operations

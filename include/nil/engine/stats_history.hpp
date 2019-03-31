@@ -40,7 +40,7 @@ namespace nil {
             virtual uint64_t GetStatsTime() const = 0;
 
             // Return the current stats history as an std::map which specifies the
-            // mapping from stats name to stats value . The underlying storage
+            // mapping from stats name to stats value . The underlying engine
             // for the returned map is valid only until the next modification of
             // the iterator.
             // REQUIRES: Valid()

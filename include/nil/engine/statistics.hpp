@@ -168,7 +168,7 @@ namespace nil {
             NUMBER_MULTIGET_BYTES_READ,
 
             // Number of deletes records that were not required to be
-            // written to storage because key does not exist
+            // written to engine because key does not exist
                     NUMBER_FILTERED_DELETES,
             NUMBER_MERGE_FAILURES,
 
