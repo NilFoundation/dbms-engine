@@ -1,25 +1,17 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-// Copyright (c) 2011 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
-//
-// WriteBatch holds a collection of updates to apply atomically to a DB.
+// write_batch holds a collection of updates to apply atomically to a database.
 //
 // The updates are applied in the order in which they are added
-// to the WriteBatch.  For example, the value of "key" will be "v3"
+// to the write_batch.  For example, the value of "key" will be "v3"
 // after the following batch is written:
 //
-//    batch.Put("key", "v1");
-//    batch.Delete("key");
-//    batch.Put("key", "v2");
-//    batch.Put("key", "v3");
+//    batch.insert("key", "v1");
+//    batch.remove("key");
+//    batch.insert("key", "v2");
+//    batch.insert("key", "v3");
 //
-// Multiple threads can invoke const methods on a WriteBatch without
+// Multiple threads can invoke const methods on a write_batch without
 // external synchronization, but if any of the threads may call a
-// non-const method, all threads accessing the same WriteBatch must use
+// non-const method, all threads accessing the same write_batch must use
 // external synchronization.
 
 #pragma once
@@ -29,8 +21,8 @@
 #include <string>
 #include <cstdint>
 
-#include <nil/storage/status.hpp>
-#include <nil/storage/write_batch_base.hpp>
+#include <nil/engine/status.hpp>
+#include <nil/engine/write_batch_base.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -40,7 +32,7 @@ namespace nil {
         class column_family_handle;
 
         struct SavePoints;
-        struct SliceParts;
+        struct slice_parts;
 
         struct SavePoint {
             size_t size;  // size of rep_
@@ -64,149 +56,148 @@ namespace nil {
             }
         };
 
-        class WriteBatch : public WriteBatchBase {
+        class write_batch : public write_batch_base {
         public:
-            explicit WriteBatch(size_t reserved_bytes = 0, size_t max_bytes = 0);
+            explicit write_batch(size_t reserved_bytes = 0, size_t max_bytes = 0);
 
-            ~WriteBatch() override;
+            ~write_batch() override;
 
-            using WriteBatchBase::Put;
+            using write_batch_base::insert;
 
             // Store the mapping "key->value" in the database.
-            status_type Put(column_family_handle *column_family, const slice &key, const slice &value) override;
+            status_type insert(column_family_handle *column_family, const slice &key, const slice &value) override;
 
-            status_type Put(const slice &key, const slice &value) override {
-                return Put(nullptr, key, value);
+            status_type insert(const slice &key, const slice &value) override {
+                return insert(nullptr, key, value);
             }
 
-            // Variant of Put() that gathers output like writev(2).  The key and value
+            // Variant of insert() that gathers output like writev(2).  The key and value
             // that will be written to the database are concatenations of arrays of
             // slices.
-            status_type Put(column_family_handle *column_family, const SliceParts &key,
-                            const SliceParts &value) override;
+            status_type insert(column_family_handle *column_family, const slice_parts &key, const slice_parts &value) override;
 
-            status_type Put(const SliceParts &key, const SliceParts &value) override {
-                return Put(nullptr, key, value);
+            status_type insert(const slice_parts &key, const slice_parts &value) override {
+                return insert(nullptr, key, value);
             }
 
-            using WriteBatchBase::Delete;
+            using write_batch_base::remove;
 
             // If the database contains a mapping for "key", erase it.  Else do nothing.
-            status_type Delete(column_family_handle *column_family, const slice &key) override;
+            status_type remove(column_family_handle *column_family, const slice &key) override;
 
-            status_type Delete(const slice &key) override {
-                return Delete(nullptr, key);
+            status_type remove(const slice &key) override {
+                return remove(nullptr, key);
             }
 
-            // variant that takes SliceParts
-            status_type Delete(column_family_handle *column_family, const SliceParts &key) override;
+            // variant that takes slice_parts
+            status_type remove(column_family_handle *column_family, const slice_parts &key) override;
 
-            status_type Delete(const SliceParts &key) override {
-                return Delete(nullptr, key);
+            status_type remove(const slice_parts &key) override {
+                return remove(nullptr, key);
             }
 
-            using WriteBatchBase::SingleDelete;
+            using write_batch_base::single_remove;
 
-            // WriteBatch implementation of DB::SingleDelete().  See db.h.
-            status_type SingleDelete(column_family_handle *column_family, const slice &key) override;
+            // write_batch implementation of database::single_remove().  See db.h.
+            status_type single_remove(column_family_handle *column_family, const slice &key) override;
 
-            status_type SingleDelete(const slice &key) override {
-                return SingleDelete(nullptr, key);
+            status_type single_remove(const slice &key) override {
+                return single_remove(nullptr, key);
             }
 
-            // variant that takes SliceParts
-            status_type SingleDelete(column_family_handle *column_family, const SliceParts &key) override;
+            // variant that takes slice_parts
+            status_type single_remove(column_family_handle *column_family, const slice_parts &key) override;
 
-            status_type SingleDelete(const SliceParts &key) override {
-                return SingleDelete(nullptr, key);
+            status_type single_remove(const slice_parts &key) override {
+                return single_remove(nullptr, key);
             }
 
-            using WriteBatchBase::DeleteRange;
+            using write_batch_base::remove_range;
 
-            // WriteBatch implementation of DB::DeleteRange().  See db.h.
-            status_type DeleteRange(column_family_handle *column_family, const slice &begin_key,
-                                    const slice &end_key) override;
+            // write_batch implementation of database::remove_range().  See db.h.
+            status_type remove_range(column_family_handle *column_family, const slice &begin_key,
+                                     const slice &end_key) override;
 
-            status_type DeleteRange(const slice &begin_key, const slice &end_key) override {
-                return DeleteRange(nullptr, begin_key, end_key);
+            status_type remove_range(const slice &begin_key, const slice &end_key) override {
+                return remove_range(nullptr, begin_key, end_key);
             }
 
-            // variant that takes SliceParts
-            status_type DeleteRange(column_family_handle *column_family, const SliceParts &begin_key,
-                                    const SliceParts &end_key) override;
+            // variant that takes slice_parts
+            status_type remove_range(column_family_handle *column_family, const slice_parts &begin_key,
+                                     const slice_parts &end_key) override;
 
-            status_type DeleteRange(const SliceParts &begin_key, const SliceParts &end_key) override {
-                return DeleteRange(nullptr, begin_key, end_key);
+            status_type remove_range(const slice_parts &begin_key, const slice_parts &end_key) override {
+                return remove_range(nullptr, begin_key, end_key);
             }
 
-            using WriteBatchBase::Merge;
+            using write_batch_base::merge;
 
-            // Merge "value" with the existing value of "key" in the database.
+            // merge "value" with the existing value of "key" in the database.
             // "key->merge(existing, value)"
-            status_type Merge(column_family_handle *column_family, const slice &key, const slice &value) override;
+            status_type merge(column_family_handle *column_family, const slice &key, const slice &value) override;
 
-            status_type Merge(const slice &key, const slice &value) override {
-                return Merge(nullptr, key, value);
+            status_type merge(const slice &key, const slice &value) override {
+                return merge(nullptr, key, value);
             }
 
-            // variant that takes SliceParts
-            status_type Merge(column_family_handle *column_family, const SliceParts &key,
-                              const SliceParts &value) override;
+            // variant that takes slice_parts
+            status_type merge(column_family_handle *column_family, const slice_parts &key,
+                              const slice_parts &value) override;
 
-            status_type Merge(const SliceParts &key, const SliceParts &value) override {
-                return Merge(nullptr, key, value);
+            status_type merge(const slice_parts &key, const slice_parts &value) override {
+                return merge(nullptr, key, value);
             }
 
-            using WriteBatchBase::PutLogData;
+            using write_batch_base::put_log_data;
 
-            // Append a blob of arbitrary size to the records in this batch. The blob will
+            // append a blob of arbitrary size to the records in this batch. The blob will
             // be stored in the transaction log but not in any other file. In particular,
             // it will not be persisted to the SST files. When iterating over this
-            // WriteBatch, WriteBatch::Handler::LogData will be called with the contents
+            // write_batch, write_batch::handler::LogData will be called with the contents
             // of the blob as it is encountered. Blobs, puts, deletes, and merges will be
             // encountered in the same order in which they were inserted. The blob will
             // NOT consume sequence number(s) and will NOT increase the count of the batch
             //
             // Example application: add timestamps to the transaction log for use in
             // replication.
-            status_type PutLogData(const slice &blob) override;
+            status_type put_log_data(const slice &blob) override;
 
-            using WriteBatchBase::Clear;
+            using write_batch_base::clear;
 
-            // Clear all updates buffered in this batch.
-            void Clear() override;
+            // clear all updates buffered in this batch.
+            void clear() override;
 
-            // Records the state of the batch for future calls to RollbackToSavePoint().
+            // Records the state of the batch for future calls to rollback_to_save_point().
             // May be called multiple times to set multiple save points.
-            void SetSavePoint() override;
+            void set_save_point() override;
 
-            // remove all entries in this batch (Put, Merge, Delete, PutLogData) since the
-            // most recent call to SetSavePoint() and removes the most recent save point.
-            // If there is no previous call to SetSavePoint(), status_type::NotFound()
+            // remove all entries in this batch (insert, merge, remove, put_log_data) since the
+            // most recent call to set_save_point() and removes the most recent save point.
+            // If there is no previous call to set_save_point(), status_type::NotFound()
             // will be returned.
             // Otherwise returns status_type::OK().
-            status_type RollbackToSavePoint() override;
+            status_type rollback_to_save_point() override;
 
             // Pop the most recent save point.
-            // If there is no previous call to SetSavePoint(), status_type::NotFound()
+            // If there is no previous call to set_save_point(), status_type::NotFound()
             // will be returned.
             // Otherwise returns status_type::OK().
-            status_type PopSavePoint() override;
+            status_type pop_save_point() override;
 
             // Support for iterating over the contents of a batch.
-            class Handler {
+            class handler {
             public:
-                virtual ~Handler();
+                virtual ~handler();
                 // All handler functions in this class provide default implementations so
-                // we won't break existing clients of Handler on a source code level when
+                // we won't break existing clients of handler on a source code level when
                 // adding a new member function.
 
-                // default implementation will just call Put without column family for
+                // default implementation will just call insert without column family for
                 // backwards compatibility. If the column family is not default,
                 // the function is noop
                 virtual status_type PutCF(uint32_t column_family_id, const slice &key, const slice &value) {
                     if (column_family_id == 0) {
-                        // Put() historically doesn't return status. We didn't want to be
+                        // insert() historically doesn't return status. We didn't want to be
                         // backwards incompatible so we didn't change the return status
                         // (this is a public API). We do an ordinary get and return status_type::OK()
                         Put(key, value);
@@ -284,13 +275,13 @@ namespace nil {
                     return status_type::InvalidArgument("MarkCommit() handler not defined.");
                 }
 
-                // Continue is called by WriteBatch::Iterate. If it returns false,
+                // Continue is called by write_batch::Iterate. If it returns false,
                 // iteration is halted. Otherwise, it continues iterating. The default
                 // implementation always returns true.
                 virtual bool Continue();
 
             protected:
-                friend class WriteBatch;
+                friend class write_batch;
 
                 virtual bool WriteAfterCommit() const {
                     return true;
@@ -301,7 +292,7 @@ namespace nil {
                 }
             };
 
-            status_type Iterate(Handler *handler) const;
+            status_type Iterate(handler *handler) const;
 
             // Retrieve the serialized version of this batch.
             const std::string &Data() const {
@@ -343,26 +334,26 @@ namespace nil {
             // Returns trie if MarkRollback will be called during Iterate
             bool HasRollback() const;
 
-            using WriteBatchBase::GetWriteBatch;
+            using write_batch_base::GetWriteBatch;
 
-            WriteBatch *GetWriteBatch() override {
+            write_batch *GetWriteBatch() override {
                 return this;
             }
 
             // Constructor with a serialized string object
-            explicit WriteBatch(const std::string &rep);
+            explicit write_batch(const std::string &rep);
 
-            explicit WriteBatch(std::string &&rep);
+            explicit write_batch(std::string &&rep);
 
-            WriteBatch(const WriteBatch &src);
+            write_batch(const write_batch &src);
 
-            WriteBatch(WriteBatch &&src) noexcept;
+            write_batch(write_batch &&src) noexcept;
 
-            WriteBatch &operator=(const WriteBatch &src);
+            write_batch &operator=(const write_batch &src);
 
-            WriteBatch &operator=(WriteBatch &&src);
+            write_batch &operator=(write_batch &&src);
 
-            // marks this point in the WriteBatch as the last record to
+            // marks this point in the write_batch as the last record to
             // be inserted into the WAL, provided the WAL is enabled
             void MarkWalTerminationPoint();
 
@@ -386,7 +377,7 @@ namespace nil {
 
             SavePoints *save_points_;
 
-            // When sending a WriteBatch through WriteImpl we might want to
+            // When sending a write_batch through WriteImpl we might want to
             // specify that only the first x records of the batch be written to
             // the WAL.
             SavePoint wal_term_point_;

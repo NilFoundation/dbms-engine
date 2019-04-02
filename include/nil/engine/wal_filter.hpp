@@ -1,8 +1,3 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
 #include <string>
@@ -11,7 +6,7 @@
 namespace nil {
     namespace dcdb {
 
-        class WriteBatch;
+        class write_batch;
 
 // WALFilter allows an application to inspect write-ahead-log (WAL)
 // records or modify their processing on recovery.
@@ -58,7 +53,7 @@ namespace nil {
             //    discarding the logs from current record onwards.
             //
             // @params log_number     log_number of the current log.
-            //                        Filter might use this to determine if the log
+            //                        filter might use this to determine if the log
             //                        record is applicable to a certain column family.
             // @params log_file_name  log file name - only for informational purposes
             // @params batch          batch encountered in the log during recovery
@@ -75,16 +70,16 @@ namespace nil {
             //                        Please see WalProcessingOption enum above for
             //                        details.
             virtual WalProcessingOption LogRecordFound(unsigned long long /*log_number*/,
-                                                       const std::string & /*log_file_name*/, const WriteBatch &batch,
-                                                       WriteBatch *new_batch, bool *batch_changed) {
-                // Default implementation falls back to older function for compatibility
+                                                       const std::string & /*log_file_name*/, const write_batch &batch,
+                                                       write_batch *new_batch, bool *batch_changed) {
+                // default_environment implementation falls back to older function for compatibility
                 return LogRecord(batch, new_batch, batch_changed);
             }
 
             // Please see the comments for LogRecord above. This function is for
             // compatibility only and contains a subset of parameters.
             // New code should use the function above.
-            virtual WalProcessingOption LogRecord(const WriteBatch & /*batch*/, WriteBatch * /*new_batch*/,
+            virtual WalProcessingOption LogRecord(const write_batch & /*batch*/, write_batch * /*new_batch*/,
                                                   bool * /*batch_changed*/) const {
                 return WalProcessingOption::kContinueProcessing;
             }

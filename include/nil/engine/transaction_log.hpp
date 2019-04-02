@@ -1,13 +1,8 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
-#include <nil/storage/status.hpp>
-#include <nil/storage/types.hpp>
-#include <nil/storage/write_batch.hpp>
+#include <nil/engine/status.hpp>
+#include <nil/engine/types.hpp>
+#include <nil/engine/write_batch.hpp>
 
 #include <memory>
 #include <vector>
@@ -54,17 +49,17 @@ namespace nil {
             virtual WalFileType Type() const = 0;
 
             // Starting sequence number of writebatch written in this log file
-            virtual SequenceNumber StartSequence() const = 0;
+            virtual sequence_number StartSequence() const = 0;
 
             // Size of log file on disk in Bytes
             virtual uint64_t SizeFileBytes() const = 0;
         };
 
         struct BatchResult {
-            SequenceNumber sequence = 0;
-            std::unique_ptr<WriteBatch> writeBatchPtr;
+            sequence_number sequence = 0;
+            std::unique_ptr<write_batch> writeBatchPtr;
 
-            // Add empty __ctor and __dtor for the rule of five
+            // add empty __ctor and __dtor for the rule of five
             // However, preserve the original semantics and prohibit copying
             // as the std::unique_ptr member does not copy.
             BatchResult() {
@@ -88,23 +83,23 @@ namespace nil {
             }
         };
 
-// A TransactionLogIterator is used to iterate over the transactions in a db.
+// A transaction_log_iterator is used to iterate over the transactions in a db.
 // One run of the iterator is continuous, i.e. the iterator will stop at the
 // beginning of any gap in sequences
-        class TransactionLogIterator {
+        class transaction_log_iterator {
         public:
-            TransactionLogIterator() {
+            transaction_log_iterator() {
             }
 
-            virtual ~TransactionLogIterator() {
+            virtual ~transaction_log_iterator() {
             }
 
-            // An iterator is either positioned at a WriteBatch or not valid.
+            // An iterator is either positioned at a write_batch or not valid.
             // This method returns true if the iterator is valid.
             // Can read data from a valid iterator.
             virtual bool Valid() = 0;
 
-            // Moves the iterator to the next WriteBatch.
+            // Moves the iterator to the next write_batch.
             // REQUIRES: Valid() to be true.
             virtual void Next() = 0;
 
@@ -117,17 +112,17 @@ namespace nil {
             // ONLY use if Valid() is true and status() is OK.
             virtual BatchResult GetBatch() = 0;
 
-            // The read options for TransactionLogIterator.
-            struct ReadOptions {
+            // The read options for transaction_log_iterator.
+            struct read_options {
                 // If true, all data read from underlying engine will be
                 // verified against corresponding checksums.
-                // Default: true
+                // default_environment: true
                 bool verify_checksums_;
 
-                ReadOptions() : verify_checksums_(true) {
+                read_options() : verify_checksums_(true) {
                 }
 
-                explicit ReadOptions(bool verify_checksums) : verify_checksums_(verify_checksums) {
+                explicit read_options(bool verify_checksums) : verify_checksums_(verify_checksums) {
                 }
             };
         };

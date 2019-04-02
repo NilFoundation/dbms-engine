@@ -1,8 +1,3 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
 #include <cstdint>
@@ -11,20 +6,20 @@
 #include <string>
 #include <vector>
 
-#include <nil/storage/types.hpp>
+#include <nil/engine/types.hpp>
 
 namespace nil {
     namespace dcdb {
-        struct ColumnFamilyMetaData;
+        struct column_family_meta_data;
         struct LevelMetaData;
         struct SstFileMetaData;
 
 // The metadata that describes a column family.
-        struct ColumnFamilyMetaData {
-            ColumnFamilyMetaData() : size(0), file_count(0), name("") {
+        struct column_family_meta_data {
+            column_family_meta_data() : size(0), file_count(0), name("") {
             }
 
-            ColumnFamilyMetaData(const std::string &_name, uint64_t _size, const std::vector<LevelMetaData> &&_levels)
+            column_family_meta_data(const std::string &_name, uint64_t _size, const std::vector<LevelMetaData> &&_levels)
                     : size(_size), name(_name), levels(_levels) {
             }
 
@@ -61,7 +56,7 @@ namespace nil {
             }
 
             SstFileMetaData(const std::string &_file_name, const std::string &_path, size_t _size,
-                            SequenceNumber _smallest_seqno, SequenceNumber _largest_seqno,
+                            sequence_number _smallest_seqno, sequence_number _largest_seqno,
                             const std::string &_smallestkey, const std::string &_largestkey,
                             uint64_t _num_reads_sampled, bool _being_compacted) : size(_size), name(_file_name),
                     db_path(_path), smallest_seqno(_smallest_seqno), largest_seqno(_largest_seqno),
@@ -76,8 +71,8 @@ namespace nil {
             // The full path where the file locates.
             std::string db_path;
 
-            SequenceNumber smallest_seqno;  // Smallest sequence number in file.
-            SequenceNumber largest_seqno;   // Largest sequence number in file.
+            sequence_number smallest_seqno;  // Smallest sequence number in file.
+            sequence_number largest_seqno;   // Largest sequence number in file.
             std::string smallestkey;     // Smallest user defined key in the file.
             std::string largestkey;      // Largest user defined key in the file.
             uint64_t num_reads_sampled;  // How many times the file is read.
@@ -88,10 +83,10 @@ namespace nil {
         };
 
 // The full set of metadata associated with each SST file.
-        struct LiveFileMetaData : SstFileMetaData {
-            std::string column_family_name;  // Name of the column family
+        struct live_file_meta_data : SstFileMetaData {
+            std::string column_family_name;  // name of the column family
             int level;               // Level at which this file resides.
-            LiveFileMetaData() : column_family_name(), level(0) {
+            live_file_meta_data() : column_family_name(), level(0) {
             }
         };
     }

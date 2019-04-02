@@ -11,8 +11,8 @@
 #include <time.h>
 #include <iostream>
 #include "nil/dcdb/port/sys_time.hpp"
-#include <nil/storage/env.hpp>
-#include <nil/storage/status.hpp>
+#include <nil/engine/env.hpp>
+#include <nil/engine/status.hpp>
 
 #ifdef USE_HDFS
 #include <hdfs.h>
@@ -56,7 +56,7 @@ class HdfsEnv : public environment_type {
   }
 
   virtual status_type NewSequentialFile(const std::string& fname,
-                                   std::unique_ptr<SequentialFile>* result,
+                                   std::unique_ptr<sequential_file>* result,
                                    const environment_options& options);
 
   virtual status_type NewRandomAccessFile(const std::string& fname,
@@ -256,137 +256,133 @@ namespace nil {
             virtual ~HdfsEnv() {
             }
 
-            virtual status_type NewSequentialFile(const std::string &fname, std::unique_ptr<SequentialFile> *result,
-                                                  const environment_options &options) override;
+            virtual status_type new_sequential_file(const std::string &fname, std::unique_ptr<sequential_file> *result,
+                                                    const environment_options &options) override;
 
-            virtual status_type NewRandomAccessFile(const std::string & /*fname*/,
-                                                    std::unique_ptr<random_access_file> * /*result*/,
-                                                    const environment_options & /*options*/) override {
+            virtual status_type new_random_access_file(const std::string & /*fname*/,
+                                                       std::unique_ptr<random_access_file> * /*result*/,
+                                                       const environment_options & /*options*/) override {
                 return notsup;
             }
 
-            virtual status_type NewWritableFile(const std::string & /*fname*/,
-                                                std::unique_ptr<writable_file> * /*result*/,
-                                                const environment_options & /*options*/) override {
+            virtual status_type new_writable_file(const std::string & /*fname*/,
+                                                  std::unique_ptr<writable_file> * /*result*/,
+                                                  const environment_options & /*options*/) override {
                 return notsup;
             }
 
-            virtual status_type NewDirectory(const std::string & /*name*/,
-                                             std::unique_ptr<Directory> * /*result*/) override {
+            virtual status_type new_directory(const std::string & /*name*/, std::unique_ptr<directory> * /*result*/) override {
                 return notsup;
             }
 
-            virtual status_type FileExists(const std::string & /*fname*/) override {
+            virtual status_type file_exists(const std::string & /*fname*/) override {
                 return notsup;
             }
 
-            virtual status_type GetChildren(const std::string & /*path*/,
-                                            std::vector<std::string> * /*result*/) override {
+            virtual status_type get_children(const std::string & /*path*/, std::vector<std::string> * /*result*/) override {
                 return notsup;
             }
 
-            virtual status_type DeleteFile(const std::string & /*fname*/) override {
+            virtual status_type delete_file(const std::string & /*fname*/) override {
                 return notsup;
             }
 
-            virtual status_type CreateDir(const std::string & /*name*/) override {
+            virtual status_type create_dir(const std::string & /*name*/) override {
                 return notsup;
             }
 
-            virtual status_type CreateDirIfMissing(const std::string & /*name*/) override {
+            virtual status_type create_dir_if_missing(const std::string & /*name*/) override {
                 return notsup;
             }
 
-            virtual status_type DeleteDir(const std::string & /*name*/) override {
+            virtual status_type delete_dir(const std::string & /*name*/) override {
                 return notsup;
             }
 
-            virtual status_type GetFileSize(const std::string & /*fname*/, uint64_t * /*size*/) override {
+            virtual status_type get_file_size(const std::string & /*fname*/, uint64_t * /*size*/) override {
                 return notsup;
             }
 
-            virtual status_type GetFileModificationTime(const std::string & /*fname*/, uint64_t * /*time*/) override {
+            virtual status_type get_file_modification_time(const std::string & /*fname*/, uint64_t * /*time*/) override {
                 return notsup;
             }
 
-            virtual status_type RenameFile(const std::string & /*src*/, const std::string & /*target*/) override {
+            virtual status_type rename_file(const std::string & /*src*/, const std::string & /*target*/) override {
                 return notsup;
             }
 
-            virtual status_type LinkFile(const std::string & /*src*/, const std::string & /*target*/) override {
+            virtual status_type link_file(const std::string & /*src*/, const std::string & /*target*/) override {
                 return notsup;
             }
 
-            virtual status_type LockFile(const std::string & /*fname*/, FileLock ** /*lock*/) override {
+            virtual status_type lock_file(const std::string & /*fname*/, FileLock ** /*lock*/) override {
                 return notsup;
             }
 
-            virtual status_type UnlockFile(FileLock * /*lock*/) override {
+            virtual status_type unlock_file(FileLock * /*lock*/) override {
                 return notsup;
             }
 
-            virtual status_type NewLogger(const std::string & /*fname*/,
-                                          std::shared_ptr<Logger> * /*result*/) override {
+            virtual status_type new_logger(const std::string & /*fname*/, std::shared_ptr<Logger> * /*result*/) override {
                 return notsup;
             }
 
-            virtual void Schedule(void (* /*function*/)(void *arg), void * /*arg*/, Priority /*pri*/ = LOW,
-                                  void * /*tag*/ = nullptr, void (* /*unschedFunction*/)(void *arg) = 0) override {
+            virtual void schedule(void (* /*function*/)(void *arg), void * /*arg*/, Priority /*pri*/ = LOW,
+                                  void * /*tag*/ = nullptr, void (* /*unschedFunction*/)(void *arg) = nullptr) override {
             }
 
-            virtual int UnSchedule(void * /*tag*/, Priority /*pri*/) override {
+            virtual int unschedule(void * /*tag*/, Priority /*pri*/) override {
                 return 0;
             }
 
-            virtual void StartThread(void (* /*function*/)(void *arg), void * /*arg*/) override {
+            virtual void start_thread(void (* /*function*/)(void *arg), void * /*arg*/) override {
             }
 
-            virtual void WaitForJoin() override {
+            virtual void wait_for_join() override {
             }
 
-            virtual unsigned int GetThreadPoolQueueLen(Priority /*pri*/ = LOW) const override {
+            virtual unsigned int get_thread_pool_queue_len(Priority pri = LOW) const override {
                 return 0;
             }
 
-            virtual status_type GetTestDirectory(std::string * /*path*/) override {
+            virtual status_type get_test_directory(std::string * /*path*/) override {
                 return notsup;
             }
 
-            virtual uint64_t NowMicros() override {
+            virtual uint64_t now_micros() override {
                 return 0;
             }
 
-            virtual void SleepForMicroseconds(int /*micros*/) override {
+            virtual void sleep_for_microseconds(int /*micros*/) override {
             }
 
-            virtual status_type GetHostName(char * /*name*/, uint64_t /*len*/) override {
+            virtual status_type get_host_name(char * /*name*/, uint64_t /*len*/) override {
                 return notsup;
             }
 
-            virtual status_type GetCurrentTime(int64_t * /*unix_time*/) override {
+            virtual status_type get_current_time(int64_t * /*unix_time*/) override {
                 return notsup;
             }
 
-            virtual status_type GetAbsolutePath(const std::string & /*db_path*/,
-                                                std::string * /*outputpath*/) override {
+            virtual status_type get_absolute_path(const std::string & /*db_path*/, std::string * /*outputpath*/) override {
                 return notsup;
             }
 
-            virtual void SetBackgroundThreads(int /*number*/, Priority /*pri*/ = LOW) override {
+            virtual void set_background_threads(int /*number*/, Priority /*pri*/ = LOW) override {
             }
 
-            virtual int GetBackgroundThreads(Priority /*pri*/ = LOW) override {
+            virtual int get_background_threads(Priority /*pri*/ = LOW) override {
                 return 0;
             }
 
-            virtual void IncBackgroundThreadsIfNeeded(int /*number*/, Priority /*pri*/) override {
+            virtual void inc_background_threads_if_needed(int /*number*/, Priority /*pri*/) override {
             }
 
-            virtual std::string TimeToString(uint64_t /*number*/) override {
+            virtual std::string time_to_string(uint64_t /*number*/) override {
                 return "";
             }
 
-            virtual uint64_t GetThreadID() const override {
+            virtual uint64_t get_thread_id() const override {
                 return 0;
             }
         };

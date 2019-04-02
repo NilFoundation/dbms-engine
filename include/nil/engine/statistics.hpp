@@ -1,8 +1,3 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
 #include <atomic>
@@ -13,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include <nil/storage/status.hpp>
+#include <nil/engine/status.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -97,11 +92,11 @@ namespace nil {
             // # of memtable misses.
                     MEMTABLE_MISS,
 
-            // # of Get() queries served by L0
+            // # of get() queries served by L0
                     GET_HIT_L0,
-            // # of Get() queries served by L1
+            // # of get() queries served by L1
                     GET_HIT_L1,
-            // # of Get() queries served by L2 and up
+            // # of get() queries served by L2 and up
                     GET_HIT_L2_AND_UP,
 
             /**
@@ -119,18 +114,18 @@ namespace nil {
             // If a compaction was cancelled in sfm to prevent ENOSPC
                     COMPACTION_CANCELLED,
 
-            // Number of keys written to the database via the Put and Write call's
+            // Number of keys written to the database via the insert and write call's
                     NUMBER_KEYS_WRITTEN,
             // Number of Keys read,
                     NUMBER_KEYS_READ,
             // Number keys updated, if inplace update is enabled
                     NUMBER_KEYS_UPDATED,
-            // The number of uncompressed bytes issued by DB::Put(), DB::Delete(),
-            // DB::Merge(), and DB::Write().
+            // The number of uncompressed bytes issued by database::insert(), database::remove(),
+            // database::merge(), and database::write().
                     BYTES_WRITTEN,
-            // The number of uncompressed bytes read from DB::Get().  It could be
+            // The number of uncompressed bytes read from database::get().  It could be
             // either from memtables, cache, or table files.
-            // For the number of logical bytes read from DB::MultiGet(),
+            // For the number of logical bytes read from database::multi_get(),
             // please use NUMBER_MULTIGET_BYTES_READ.
                     BYTES_READ,
             // The number of calls to seek/next/prev
@@ -162,7 +157,7 @@ namespace nil {
             // DEPRECATED number of iterators currently open
                     NO_ITERATORS,
 
-            // Number of MultiGet calls, keys read, and bytes read
+            // Number of multi_get calls, keys read, and bytes read
                     NUMBER_MULTIGET_CALLS,
             NUMBER_MULTIGET_KEYS_READ,
             NUMBER_MULTIGET_BYTES_READ,
@@ -199,7 +194,7 @@ namespace nil {
                     WRITE_DONE_BY_SELF,
             WRITE_DONE_BY_OTHER,  // Equivalent to writes done for others
             WRITE_TIMEDOUT,       // Number of writes ending up with timed-out.
-            WRITE_WITH_WAL,       // Number of Write calls that request WAL
+            WRITE_WITH_WAL,       // Number of write calls that request WAL
             COMPACT_READ_BYTES,   // Bytes read during compaction
             COMPACT_WRITE_BYTES,  // Bytes written during compaction
             FLUSH_WRITE_BYTES,    // Bytes written during flush
@@ -223,11 +218,11 @@ namespace nil {
                     ROW_CACHE_HIT,
             ROW_CACHE_MISS,
 
-            // Read amplification statistics.
-            // Read amplification can be calculated using this formula
+            // read amplification statistics.
+            // read amplification can be calculated using this formula
             // (READ_AMP_TOTAL_READ_BYTES / READ_AMP_ESTIMATE_USEFUL_BYTES)
             //
-            // REQUIRES: ReadOptions::read_amp_bytes_per_bit to be enabled
+            // REQUIRES: read_options::read_amp_bytes_per_bit to be enabled
                     READ_AMP_ESTIMATE_USEFUL_BYTES,  // Estimate of total bytes actually used.
             READ_AMP_TOTAL_READ_BYTES,       // Total size of loaded data blocks.
 
@@ -238,13 +233,13 @@ namespace nil {
                     NUMBER_ITER_SKIP,
 
             // BlobDB specific stats
-            // # of Put/PutTTL/PutUntil to BlobDB.
+            // # of insert/PutTTL/PutUntil to BlobDB.
                     BLOB_DB_NUM_PUT,
-            // # of Write to BlobDB.
+            // # of write to BlobDB.
                     BLOB_DB_NUM_WRITE,
-            // # of Get to BlobDB.
+            // # of get to BlobDB.
                     BLOB_DB_NUM_GET,
-            // # of MultiGet to BlobDB.
+            // # of multi_get to BlobDB.
                     BLOB_DB_NUM_MULTIGET,
             // # of Seek/SeekToFirst/SeekToLast/SeekForPrev to BlobDB iterator.
                     BLOB_DB_NUM_SEEK,
@@ -274,16 +269,16 @@ namespace nil {
                     BLOB_DB_BLOB_FILE_BYTES_READ,
             // # of times a blob files being synced.
                     BLOB_DB_BLOB_FILE_SYNCED,
-            // # of blob index evicted from base DB by BlobDB compaction filter because
+            // # of blob index evicted from base database by BlobDB compaction filter because
             // of expiration.
                     BLOB_DB_BLOB_INDEX_EXPIRED_COUNT,
-            // size of blob index evicted from base DB by BlobDB compaction filter
+            // size of blob index evicted from base database by BlobDB compaction filter
             // because of expiration.
                     BLOB_DB_BLOB_INDEX_EXPIRED_SIZE,
-            // # of blob index evicted from base DB by BlobDB compaction filter because
+            // # of blob index evicted from base database by BlobDB compaction filter because
             // of corresponding file deleted.
                     BLOB_DB_BLOB_INDEX_EVICTED_COUNT,
-            // size of blob index evicted from base DB by BlobDB compaction filter
+            // size of blob index evicted from base database by BlobDB compaction filter
             // because of corresponding file deleted.
                     BLOB_DB_BLOB_INDEX_EVICTED_SIZE,
             // # of blob files being garbage collected.
@@ -324,7 +319,7 @@ namespace nil {
             // # of times snapshot_mutex_ is acquired in the fast path.
                     TXN_SNAPSHOT_MUTEX_OVERHEAD,
 
-            // Number of keys actually found in MultiGet calls (vs number requested by
+            // Number of keys actually found in multi_get calls (vs number requested by
             // caller)
             // NUMBER_MULTIGET_KEYS_READ gives the number requested by caller
                     NUMBER_MULTIGET_KEYS_FOUND,
@@ -399,11 +394,11 @@ namespace nil {
                     BLOB_DB_KEY_SIZE,
             // Size of values written to BlobDB.
                     BLOB_DB_VALUE_SIZE,
-            // BlobDB Put/PutWithTTL/PutUntil/Write latency.
+            // BlobDB insert/PutWithTTL/PutUntil/write latency.
                     BLOB_DB_WRITE_MICROS,
-            // BlobDB Get lagency.
+            // BlobDB get lagency.
                     BLOB_DB_GET_MICROS,
-            // BlobDB MultiGet latency.
+            // BlobDB multi_get latency.
                     BLOB_DB_MULTIGET_MICROS,
             // BlobDB Seek/SeekToFirst/SeekToLast/SeekForPrev latency.
                     BLOB_DB_SEEK_MICROS,
@@ -447,7 +442,7 @@ namespace nil {
 
         enum StatsLevel : uint8_t {
             // Disable timer stats, and skip histogram stats
-                    kExceptHistogramOrTimers, // Skip timer stats
+                    kExceptHistogramOrTimers, // skip timer stats
             kExceptTimers, // Collect all stats except time inside mutex lock AND time spent on
             // compression.
                     kExceptDetailedTimers, // Collect all stats except the counters requiring to get time inside the

@@ -1,8 +1,3 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
 #include <cstdint>
@@ -26,13 +21,13 @@ namespace nil {
 
             // Percentage flexibility while comparing file size. If the candidate file(s)
             // size is 1% smaller than the next file's size, then include next file into
-            // this candidate set. // Default: 1
+            // this candidate set. // default_environment: 1
             unsigned int size_ratio;
 
-            // The minimum number of files in a single compaction run. Default: 2
+            // The minimum number of files in a single compaction run. default_environment: 2
             unsigned int min_merge_width;
 
-            // The maximum number of files in a single compaction run. Default: UINT_MAX
+            // The maximum number of files in a single compaction run. default_environment: UINT_MAX
             unsigned int max_merge_width;
 
             // The size amplification is defined as the amount (in percentage) of
@@ -43,7 +38,7 @@ namespace nil {
             // a size amplification of 0%. Rocksdb uses the following heuristic
             // to calculate size amplification: it assumes that all files excluding
             // the earliest file contribute to the size amplification.
-            // Default: 200, which means that a 100 byte database could require upto
+            // default_environment: 200, which means that a 100 byte database could require upto
             // 300 bytes of engine.
             unsigned int max_size_amplification_percent;
 
@@ -62,19 +57,19 @@ namespace nil {
             // well as  the total size of C1...Ct as total_C, the compaction output file
             // will be compressed iff
             //   total_C / total_size < this percentage
-            // Default: -1
+            // default_environment: -1
             int compression_size_percent;
 
             // The algorithm used to stop picking files into a single compaction run
-            // Default: kCompactionStopStyleTotalSize
+            // default_environment: kCompactionStopStyleTotalSize
             CompactionStopStyle stop_style;
 
             // Option to optimize the universal multi level compaction by enabling
             // trivial move for non overlapping files.
-            // Default: false
+            // default_environment: false
             bool allow_trivial_move;
 
-            // Default set of parameters
+            // default_environment set of parameters
             compaction_options_universal() : size_ratio(1), min_merge_width(2), max_merge_width(UINT_MAX),
                     max_size_amplification_percent(200), compression_size_percent(-1),
                     stop_style(kCompactionStopStyleTotalSize), allow_trivial_move(false) {

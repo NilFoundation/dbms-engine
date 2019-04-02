@@ -1,16 +1,7 @@
-//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-//
-// Copyright (c) 2011 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
-
 #pragma once
 
-#include <nil/storage/env.hpp>
-#include <nil/storage/statistics.hpp>
+#include <nil/engine/env.hpp>
+#include <nil/engine/statistics.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -38,21 +29,21 @@ namespace nil {
             virtual void SetBytesPerSecond(int64_t bytes_per_second) = 0;
 
             // Deprecated. New RateLimiter derived classes should override
-            // Request(const int64_t, const environment_type::IOPriority, Statistics*) or
-            // Request(const int64_t, const environment_type::IOPriority, Statistics*, OpType)
+            // Request(const int64_t, const environment_type::io_priority, Statistics*) or
+            // Request(const int64_t, const environment_type::io_priority, Statistics*, OpType)
             // instead.
             //
             // Request for token for bytes. If this request can not be satisfied, the call
             // is blocked. Caller is responsible to make sure
             // bytes <= GetSingleBurstBytes()
-            virtual void Request(const int64_t /*bytes*/, const environment_type::IOPriority /*pri*/) {
+            virtual void Request(const int64_t /*bytes*/, const environment_type::io_priority /*pri*/) {
                 assert(false);
             }
 
             // Request for token for bytes and potentially update statistics. If this
             // request can not be satisfied, the call is blocked. Caller is responsible to
             // make sure bytes <= GetSingleBurstBytes().
-            virtual void Request(const int64_t bytes, const environment_type::IOPriority pri,
+            virtual void Request(const int64_t bytes, const environment_type::io_priority pri,
                                  Statistics * /* stats */) {
                 // For API compatibility, default implementation calls the older API in
                 // which statistics are unsupported.
@@ -63,7 +54,7 @@ namespace nil {
             //
             // If this request can not be satisfied, the call is blocked. Caller is
             // responsible to make sure bytes <= GetSingleBurstBytes().
-            virtual void Request(const int64_t bytes, const environment_type::IOPriority pri, Statistics *stats,
+            virtual void Request(const int64_t bytes, const environment_type::io_priority pri, Statistics *stats,
                                  OpType op_type) {
                 if (IsRateLimited(op_type)) {
                     Request(bytes, pri, stats);
@@ -74,7 +65,7 @@ namespace nil {
             // Takes into account GetSingleBurstBytes() and alignment (e.g., in case of
             // direct I/O) to allocate an appropriate number of bytes, which may be less
             // than the number of bytes requested.
-            virtual size_t RequestToken(size_t bytes, size_t alignment, environment_type::IOPriority io_priority,
+            virtual size_t RequestToken(size_t bytes, size_t alignment, environment_type::io_priority io_priority,
                                         Statistics *stats, RateLimiter::OpType op_type);
 
             // Max bytes can be granted in a single burst
@@ -82,11 +73,11 @@ namespace nil {
 
             // Total bytes that go through rate limiter
             virtual int64_t GetTotalBytesThrough(
-                    const environment_type::IOPriority pri = environment_type::IO_TOTAL) const = 0;
+                    const environment_type::io_priority pri = environment_type::IO_TOTAL) const = 0;
 
             // Total # of requests that go through rate limiter
             virtual int64_t GetTotalRequests(
-                    const environment_type::IOPriority pri = environment_type::IO_TOTAL) const = 0;
+                    const environment_type::io_priority pri = environment_type::IO_TOTAL) const = 0;
 
             virtual int64_t GetBytesPerSecond() const = 0;
 

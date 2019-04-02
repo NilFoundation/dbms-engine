@@ -1,19 +1,16 @@
-// Copyright (c) 2011 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
 #pragma once
 
 #include <cstdint>
 #include <map>
 #include <string>
 
-#include <nil/storage/status.hpp>
-#include <nil/storage/types.hpp>
+#include <nil/engine/status.hpp>
+#include <nil/engine/types.hpp>
 
 namespace nil {
     namespace dcdb {
 
-// -- Table Properties
+// -- Table properties
 // Other than basic table properties, each table may also have the user
 // collected properties.
 // The value of the user-collected properties are encoded as raw bytes --
@@ -76,11 +73,11 @@ namespace nil {
 
             // DEPRECATE User defined collector should implement AddUserKey(), though
             //           this old function still works for backward compatible reason.
-            // Add() will be called when a new key/value pair is inserted into the table.
+            // add() will be called when a new key/value pair is inserted into the table.
             // @params key    the user key that is inserted into the table.
             // @params value  the value that is inserted into the table.
             virtual status_type Add(const slice & /*key*/, const slice & /*value*/) {
-                return status_type::InvalidArgument("TablePropertiesCollector::Add() deprecated.");
+                return status_type::InvalidArgument("TablePropertiesCollector::add() deprecated.");
             }
 
             // AddUserKey() will be called when a new key/value pair is inserted into the
@@ -88,7 +85,7 @@ namespace nil {
             // @params key    the user key that is inserted into the table.
             // @params value  the value that is inserted into the table.
             virtual status_type AddUserKey(const slice &key, const slice &value, EntryType /*type*/,
-                                           SequenceNumber /*seq*/, uint64_t /*file_size*/) {
+                                           sequence_number /*seq*/, uint64_t /*file_size*/) {
                 // For backwards-compatibility.
                 return Add(key, value);
             }
@@ -185,7 +182,7 @@ namespace nil {
             // Timestamp of the earliest key. 0 means unknown.
             uint64_t oldest_key_time = 0;
 
-            // Name of the column family with which this SST file is associated.
+            // name of the column family with which this SST file is associated.
             // If column family is unknown, `column_family_name` will be an empty string.
             std::string column_family_name;
 

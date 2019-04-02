@@ -1,15 +1,7 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-// Copyright (c) 2011 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
-//
 // An iterator yields a sequence of key/value pairs from a source.
 // The following class defines the interface.  Multiple implementations
 // are provided by this library.  In particular, iterators are provided
-// to access the contents of a Table or a DB.
+// to access the contents of a Table or a database.
 //
 // Multiple threads can invoke const methods on an Iterator without
 // external synchronization, but if any of the threads may call a
@@ -20,9 +12,9 @@
 
 #include <string>
 
-#include <nil/storage/cleanable.hpp>
-#include <nil/storage/slice.hpp>
-#include <nil/storage/status.hpp>
+#include <nil/engine/cleanable.hpp>
+#include <nil/engine/slice.hpp>
+#include <nil/engine/status.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -90,7 +82,7 @@ namespace nil {
 
             // If supported, renew the iterator to represent the latest state. The
             // iterator will be invalidated after the call. Not supported if
-            // ReadOptions.snapshot is given when creating the iterator.
+            // read_options.snapshot is given when creating the iterator.
             virtual status_type Refresh() {
                 return status_type::NotSupported("Refresh() is not supported");
             }
@@ -99,16 +91,16 @@ namespace nil {
             //   If returning "1", this means that the slice returned by key() is valid
             //   as long as the iterator is not deleted.
             //   It is guaranteed to always return "1" if
-            //      - Iterator created with ReadOptions::pin_data = true
-            //      - DB tables were created with
+            //      - Iterator created with read_options::pin_data = true
+            //      - database tables were created with
             //        block_based_table_options::use_delta_encoding = false.
             // Property "rocksdb.iterator.super-version-number":
-            //   LSM version used by the iterator. The same format as DB Property
+            //   LSM version used by the iterator. The same format as database Property
             //   kCurrentSuperVersionNumber. See its comment for more information.
             // Property "rocksdb.iterator.internal-key":
-            //   Get the user-key portion of the internal key at which the iteration
+            //   get the user-key portion of the internal key at which the iteration
             //   stopped.
-            virtual status_type GetProperty(std::string prop_name, std::string *prop);
+            virtual status_type get_property(std::string prop_name, std::string *prop);
 
         private:
             // No copying allowed

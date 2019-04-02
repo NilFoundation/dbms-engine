@@ -1,12 +1,4 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-// Copyright (c) 2011 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
-//
-// slice is a simple structure containing a pointer into some external
+// Slice is a simple structure containing a pointer into some external
 // engine and a size.  The user of a slice must ensure that the slice
 // is not used after the corresponding external engine has been
 // deallocated.
@@ -28,7 +20,7 @@
 #include <string_view>
 #endif
 
-#include <nil/storage/cleanable.hpp>
+#include <nil/engine/cleanable.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -60,9 +52,9 @@ namespace nil {
                 size_ = (s == nullptr) ? 0 : strlen(s);
             }
 
-            // Create a single slice from SliceParts using buf as engine.
+            // Create a single slice from slice_parts using buf as engine.
             // buf must exist as long as the returned slice exists.
-            slice(const struct SliceParts &parts, std::string *buf);
+            slice(const struct slice_parts &parts, std::string *buf);
 
             // Return a pointer to the beginning of the referenced data
             const char *data() const {
@@ -137,7 +129,7 @@ namespace nil {
                 return ((size_ >= x.size_) && (memcmp(data_ + size_ - x.size_, x.data_, x.size_) == 0));
             }
 
-            // Compare two slices and returns the first byte where they differ
+            // compare two slices and returns the first byte where they differ
             size_t difference_offset(const slice &b) const;
 
             // private: make these public for rocksdbjni access
@@ -168,7 +160,7 @@ namespace nil {
 
             PinnableSlice &operator=(PinnableSlice &) = delete;
 
-            inline void PinSlice(const slice &s, CleanupFunction f, void *arg1, void *arg2) {
+            inline void PinSlice(const slice &s, cleanup_function f, void *arg1, void *arg2) {
                 assert(!pinned_);
                 pinned_ = true;
                 data_ = s.data();
@@ -239,11 +231,11 @@ namespace nil {
 
 // A set of Slices that are virtually concatenated together.  'parts' points
 // to an array of Slices.  The number of elements in the array is 'num_parts'.
-        struct SliceParts {
-            SliceParts(const slice *_parts, int _num_parts) : parts(_parts), num_parts(_num_parts) {
+        struct slice_parts {
+            slice_parts(const slice *_parts, int _num_parts) : parts(_parts), num_parts(_num_parts) {
             }
 
-            SliceParts() : parts(nullptr), num_parts(0) {
+            slice_parts() : parts(nullptr), num_parts(0) {
             }
 
             const slice *parts;

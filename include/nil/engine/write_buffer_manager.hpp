@@ -1,13 +1,4 @@
-//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-//
-// Copyright (c) 2011 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
-//
-// WriteBufferManager is for managing memory allocation for one or more
+// write_buffer_manager is for managing memory allocation for one or more
 // MemTables.
 
 #pragma once
@@ -15,20 +6,20 @@
 #include <atomic>
 #include <cstddef>
 
-#include <nil/storage/cache.hpp>
+#include <nil/engine/cache.hpp>
 
 namespace nil {
     namespace dcdb {
 
-        class WriteBufferManager {
+        class write_buffer_manager {
         public:
             // _buffer_size = 0 indicates no limit. Memory won't be capped.
-            // memory_usage() won't be valid and ShouldFlush() will always return true.
-            // if `cache` is provided, we'll put dummy entries in the cache and cost
+            // memory_usage() won't be valid and should_flush() will always return true.
+            // if `cache` is provided, we'll insert dummy entries in the cache and cost
             // the memory allocated to the cache. It can be used even if _buffer_size = 0.
-            explicit WriteBufferManager(size_t _buffer_size, std::shared_ptr<cache> cache = {});
+            explicit write_buffer_manager(size_t _buffer_size, std::shared_ptr<cache> cache = {});
 
-            ~WriteBufferManager();
+            ~write_buffer_manager();
 
             bool enabled() const {
                 return buffer_size_ != 0;
@@ -52,7 +43,7 @@ namespace nil {
             }
 
             // Should only be called from write thread
-            bool ShouldFlush() const {
+            bool should_flush() const {
                 if (enabled()) {
                     if (mutable_memtable_memory_usage() > mutable_limit_) {
                         return true;
@@ -67,9 +58,9 @@ namespace nil {
                 return false;
             }
 
-            void ReserveMem(size_t mem) {
+            void reserve_mem(size_t mem) {
                 if (cache_rep_ != nullptr) {
-                    ReserveMemWithCache(mem);
+                    reserve_mem_with_cache(mem);
                 } else if (enabled()) {
                     memory_used_.fetch_add(mem, std::memory_order_relaxed);
                 }
@@ -80,15 +71,15 @@ namespace nil {
 
             // We are in the process of freeing `mem` bytes, so it is not considered
             // when checking the soft limit.
-            void ScheduleFreeMem(size_t mem) {
+            void schedule_free_mem(size_t mem) {
                 if (enabled()) {
                     memory_active_.fetch_sub(mem, std::memory_order_relaxed);
                 }
             }
 
-            void FreeMem(size_t mem) {
+            void free_mem(size_t mem) {
                 if (cache_rep_ != nullptr) {
-                    FreeMemWithCache(mem);
+                    free_mem_with_cache(mem);
                 } else if (enabled()) {
                     memory_used_.fetch_sub(mem, std::memory_order_relaxed);
                 }
@@ -103,14 +94,14 @@ namespace nil {
             struct CacheRep;
             std::unique_ptr<CacheRep> cache_rep_;
 
-            void ReserveMemWithCache(size_t mem);
+            void reserve_mem_with_cache(size_t mem);
 
-            void FreeMemWithCache(size_t mem);
+            void free_mem_with_cache(size_t mem);
 
             // No copying allowed
-            WriteBufferManager(const WriteBufferManager &) = delete;
+            write_buffer_manager(const write_buffer_manager &) = delete;
 
-            WriteBufferManager &operator=(const WriteBufferManager &) = delete;
+            write_buffer_manager &operator=(const write_buffer_manager &) = delete;
         };
     }
 } // namespace nil

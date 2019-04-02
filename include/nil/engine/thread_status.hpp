@@ -1,11 +1,6 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-//
 // This file defines the structures for exposing run-time status of any
 // rocksdb-related thread.  Such run-time status can be obtained via
-// GetThreadList() API.
+// get_thread_list() API.
 //
 // Note that all thread-status features are still under-development, and
 // thus APIs and class definitions might subject to change at this point.
@@ -39,8 +34,8 @@ namespace nil {
 
 // A structure that describes the current status of a thread.
 // The status of active threads can be fetched using
-// nil::dcdb::GetThreadList().
-        struct ThreadStatus {
+// nil::dcdb::get_thread_list().
+        struct thread_status {
             // The type of a thread.
             enum ThreadType : int {
                 HIGH_PRIORITY = 0,  // RocksDB BG thread in high-pri thread pool
@@ -98,7 +93,7 @@ namespace nil {
                 STATE_UNKNOWN = 0, STATE_MUTEX_WAIT = 1, NUM_STATE_TYPES
             };
 
-            ThreadStatus(const uint64_t _id, const ThreadType _thread_type, const std::string &_db_name,
+            thread_status(const uint64_t _id, const ThreadType _thread_type, const std::string &_db_name,
                          const std::string &_cf_name, const OperationType _operation_type,
                          const uint64_t _op_elapsed_micros, const OperationStage _operation_stage,
                          const uint64_t _op_props[], const StateType _state_type) : thread_id(_id),
@@ -116,9 +111,9 @@ namespace nil {
             // LOW_PRIORITY, and USER
             const ThreadType thread_type;
 
-            // The name of the DB instance where the thread is currently
+            // The name of the database instance where the thread is currently
             // involved with.  It would be set to empty string if the thread
-            // does not involve in any DB operation.
+            // does not involve in any database operation.
             const std::string db_name;
 
             // The name of the column family where the thread is currently
@@ -145,7 +140,7 @@ namespace nil {
             const StateType state_type;
 
             // The followings are a set of utility functions for interpreting
-            // the information of ThreadStatus
+            // the information of thread_status
 
             static std::string GetThreadTypeName(ThreadType thread_type);
 

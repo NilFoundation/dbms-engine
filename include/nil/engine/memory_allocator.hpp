@@ -1,11 +1,6 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
-#include <nil/storage/status.hpp>
+#include <nil/engine/status.hpp>
 
 #include <memory>
 
@@ -20,10 +15,10 @@ namespace nil {
         public:
             virtual ~MemoryAllocator() = default;
 
-            // Name of the cache allocator, printed in the log
+            // name of the cache allocator, printed in the log
             virtual const char *Name() const = 0;
 
-            // Allocate a block of at least size. Has to be thread-safe.
+            // allocate a block of at least size. Has to be thread-safe.
             virtual void *Allocate(size_t size) = 0;
 
             // Deallocate previously allocated block. Has to be thread-safe.

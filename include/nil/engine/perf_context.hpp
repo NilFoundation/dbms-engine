@@ -1,15 +1,10 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
 #include <map>
 #include <cstdint>
 #include <string>
 
-#include <nil/storage/perf_level.hpp>
+#include <nil/engine/perf_level.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -30,7 +25,7 @@ namespace nil {
             uint64_t bloom_filter_full_true_positive = 0;
 
             // total number of user key returned (only include keys that are found, does
-            // not include keys that are deleted or merged without a final put
+            // not include keys that are deleted or merged without a final insert
             uint64_t user_key_return_count;
 
             // total nanos spent on reading data from SST files
@@ -82,8 +77,8 @@ namespace nil {
             uint64_t block_checksum_time;       // total nanos spent on block checksum
             uint64_t block_decompress_time;  // total nanos spent on block decompression
 
-            uint64_t get_read_bytes;       // bytes for vals returned by Get
-            uint64_t multiget_read_bytes;  // bytes for vals returned by MultiGet
+            uint64_t get_read_bytes;       // bytes for vals returned by get
+            uint64_t multiget_read_bytes;  // bytes for vals returned by multi_get
             uint64_t iter_read_bytes;      // bytes for keys/vals decoded by iterator
 
             // total number of internal keys skipped over during iteration.
@@ -123,7 +118,7 @@ namespace nil {
             uint64_t get_snapshot_time;       // total nanos spent on getting snapshot
             uint64_t get_from_memtable_time;  // total nanos spent on querying memtables
             uint64_t get_from_memtable_count;    // number of mem tables queried
-            // total nanos spent after Get() finds a key
+            // total nanos spent after get() finds a key
             uint64_t get_post_process_time;
             uint64_t get_from_output_files_time;  // total nanos reading from output files
             // total nanos spent on seeking memtable
@@ -146,7 +141,7 @@ namespace nil {
             // total nanos spent on iterating internal entries to find the next user entry
             uint64_t find_next_user_entry_time;
 
-            // This group of stats provide a breakdown of time spent by Write().
+            // This group of stats provide a breakdown of time spent by write().
             // May be inaccurate when 2PC, two_write_queues or enable_pipelined_write
             // are enabled.
             //
@@ -165,9 +160,9 @@ namespace nil {
             // time spent waiting for other threads of the batch group
             uint64_t write_thread_wait_nanos;
 
-            // time spent on acquiring DB mutex.
+            // time spent on acquiring database mutex.
             uint64_t db_mutex_lock_nanos;
-            // Time spent on waiting with a condition variable created with DB mutex.
+            // Time spent on waiting with a condition variable created with database mutex.
             uint64_t db_condition_wait_nanos;
             // Time spent on merge operator.
             uint64_t merge_operator_time_nanos;
@@ -227,7 +222,7 @@ namespace nil {
             bool per_level_perf_context_enabled = false;
         };
 
-// Get Thread-local PerfContext object pointer
+// get Thread-local PerfContext object pointer
 // if defined(NPERF_CONTEXT), then the pointer is not thread-local
         PerfContext *get_perf_context();
 

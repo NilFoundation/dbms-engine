@@ -1,8 +1,3 @@
-//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
 #ifndef ROCKSDB_LITE
@@ -10,10 +5,10 @@
 #include <memory>
 #include <string>
 
-#include <nil/storage/env.hpp>
-#include <nil/storage/options.hpp>
-#include <nil/storage/table_properties.hpp>
-#include <nil/storage/types.hpp>
+#include <nil/engine/env.hpp>
+#include <nil/engine/options.hpp>
+#include <nil/engine/table_properties.hpp>
+#include <nil/engine/types.hpp>
 
 #if defined(__GNUC__) || defined(__clang__)
 #define ROCKSDB_DEPRECATED_FUNC __attribute__((__deprecated__))
@@ -24,18 +19,18 @@
 namespace nil {
     namespace dcdb {
 
-        class Comparator;
+        class comparator;
 
-// ExternalSstFileInfo include information about sst files created
+// external_sst_file_info include information about sst files created
 // using SstFileWriter.
-        struct ExternalSstFileInfo {
-            ExternalSstFileInfo() : file_path(""), smallest_key(""), largest_key(""), smallest_range_del_key(""),
+        struct external_sst_file_info {
+            external_sst_file_info() : file_path(""), smallest_key(""), largest_key(""), smallest_range_del_key(""),
                     largest_range_del_key(""), sequence_number(0), file_size(0), num_entries(0),
                     num_range_del_entries(0), version(0) {
             }
 
-            ExternalSstFileInfo(const std::string &_file_path, const std::string &_smallest_key,
-                                const std::string &_largest_key, SequenceNumber _sequence_number, uint64_t _file_size,
+            external_sst_file_info(const std::string &_file_path, const std::string &_smallest_key,
+                                const std::string &_largest_key, sequence_number _sequence_number, uint64_t _file_size,
                                 int32_t _num_entries, int32_t _version) : file_path(_file_path),
                     smallest_key(_smallest_key), largest_key(_largest_key), smallest_range_del_key(""),
                     largest_range_del_key(""), sequence_number(_sequence_number), file_size(_file_size),
@@ -47,7 +42,7 @@ namespace nil {
             std::string largest_key;   // largest user key in file
             std::string smallest_range_del_key;  // smallest range deletion user key in file
             std::string largest_range_del_key;  // largest range deletion user key in file
-            SequenceNumber sequence_number;     // sequence number of all keys in file
+            sequence_number sequence_number;     // sequence number of all keys in file
             uint64_t file_size;                 // file size in bytes
             uint64_t num_entries;               // number of entries in file
             uint64_t num_range_del_entries;  // number of range deletion entries in file
@@ -66,16 +61,16 @@ namespace nil {
             // To use the rate limiter an io_priority smaller than IO_TOTAL can be passed.
             SstFileWriter(const environment_options &env_options, const Options &options,
                           column_family_handle *column_family = nullptr, bool invalidate_page_cache = true,
-                          environment_type::IOPriority io_priority = environment_type::IOPriority::IO_TOTAL,
+                          environment_type::io_priority io_priority = environment_type::io_priority::IO_TOTAL,
                           bool skip_filters = false) : SstFileWriter(env_options, options, options.comparator,
                     column_family, invalidate_page_cache, io_priority, skip_filters) {
             }
 
             // Deprecated API
             SstFileWriter(const environment_options &env_options, const Options &options,
-                          const Comparator *user_comparator, column_family_handle *column_family = nullptr,
+                          const comparator *user_comparator, column_family_handle *column_family = nullptr,
                           bool invalidate_page_cache = true,
-                          environment_type::IOPriority io_priority = environment_type::IOPriority::IO_TOTAL,
+                          environment_type::io_priority io_priority = environment_type::io_priority::IO_TOTAL,
                           bool skip_filters = false);
 
             ~SstFileWriter();
@@ -83,30 +78,30 @@ namespace nil {
             // Prepare SstFileWriter to write into file located at "file_path".
             status_type Open(const std::string &file_path);
 
-            // Add a Put key with value to currently opened file (deprecated)
+            // add a insert key with value to currently opened file (deprecated)
             // REQUIRES: key is after any previously added key according to comparator.
             ROCKSDB_DEPRECATED_FUNC status_type Add(const slice &user_key, const slice &value);
 
-            // Add a Put key with value to currently opened file
+            // add a insert key with value to currently opened file
             // REQUIRES: key is after any previously added key according to comparator.
             status_type Put(const slice &user_key, const slice &value);
 
-            // Add a Merge key with value to currently opened file
+            // add a merge key with value to currently opened file
             // REQUIRES: key is after any previously added key according to comparator.
             status_type Merge(const slice &user_key, const slice &value);
 
-            // Add a deletion key to currently opened file
+            // add a deletion key to currently opened file
             // REQUIRES: key is after any previously added key according to comparator.
             status_type Delete(const slice &user_key);
 
-            // Add a range deletion tombstone to currently opened file
+            // add a range deletion tombstone to currently opened file
             status_type DeleteRange(const slice &begin_key, const slice &end_key);
 
             // Finalize writing to sst file and close file.
             //
-            // An optional ExternalSstFileInfo pointer can be passed to the function
+            // An optional external_sst_file_info pointer can be passed to the function
             // which will be populated with information about the created sst file.
-            status_type Finish(ExternalSstFileInfo *file_info = nullptr);
+            status_type Finish(external_sst_file_info *file_info = nullptr);
 
             // Return the current file size.
             uint64_t FileSize();

@@ -1,11 +1,3 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-// Copyright (c) 2013 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
-
 #pragma once
 
 #include <cassert>
@@ -20,7 +12,7 @@ namespace nil {
 
         class slice_transform;
 
-// Context information of a compaction run
+// context information of a compaction run
         struct compaction_filter_context {
             // Does this compaction run include all data files
             bool is_full_compaction;
@@ -34,16 +26,16 @@ namespace nil {
 
         class compaction_filter {
         public:
-            enum ValueType {
+            enum value_type {
                 kValue, kMergeOperand, kBlobIndex,  // used internally by BlobDB.
             };
 
-            enum class Decision {
+            enum class decision {
                 kKeep, kRemove, kChangeValue, kRemoveAndSkipUntil,
             };
 
-            // Context information of a compaction run
-            struct Context {
+            // context information of a compaction run
+            struct context {
                 // Does this compaction run include all data files
                 bool is_full_compaction;
                 // Is this compaction requested by the client (true),
@@ -65,16 +57,16 @@ namespace nil {
             // the existing value of the key and make decision based on it.
             //
             // Key-Values that are results of merge operation during compaction are not
-            // passed into this function. Currently, when you have a mix of Put()s and
-            // Merge()s on a same key, we only guarantee to process the merge operands
-            // through the compaction filters. Put()s might be processed, or might not.
+            // passed into this function. Currently, when you have a mix of insert()s and
+            // merge()s on a same key, we only guarantee to process the merge operands
+            // through the compaction filters. insert()s might be processed, or might not.
             //
             // When the value is to be preserved, the application has the option
             // to modify the existing_value and pass it back through new_value.
             // value_changed needs to be set to true in this case.
             //
-            // Note that RocksDB snapshots (i.e. call GetSnapshot() API on a
-            // DB* object) will not guarantee to preserve the state of the DB with
+            // Note that RocksDB snapshots (i.e. call get_snapshot() API on a
+            // database* object) will not guarantee to preserve the state of the database with
             // compaction_filter. Data seen from a snapshot might disppear after a
             // compaction finishes. If you use snapshots, think twice about whether you
             // want to use compaction filter and whether you are using it in a safe way.
@@ -88,8 +80,8 @@ namespace nil {
             // be used by a single thread that is doing the compaction run, and this
             // call does not need to be thread-safe.  However, multiple filters may be
             // in existence and operating concurrently.
-            virtual bool Filter(int /*level*/, const slice & /*key*/, const slice & /*existing_value*/,
-                                std::string * /*new_value*/, bool * /*value_changed*/) const {
+            virtual bool filter(int level, const slice &key, const slice &existing_value, std::string *new_value,
+                                bool *value_changed) const {
                 return false;
             }
 
@@ -98,20 +90,20 @@ namespace nil {
             // in the compaction output
             //
             // Note: If you are using a TransactionDB, it is not recommended to implement
-            // FilterMergeOperand().  If a Merge operation is filtered out, TransactionDB
+            // filter_merge_operand().  If a merge operation is filtered out, TransactionDB
             // may not realize there is a write conflict and may allow a Transaction to
             // Commit that should have failed.  Instead, it is better to implement any
-            // Merge filtering inside the MergeOperator.
-            virtual bool FilterMergeOperand(int /*level*/, const slice & /*key*/, const slice & /*operand*/) const {
+            // merge filtering inside the merge_operator.
+            virtual bool filter_merge_operand(int level, const slice &key, const slice &operand) const {
                 return false;
             }
 
             // An extended API. Called for both values and merge operands.
             // Allows changing value and skipping ranges of keys.
-            // The default implementation uses Filter() and FilterMergeOperand().
+            // The default implementation uses filter() and filter_merge_operand().
             // If you're overriding this method, no need to override the other two.
             // `value_type` indicates whether this key-value corresponds to a normal
-            // value (e.g. written with Put())  or a merge operand (written with Merge()).
+            // value (e.g. written with insert())  or a merge operand (written with merge()).
             //
             // Possible return values:
             //  * kKeep - keep the key-value pair.
@@ -122,16 +114,16 @@ namespace nil {
             //      of keys will be skipped without reading, potentially saving some
             //      IO operations compared to removing the keys one by one.
             //
-            //      *skip_until <= key is treated the same as Decision::kKeep
+            //      *skip_until <= key is treated the same as decision::kKeep
             //      (since the range [key, *skip_until) is empty).
             //
             //      Caveats:
             //       - The keys are skipped even if there are snapshots containing them,
             //         i.e. values removed by kRemoveAndSkipUntil can disappear from a
             //         snapshot - beware if you're using TransactionDB or
-            //         DB::GetSnapshot().
-            //       - If value for a key was overwritten or merged into (multiple Put()s
-            //         or Merge()s), and compaction filter skips this key with
+            //         database::get_snapshot().
+            //       - If value for a key was overwritten or merged into (multiple insert()s
+            //         or merge()s), and compaction filter skips this key with
             //         kRemoveAndSkipUntil, it's possible that it will remove only
             //         the new value, exposing the old value that was supposed to be
             //         overwritten.
@@ -140,31 +132,31 @@ namespace nil {
             //         compaction_readahead_size option.
             //
             // Note: If you are using a TransactionDB, it is not recommended to filter
-            // out or modify merge operands (ValueType::kMergeOperand).
+            // out or modify merge operands (value_type::kMergeOperand).
             // If a merge operation is filtered out, TransactionDB may not realize there
             // is a write conflict and may allow a Transaction to Commit that should have
-            // failed. Instead, it is better to implement any Merge filtering inside the
-            // MergeOperator.
-            virtual Decision FilterV2(int level, const slice &key, ValueType value_type, const slice &existing_value,
-                                      std::string *new_value, std::string * /*skip_until*/) const {
-                switch (value_type) {
-                    case ValueType::kValue: {
+            // failed. Instead, it is better to implement any merge filtering inside the
+            // merge_operator.
+            virtual decision filter_v2(int level, const slice &key, value_type vt, const slice &existing_value,
+                                       std::string *new_value, std::string *skip_until) const {
+                switch (vt) {
+                    case value_type::kValue: {
                         bool value_changed = false;
-                        bool rv = Filter(level, key, existing_value, new_value, &value_changed);
+                        bool rv = filter(level, key, existing_value, new_value, &value_changed);
                         if (rv) {
-                            return Decision::kRemove;
+                            return decision::kRemove;
                         }
-                        return value_changed ? Decision::kChangeValue : Decision::kKeep;
+                        return value_changed ? decision::kChangeValue : decision::kKeep;
                     }
-                    case ValueType::kMergeOperand: {
-                        bool rv = FilterMergeOperand(level, key, existing_value);
-                        return rv ? Decision::kRemove : Decision::kKeep;
+                    case value_type::kMergeOperand: {
+                        bool rv = filter_merge_operand(level, key, existing_value);
+                        return rv ? decision::kRemove : decision::kKeep;
                     }
-                    case ValueType::kBlobIndex:
-                        return Decision::kKeep;
+                    case value_type::kBlobIndex:
+                        return decision::kKeep;
                 }
                 assert(false);
-                return Decision::kKeep;
+                return decision::kKeep;
             }
 
             // This function is deprecated. Snapshots will always be ignored for
@@ -172,27 +164,27 @@ namespace nil {
             // provide the gurantee we initially thought it would provide. Repeatable
             // reads will not be guaranteed anyway. If you override the function and
             // returns false, we will fail the compaction.
-            virtual bool IgnoreSnapshots() const {
+            virtual bool ignore_snapshots() const {
                 return true;
             }
 
             // Returns a name that identifies this compaction filter.
             // The name will be printed to LOG file on start up for diagnosis.
-            virtual const char *Name() const = 0;
+            virtual const char *name() const = 0;
         };
 
 // Each compaction will create a new compaction_filter allowing the
 // application to know about different compactions
-        class CompactionFilterFactory {
+        class compaction_filter_factory {
         public:
-            virtual ~CompactionFilterFactory() {
+            virtual ~compaction_filter_factory() {
             }
 
-            virtual std::unique_ptr<compaction_filter> CreateCompactionFilter(
-                    const compaction_filter::Context &context) = 0;
+            virtual std::unique_ptr<compaction_filter> create_compaction_filter(
+                    const compaction_filter::context &context) = 0;
 
             // Returns a name that identifies this compaction filter factory.
-            virtual const char *Name() const = 0;
+            virtual const char *name() const = 0;
         };
 
     }

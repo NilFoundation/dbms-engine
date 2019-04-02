@@ -1,11 +1,3 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-// Copyright (c) 2012 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
-//
 // Class for specifying user-defined functions which perform a
 // transformation on a slice.  It is not required that every slice
 // belong to the domain and/or range of a function.  Subclasses should
@@ -79,7 +71,7 @@ namespace nil {
             //   safe to use prefix bloom filter and seek to key `prefix`.
             // If this function returns true, this means a user can Seek() to a prefix
             // using the bloom filter. Otherwise, user needs to skip the bloom filter
-            // by setting ReadOptions.total_order_seek = true.
+            // by setting read_options.total_order_seek = true.
             //
             // Here is an example: Suppose we implement a slice transform that returns
             // the first part of the string after splitting it using delimiter ",":
@@ -89,7 +81,7 @@ namespace nil {
             //    will not be filtered out.
             // 2. SameResultWhenAppended("abc") should return false. A user will not
             //    guaranteed to see all the keys matching "abc.*" if a user seek to "abc"
-            //    against a DB with the same setting. If one SST file only contains
+            //    against a database with the same setting. If one SST file only contains
             //    "abcd,e", the file can be filtered out and the key will be invisible.
             //
             // i.e., an implementation always returning false is safe.

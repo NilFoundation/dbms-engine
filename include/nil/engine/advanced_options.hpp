@@ -1,17 +1,9 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-// Copyright (c) 2011 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
-
 #pragma once
 
 #include <memory>
 
-#include <nil/storage/memtablerep.hpp>
-#include <nil/storage/universal_compaction.hpp>
+#include <nil/engine/memtablerep.hpp>
+#include <nil/engine/universal_compaction.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -35,7 +27,7 @@ namespace nil {
                     kCompactionStyleUniversal = 0x1, // FIFO compaction style
             // Not supported in ROCKSDB_LITE
                     kCompactionStyleFIFO = 0x2, // Disable background compaction. Compaction jobs are submitted
-            // via CompactFiles().
+            // via compact_files().
             // Not supported in ROCKSDB_LITE
                     kCompactionStyleNone = 0x3,
         };
@@ -59,7 +51,7 @@ namespace nil {
         struct compaction_options_fifo {
             // once the total sum of table files reaches this, we will delete the oldest
             // table file
-            // Default: 1GB
+            // default_environment: 1GB
             uint64_t max_table_files_size;
 
             // If true, try to do compaction to compact smaller files into larger ones.
@@ -67,7 +59,7 @@ namespace nil {
             // and compaction won't trigger if average compact bytes per del file is
             // larger than options.write_buffer_size. This is to protect large files
             // from being compacted again.
-            // Default: false;
+            // default_environment: false;
             bool allow_compaction = false;
 
             compaction_options_fifo() : max_table_files_size(1 * 1024 * 1024 * 1024) {
@@ -107,7 +99,7 @@ namespace nil {
             // can only be compressed and written after the dictionary has been finalized.
             // So users of this feature may see increased memory usage.
             //
-            // Default: 0.
+            // default_environment: 0.
             uint32_t max_dict_bytes;
 
             // Maximum size of training data passed to zstd's dictionary trainer. Using
@@ -116,7 +108,7 @@ namespace nil {
             //
             // The training data will be used to generate a dictionary of max_dict_bytes.
             //
-            // Default: 0.
+            // default_environment: 0.
             uint32_t zstd_max_train_bytes;
 
             // When the compression options are set by the user, it will be set to "true".
@@ -127,7 +119,7 @@ namespace nil {
             // For compression_opts, if compression_opts.enabled=false, it is still
             // used as compression options for compression process.
             //
-            // Default: false.
+            // default_environment: false.
             bool enabled;
 
             compression_options() : window_bits(-14), level(kDefaultCompressionLevel), strategy(0), max_dict_bytes(0),
@@ -156,9 +148,9 @@ namespace nil {
             // options.delayed_write_rate if we are writing to the last write buffer
             // allowed.
             //
-            // Default: 2
+            // default_environment: 2
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             int max_write_buffer_number = 2;
 
             // The minimum number of write buffers that will be merged together
@@ -167,7 +159,7 @@ namespace nil {
             // read amplification because a get request has to check in all of these
             // files. Also, an in-memory merge may result in writing lesser
             // data to engine if there are duplicate records in each of these
-            // individual write buffers.  Default: 1
+            // individual write buffers.  default_environment: 1
             int min_write_buffer_number_to_merge = 1;
 
             // The total maximum number of write buffers to maintain in memory including
@@ -190,7 +182,7 @@ namespace nil {
             // after they are flushed.
             // If this value is set to -1, 'max_write_buffer_number' will be used.
             //
-            // Default:
+            // default_environment:
             // If using a TransactionDB/OptimisticTransactionDB, the default value will
             // be set to the value of 'max_write_buffer_number' if it is not explicitly
             // set by the user.  Otherwise, the default is 0.
@@ -201,18 +193,18 @@ namespace nil {
             // concurrent updates). Hence iterator and multi-get will return results
             // which are not consistent as of any point-in-time.
             // If inplace_callback function is not set,
-            //   Put(key, new_value) will update inplace the existing_value iff
+            //   insert(key, new_value) will update inplace the existing_value iff
             //   * key exists in current memtable
             //   * new sizeof(new_value) <= sizeof(existing_value)
-            //   * existing_value for that key is a put i.e. kTypeValue
+            //   * existing_value for that key is a insert i.e. kTypeValue
             // If inplace_callback function is set, check doc for inplace_callback.
-            // Default: false.
+            // default_environment: false.
             bool inplace_update_support = false;
 
             // Number of locks used for inplace update
-            // Default: 10000, if inplace_update_support = true, else 0.
+            // default_environment: 10000, if inplace_update_support = true, else 0.
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             size_t inplace_update_num_locks = 10000;
 
             // existing_value - pointer to previous value (from both memtable and sst).
@@ -225,8 +217,8 @@ namespace nil {
 
             // Applicable only when inplace_update_support is true,
             // this callback function is called at the time of updating the memtable
-            // as part of a Put operation, lets say Put(key, delta_value). It allows the
-            // 'delta_value' specified as part of the Put operation to be merged with
+            // as part of a insert operation, lets say insert(key, delta_value). It allows the
+            // 'delta_value' specified as part of the insert operation to be merged with
             // an 'existing_value' of the key in the database.
 
             // If the merged value is smaller in size that the 'existing_value',
@@ -239,19 +231,19 @@ namespace nil {
             // If the merged value is larger in size than the 'existing_value' or the
             // application does not wish to modify the 'existing_value' buffer inplace,
             // then the merged value should be returned via *merge_value. It is set by
-            // merging the 'existing_value' and the Put 'delta_value'. The callback should
+            // merging the 'existing_value' and the insert 'delta_value'. The callback should
             // return update_status::UPDATED in this case. This merged value will be added
             // to the memtable.
 
             // If merging fails or the application does not wish to take any action,
             // then the callback should return update_status::UPDATE_FAILED.
 
-            // Please remember that the original call from the application is Put(key,
+            // Please remember that the original call from the application is insert(key,
             // delta_value). So the transaction log (if enabled) will still contain (key,
             // delta_value). The 'merged_value' is not stored in the transaction log.
             // Hence the inplace_callback function should be consistent across db reopens.
 
-            // Default: nullptr
+            // default_environment: nullptr
             update_status (*inplace_callback)(char *existing_value, uint32_t *existing_value_size, slice delta_value,
                                               std::string *merged_value) = nullptr;
 
@@ -260,18 +252,18 @@ namespace nil {
             // write_buffer_size * memtable_prefix_bloom_size_ratio.
             // If it is larger than 0.25, it is sanitized to 0.25.
             //
-            // Default: 0 (disable)
+            // default_environment: 0 (disable)
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             double memtable_prefix_bloom_size_ratio = 0.0;
 
             // Enable whole key bloom filter in memtable. Note this will only take effect
             // if memtable_prefix_bloom_size_ratio is not 0. Enabling whole key filtering
             // can potentially reduce CPU usage for point-look-ups.
             //
-            // Default: false (disable)
+            // default_environment: false (disable)
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             bool memtable_whole_key_filtering = false;
 
             // Page size for huge page for the arena used by the memtable. If <=0, it
@@ -283,7 +275,7 @@ namespace nil {
             // If there isn't enough free huge page available, it will fall back to
             // malloc.
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             size_t memtable_huge_page_size = 0;
 
             // If non-nullptr, memtable will use the specified function to extract
@@ -304,7 +296,7 @@ namespace nil {
             // example would be updating the same key over and over again, in which case
             // the prefix can be the key itself.
             //
-            // Default: nullptr (disable)
+            // default_environment: nullptr (disable)
             std::shared_ptr<const slice_transform> memtable_insert_with_hint_prefix_extractor = nullptr;
 
             // Control locality of bloom filter probes to improve cache miss rate.
@@ -312,7 +304,7 @@ namespace nil {
             // prefix bloom. It essentially limits every bloom checking to one cache line.
             // This optimization is turned off when set to 0, and positive number to turn
             // it on.
-            // Default: 0
+            // default_environment: 0
             uint32_t bloom_locality = 0;
 
             // size of one block in arena memory allocation.
@@ -327,9 +319,9 @@ namespace nil {
             // We'll automatically check and adjust the size number to make sure it
             // conforms to the restrictions.
             //
-            // Default: 0
+            // default_environment: 0
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             size_t arena_block_size = 0;
 
             // Different levels can have different compression policies. There
@@ -362,16 +354,16 @@ namespace nil {
             // point. A value <0 means that no writing slow down will be triggered by
             // number of files in level-0.
             //
-            // Default: 20
+            // default_environment: 20
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             int level0_slowdown_writes_trigger = 20;
 
             // Maximum number of level-0 files.  We stop writes at this point.
             //
-            // Default: 36
+            // default_environment: 36
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             int level0_stop_writes_trigger = 36;
 
             // Target file size for compaction.
@@ -383,15 +375,15 @@ namespace nil {
             // be 2MB, and each file on level 2 will be 20MB,
             // and each file on level-3 will be 200MB.
             //
-            // Default: 64MB.
+            // default_environment: 64MB.
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             uint64_t target_file_size_base = 64 * 1048576;
 
             // By default target_file_size_multiplier is 1, which means
             // by default files in different levels will have similar size.
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             int target_file_size_multiplier = 1;
 
             // If true, RocksDB will pick target size of each level dynamically.
@@ -407,7 +399,7 @@ namespace nil {
             // max_bytes_for_level_multiplier_additional are still satisfied.
             // (When L0 is too large, we make some adjustment. See below.)
             //
-            // With this option on, from an empty DB, we make last level the base level,
+            // With this option on, from an empty database, we make last level the base level,
             // which means merging L0 data into the last level, until it exceeds
             // max_bytes_for_level_base. And then we make the second last level to be
             // base level, to start to merge L0 data to second last level, with its
@@ -469,71 +461,71 @@ namespace nil {
             //
             // max_bytes_for_level_multiplier_additional is ignored with this flag on.
             //
-            // Turning this feature on or off for an existing DB can cause unexpected
+            // Turning this feature on or off for an existing database can cause unexpected
             // LSM tree structure so it's not recommended.
             //
-            // Default: false
+            // default_environment: false
             bool level_compaction_dynamic_level_bytes = false;
 
-            // Default: 10.
+            // default_environment: 10.
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             double max_bytes_for_level_multiplier = 10;
 
             // Different max-size multipliers for different levels.
             // These are multiplied by max_bytes_for_level_multiplier to arrive
             // at the max-size of each level.
             //
-            // Default: 1
+            // default_environment: 1
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             std::vector<int> max_bytes_for_level_multiplier_additional = std::vector<int>(num_levels, 1);
 
             // We try to limit number of bytes in one compaction to be lower than this
             // threshold. But it's not guaranteed.
             // Value 0 will be sanitized.
             //
-            // Default: target_file_size_base * 25
+            // default_environment: target_file_size_base * 25
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             uint64_t max_compaction_bytes = 0;
 
             // All writes will be slowed down to at least delayed_write_rate if estimated
             // bytes needed to be compaction exceed this threshold.
             //
-            // Default: 64GB
+            // default_environment: 64GB
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             uint64_t soft_pending_compaction_bytes_limit = 64 * 1073741824ull;
 
             // All writes are stopped if estimated bytes needed to be compaction exceed
             // this threshold.
             //
-            // Default: 256GB
+            // default_environment: 256GB
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             uint64_t hard_pending_compaction_bytes_limit = 256 * 1073741824ull;
 
-            // The compaction style. Default: kCompactionStyleLevel
+            // The compaction style. default_environment: kCompactionStyleLevel
             compaction_style compaction_style = kCompactionStyleLevel;
 
             // If level compaction_style = kCompactionStyleLevel, for each level,
             // which files are prioritized to be picked to compact.
-            // Default: kMinOverlappingRatio
+            // default_environment: kMinOverlappingRatio
             compaction_pri compaction_pri = kMinOverlappingRatio;
 
             // The options needed to support Universal Style compactions
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             // Dynamic change example:
-            // SetOptions("universal_compaction_options", "{size_ratio=2;}")
+            // set_options("universal_compaction_options", "{size_ratio=2;}")
             compaction_options_universal universal_compaction_options;
 
             // The options for FIFO compaction style
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             // Dynamic change example:
-            // SetOptions("compaction_options_fifo", "{max_table_files_size=100;}")
+            // set_options("compaction_options_fifo", "{max_table_files_size=100;}")
             compaction_options_fifo compaction_options_fifo;
 
             // An iteration->Next() sequentially skips over keys with the same
@@ -541,13 +533,13 @@ namespace nil {
             // of keys (with the same userkey) that will be sequentially
             // skipped before a reseek is issued.
             //
-            // Default: 8
+            // default_environment: 8
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             uint64_t max_sequential_skip_in_iterations = 8;
 
             // This is a factory that provides MemTableRep objects.
-            // Default: a factory that provides a skip-list-based implementation of
+            // default_environment: a factory that provides a skip-list-based implementation of
             // MemTableRep.
             std::shared_ptr<mem_table_rep_factory> memtable_factory = std::shared_ptr<skip_list_factory>(
                     new skip_list_factory);
@@ -563,11 +555,11 @@ namespace nil {
             //   filter_policy
             //   whole_key_filtering
             // If you'd like to customize some of these options, you will need to
-            // use NewBlockBasedTableFactory() to construct a new table factory.
+            // use new_block_based_table_factory() to construct a new table factory.
 
             // This option allows user to collect their own interested statistics of
             // the tables.
-            // Default: empty vector -- no user-defined statistics collection will be
+            // default_environment: empty vector -- no user-defined statistics collection will be
             // performed.
             typedef std::vector<
                     std::shared_ptr<table_properties_collector_factory>> table_properties_collector_factories_type;
@@ -581,9 +573,9 @@ namespace nil {
             // ensure that there are never more than max_successive_merges merge
             // operations in the memtable.
             //
-            // Default: 0 (disabled)
+            // default_environment: 0 (disabled)
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             size_t max_successive_merges = 0;
 
             // This flag specifies that the implementation should optimize the filters
@@ -599,27 +591,27 @@ namespace nil {
             // even for key hit because they tell us whether to look in that level or go
             // to the higher level.
             //
-            // Default: false
+            // default_environment: false
             bool optimize_filters_for_hits = false;
 
             // After writing every SST file, reopen it and read all the keys.
             //
-            // Default: false
+            // default_environment: false
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             bool paranoid_file_checks = false;
 
             // In debug mode, RocksDB run consistency checks on the LSM every time the LSM
-            // change (Flush, Compaction, add_file). These checks are disabled in release
+            // change (flush, Compaction, add_file). These checks are disabled in release
             // mode, use this option to enable them in release mode as well.
-            // Default: false
+            // default_environment: false
             bool force_consistency_checks = false;
 
             // Measure IO stats in compactions and flushes, if true.
             //
-            // Default: false
+            // default_environment: false
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             bool report_bg_io_stats = false;
 
             // Files older than TTL will go through the compaction process.
@@ -630,9 +622,9 @@ namespace nil {
             // In FIFO: Files older than TTL will be deleted.
             // unit: seconds. Ex: 1 day = 1 * 24 * 60 * 60
             //
-            // Default: 0 (disabled)
+            // default_environment: 0 (disabled)
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             uint64_t ttl = 0;
 
             // If this option is set then 1 in N blocks are compressed
@@ -657,9 +649,9 @@ namespace nil {
             // Puts are delayed to options.delayed_write_rate when any level has a
             // compaction score that exceeds soft_rate_limit. This is ignored when == 0.0.
             //
-            // Default: 0 (disabled)
+            // default_environment: 0 (disabled)
             //
-            // Dynamically changeable through SetOptions() API
+            // Dynamically changeable through set_options() API
             double soft_rate_limit = 0.0;
 
             // NOT SUPPORTED ANYMORE -- this options is no longer used

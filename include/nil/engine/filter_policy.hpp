@@ -1,18 +1,10 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-// Copyright (c) 2012 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
-//
 // A database can be configured with a custom filter_policy object.
 // This object is responsible for creating a small filter from a set
 // of keys.  These filters are stored in rocksdb and are consulted
 // automatically by rocksdb to decide whether or not to read some
 // information from disk. In many cases, a filter can cut down the
 // number of disk seeks form a handful to a single disk seek per
-// DB::Get() call.
+// database::get() call.
 //
 // Most people will want to use the builtin bloom filter support (see
 // NewBloomFilterPolicy() below).
@@ -36,7 +28,7 @@ namespace nil {
             virtual ~FilterBitsBuilder() {
             }
 
-            // Add Key to filter, you could use any way to store the key.
+            // add Key to filter, you could use any way to store the key.
             // Such as: storing hashes or original keys
             // Keys are in sorted order and duplicated keys are possible.
             virtual void AddKey(const slice &key) = 0;
@@ -103,7 +95,7 @@ namespace nil {
 
             // keys[0,n-1] contains a list of keys (potentially with duplicates)
             // that are ordered according to the user supplied comparator.
-            // Append a filter that summarizes keys[0,n-1] to *dst.
+            // append a filter that summarizes keys[0,n-1] to *dst.
             //
             // Warning: do not change the initial contents of *dst.  Instead,
             // append the newly constructed filter to *dst.
@@ -116,13 +108,13 @@ namespace nil {
             // list, but it should aim to return false with a high probability.
             virtual bool KeyMayMatch(const slice &key, const slice &filter) const = 0;
 
-            // Get the FilterBitsBuilder, which is ONLY used for full filter block
+            // get the FilterBitsBuilder, which is ONLY used for full filter block
             // It contains interface to take individual key, then generate filter
             virtual FilterBitsBuilder *GetFilterBitsBuilder() const {
                 return nullptr;
             }
 
-            // Get the FilterBitsReader, which is ONLY used for full filter block
+            // get the FilterBitsReader, which is ONLY used for full filter block
             // It contains interface to tell if key can be in filter
             // The input slice should NOT be deleted by filter_policy
             virtual FilterBitsReader *GetFilterBitsReader(const slice & /*contents*/) const {

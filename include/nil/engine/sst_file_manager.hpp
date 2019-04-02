@@ -1,8 +1,3 @@
-//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
 #include <memory>
@@ -10,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <nil/storage/status.hpp>
+#include <nil/engine/status.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -19,7 +14,7 @@ namespace nil {
 
         class Logger;
 
-// SstFileManager is used to track SST files in the DB and control their
+// SstFileManager is used to track SST files in the database and control their
 // deletion rate.
 // All SstFileManager public functions are thread-safe.
 // SstFileManager is not extensible.
@@ -33,7 +28,7 @@ namespace nil {
             // RocksDB will fail.
             //
             // Setting max_allowed_space to 0 will disable this feature; maximum allowed
-            // space will be infinite (Default value).
+            // space will be infinite (default_environment value).
             //
             // thread-safe.
             virtual void SetMaxAllowedSpaceUsage(uint64_t max_allowed_space) = 0;
@@ -71,11 +66,11 @@ namespace nil {
             // thread-safe
             virtual void SetDeleteRateBytesPerSecond(int64_t delete_rate) = 0;
 
-            // Return trash/DB size ratio where new files will be deleted immediately
+            // Return trash/database size ratio where new files will be deleted immediately
             // thread-safe
             virtual double GetMaxTrashDBRatio() = 0;
 
-            // Update trash/DB size ratio where new files will be deleted immediately
+            // Update trash/database size ratio where new files will be deleted immediately
             // thread-safe
             virtual void SetMaxTrashDBRatio(double ratio) = 0;
 
@@ -101,7 +96,7 @@ namespace nil {
 // @param status: If not nullptr, status will contain any errors that happened
 //    during creating the missing trash_dir or deleting existing files in trash.
 // @param max_trash_db_ratio: If the trash size constitutes for more than this
-//    fraction of the total DB size we will start deleting new files passed to
+//    fraction of the total database size we will start deleting new files passed to
 //    DeleteScheduler immediately
 // @param bytes_max_delete_chunk: if a file to delete is larger than delete
 //    chunk, ftruncate the file by this size each time, rather than dropping the

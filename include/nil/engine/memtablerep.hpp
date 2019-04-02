@@ -1,8 +1,3 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-//
 // This file contains the interface that must be implemented by any collection
 // to be used as the backing store for a MemTable. Such a collection must
 // satisfy the following properties:
@@ -40,7 +35,7 @@
 #include <cstdint>
 #include <cstdlib>
 
-#include <nil/storage/slice.hpp>
+#include <nil/engine/slice.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -69,11 +64,11 @@ namespace nil {
 
                 virtual DecodedType decode_key(const char *key) const {
                     // The format of key is frozen and can be terated as a part of the API
-                    // contract. Refer to MemTable::Add for details.
+                    // contract. Refer to MemTable::add for details.
                     return GetLengthPrefixedSlice(key);
                 }
 
-                // Compare a and b. Return a negative value if a is less than b, 0 if they
+                // compare a and b. Return a negative value if a is less than b, 0 if they
                 // are equal, and a positive value if a is greater than b
                 virtual int operator()(const char *prefix_len_key1, const char *prefix_len_key2) const = 0;
 
@@ -86,9 +81,9 @@ namespace nil {
             explicit MemTableRep(Allocator *allocator) : allocator_(allocator) {
             }
 
-            // Allocate a buf of len size for storing key. The idea is that a
+            // allocate a buf of len size for storing key. The idea is that a
             // specific memtable representation knows its underlying data structure
-            // better. By allowing it to allocate memory, it can possibly put
+            // better. By allowing it to allocate memory, it can possibly insert
             // correlated stuff in consecutive memory area to make processor
             // prefetching more efficient.
             virtual KeyHandle Allocate(const size_t len, char **buf);
@@ -146,7 +141,7 @@ namespace nil {
 
             // Notify this table rep that it will no longer be added to. By default,
             // does nothing.  After MarkReadOnly() is called, this table rep will
-            // not be written to (ie No more calls to Allocate(), insert(),
+            // not be written to (ie No more calls to allocate(), insert(),
             // or any writes done directly to entries accessed through the iterator.)
             virtual void MarkReadOnly() {
             }
@@ -166,11 +161,11 @@ namespace nil {
             // key as the second parameter. If the return value is false, then terminates.
             // Otherwise, go through the next key.
             //
-            // It's safe for Get() to terminate after having finished all the potential
+            // It's safe for get() to terminate after having finished all the potential
             // key for the k.user_key(), or not.
             //
-            // Default:
-            // Get() function with a default value of dynamically construct an iterator,
+            // default_environment:
+            // get() function with a default value of dynamically construct an iterator,
             // seek and call the call back function.
             virtual void Get(const LookupKey &k, void *callback_args,
                              bool (*callback_func)(void *arg, const char *entry));
@@ -243,13 +238,13 @@ namespace nil {
             }
 
             // Return true if the current MemTableRep supports merge operator.
-            // Default: true
+            // default_environment: true
             virtual bool IsMergeOperatorSupported() const {
                 return true;
             }
 
             // Return true if the current MemTableRep supports snapshot
-            // Default: true
+            // default_environment: true
             virtual bool IsSnapshotSupported() const {
                 return true;
             }
@@ -281,7 +276,7 @@ namespace nil {
             virtual const char *Name() const = 0;
 
             // Return true if the current MemTableRep supports concurrent inserts
-            // Default: false
+            // default_environment: false
             virtual bool IsInsertConcurrentlySupported() const {
                 return false;
             }
@@ -289,7 +284,7 @@ namespace nil {
             // Return true if the current MemTableRep supports detecting duplicate
             // <key,seq> at insertion time. If true, then MemTableRep::insert* returns
             // false when if the <key,seq> already exists.
-            // Default: false
+            // default_environment: false
             virtual bool CanHandleDuplicatedKey() const {
                 return false;
             }

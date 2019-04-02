@@ -1,11 +1,3 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-// Copyright (c) 2011 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
-
 #pragma once
 
 #include <string>
@@ -15,32 +7,32 @@ namespace nil {
 
         class slice;
 
-// A Comparator object provides a total order across slices that are
-// used as keys in an sstable or a database.  A Comparator implementation
+// A comparator object provides a total order across slices that are
+// used as keys in an sstable or a database.  A comparator implementation
 // must be thread-safe since rocksdb may invoke its methods concurrently
 // from multiple threads.
-        class Comparator {
+        class comparator {
         public:
-            virtual ~Comparator() {
+            virtual ~comparator() {
             }
 
             // Three-way comparison.  Returns value:
             //   < 0 iff "a" < "b",
             //   == 0 iff "a" == "b",
             //   > 0 iff "a" > "b"
-            virtual int Compare(const slice &a, const slice &b) const = 0;
+            virtual int compare(const slice &a, const slice &b) const = 0;
 
             // Compares two slices for equality. The following invariant should always
             // hold (and is the default implementation):
-            //   Equal(a, b) iff Compare(a, b) == 0
+            //   equal(a, b) iff compare(a, b) == 0
             // Overwrite only if equality comparisons can be done more efficiently than
             // three-way comparisons.
-            virtual bool Equal(const slice &a, const slice &b) const {
-                return Compare(a, b) == 0;
+            virtual bool equal(const slice &a, const slice &b) const {
+                return compare(a, b) == 0;
             }
 
             // The name of the comparator.  Used to check for comparator
-            // mismatches (i.e., a DB created with one comparator is
+            // mismatches (i.e., a database created with one comparator is
             // accessed using a different comparator.
             //
             // The client of this package should switch to a new name whenever
@@ -49,7 +41,7 @@ namespace nil {
             //
             // Names starting with "rocksdb." are reserved and should not be used
             // by any clients of this package.
-            virtual const char *Name() const = 0;
+            virtual const char *name() const = 0;
 
             // Advanced functions: these are used to reduce the space requirements
             // for internal data structures like index blocks.
@@ -57,21 +49,21 @@ namespace nil {
             // If *start < limit, changes *start to a short string in [start,limit).
             // Simple comparator implementations may return with *start unchanged,
             // i.e., an implementation of this method that does nothing is correct.
-            virtual void FindShortestSeparator(std::string *start, const slice &limit) const = 0;
+            virtual void find_shortest_separator(std::string *start, const slice &limit) const = 0;
 
             // Changes *key to a short string >= *key.
             // Simple comparator implementations may return with *key unchanged,
             // i.e., an implementation of this method that does nothing is correct.
-            virtual void FindShortSuccessor(std::string *key) const = 0;
+            virtual void find_short_successor(std::string *key) const = 0;
 
             // if it is a wrapped comparator, may return the root one.
             // return itself it is not wrapped.
-            virtual const Comparator *GetRootComparator() const {
+            virtual const comparator *get_root_comparator() const {
                 return this;
             }
 
             // given two keys, determine if t is the successor of s
-            virtual bool IsSameLengthImmediateSuccessor(const slice & /*s*/, const slice & /*t*/) const {
+            virtual bool is_same_length_immediate_successor(const slice &s, const slice &t) const {
                 return false;
             }
 
@@ -79,7 +71,7 @@ namespace nil {
             // as equal by this comparator.
             // The major use case is to determine if DataBlockHashIndex is compatible
             // with the customized comparator.
-            virtual bool CanKeysWithDifferentByteContentsBeEqual() const {
+            virtual bool can_keys_with_different_byte_contents_be_equal() const {
                 return true;
             }
         };
@@ -87,11 +79,11 @@ namespace nil {
 // Return a builtin comparator that uses lexicographic byte-wise
 // ordering.  The result remains the property of this module and
 // must not be deleted.
-        extern const Comparator *BytewiseComparator();
+        extern const comparator *bytewise_comparator();
 
 // Return a builtin comparator that uses reverse lexicographic byte-wise
 // ordering.
-        extern const Comparator *ReverseBytewiseComparator();
+        extern const comparator *reverse_bytewise_comparator();
 
     }
 } // namespace nil

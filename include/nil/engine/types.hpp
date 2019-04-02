@@ -1,13 +1,8 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
 #include <cstdint>
 
-#include <nil/storage/slice.hpp>
+#include <nil/engine/slice.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -15,7 +10,7 @@ namespace nil {
 // Define all public custom types here.
 
 // Represents a sequence number in a WAL file.
-        typedef uint64_t SequenceNumber;
+        typedef uint64_t sequence_number;
 
 // User-oriented representation of internal key types.
         enum EntryType {
@@ -25,12 +20,12 @@ namespace nil {
 // <user key, sequence number, and entry type> tuple.
         struct FullKey {
             slice user_key;
-            SequenceNumber sequence;
+            sequence_number sequence;
             EntryType type;
 
             FullKey() : sequence(0) {
             }  // Intentionally left uninitialized (for speed)
-            FullKey(const slice &u, const SequenceNumber &seq, EntryType t) : user_key(u), sequence(seq), type(t) {
+            FullKey(const slice &u, const sequence_number &seq, EntryType t) : user_key(u), sequence(seq), type(t) {
             }
 
             std::string DebugString(bool hex = false) const;

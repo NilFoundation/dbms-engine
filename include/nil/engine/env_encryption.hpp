@@ -1,8 +1,3 @@
-//  Copyright (c) 2016-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
 #if !defined(ROCKSDB_LITE)
@@ -40,7 +35,7 @@ namespace nil {
             virtual status_type Decrypt(uint64_t fileOffset, char *data, size_t dataSize);
 
         protected:
-            // Allocate scratch space which is passed to EncryptBlock/DecryptBlock.
+            // allocate scratch space which is passed to EncryptBlock/DecryptBlock.
             virtual void AllocateScratch(std::string &) = 0;
 
             // Encrypt a block of data at the given block index.
@@ -123,7 +118,7 @@ namespace nil {
             }
 
         protected:
-            // Allocate scratch space which is passed to EncryptBlock/DecryptBlock.
+            // allocate scratch space which is passed to EncryptBlock/DecryptBlock.
             virtual void AllocateScratch(std::string &) override;
 
             // Encrypt a block of data at the given block index.
