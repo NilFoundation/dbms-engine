@@ -1,4 +1,4 @@
-#ifndef ROCKSDB_LITE
+#ifndef DCDB_LITE
 #pragma once
 
 #include <nil/engine/options.hpp>
@@ -14,4 +14,4 @@ namespace nil {
     }
 } // namespace nil
 
-#endif  // ROCKSDB_LITE
+#endif  // DCDB_LITE

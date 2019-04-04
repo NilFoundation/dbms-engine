@@ -1,6 +1,6 @@
 #pragma once
 
-#ifndef ROCKSDB_LITE
+#ifndef DCDB_LITE
 
 #include <memory>
 #include <string>
@@ -115,4 +115,4 @@ namespace nil {
     }
 } // namespace nil
 
-#endif  // !ROCKSDB_LITE
+#endif  // !DCDB_LITE

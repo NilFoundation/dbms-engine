@@ -101,7 +101,7 @@ namespace nil {
             // Use this if you don't need to keep the data sorted, i.e. you'll never use
             // an iterator, only insert() and get() API calls
             //
-            // Not supported in ROCKSDB_LITE
+            // Not supported in DCDB_LITE
             column_family_options *OptimizeForPointLookup(uint64_t block_cache_size_mb);
 
             // default_environment values for some parameters in column_family_options are not
@@ -119,7 +119,7 @@ namespace nil {
             // Note: we might use more memory than memtable_memory_budget during high
             // write rate period
             //
-            // OptimizeUniversalStyleCompaction is not supported in ROCKSDB_LITE
+            // OptimizeUniversalStyleCompaction is not supported in DCDB_LITE
             column_family_options *OptimizeLevelStyleCompaction(uint64_t memtable_memory_budget = 512 * 1024 * 1024);
 
             column_family_options *OptimizeUniversalStyleCompaction(uint64_t memtable_memory_budget = 512 * 1024 * 1024);
@@ -359,7 +359,7 @@ namespace nil {
             // spend lots of memory for memtables.
             db_options *OptimizeForSmallDb();
 
-#ifndef ROCKSDB_LITE
+#ifndef DCDB_LITE
 
             // By default, RocksDB uses only one background thread for flush and
             // compaction. Calling this function will set it up such that total of
@@ -368,7 +368,7 @@ namespace nil {
             // bottlenecked by RocksDB.
             db_options *IncreaseParallelism(int total_threads = 16);
 
-#endif  // ROCKSDB_LITE
+#endif  // DCDB_LITE
 
             // If true, the database will be created if it is missing.
             // default_environment: false
@@ -592,7 +592,7 @@ namespace nil {
             // If specified with non-zero value, log file will be rolled
             // if it has been active longer than `log_file_time_to_roll`.
             // default_environment: 0 (disabled)
-            // Not supported in ROCKSDB_LITE mode!
+            // Not supported in DCDB_LITE mode!
             size_t log_file_time_to_roll = 0;
 
             // Maximal info log files to be kept.
@@ -661,12 +661,12 @@ namespace nil {
             // Use O_DIRECT for user and compaction reads.
             // When true, we also force new_table_reader_for_compaction_inputs to true.
             // default_environment: false
-            // Not supported in ROCKSDB_LITE mode!
+            // Not supported in DCDB_LITE mode!
             bool use_direct_reads = false;
 
             // Use O_DIRECT for writes in background flush and compactions.
             // default_environment: false
-            // Not supported in ROCKSDB_LITE mode!
+            // Not supported in DCDB_LITE mode!
             bool use_direct_io_for_flush_and_compaction = false;
 
             // If false, fallocate() calls are bypassed
@@ -926,17 +926,17 @@ namespace nil {
 
             // A global cache for table-level rows.
             // default_environment: nullptr (disabled)
-            // Not supported in ROCKSDB_LITE mode!
+            // Not supported in DCDB_LITE mode!
             std::shared_ptr<cache> row_cache = nullptr;
 
-#ifndef ROCKSDB_LITE
+#ifndef DCDB_LITE
             // A filter object supplied to be invoked while processing write-ahead-logs
             // (WALs) during recovery. The filter provides a way to inspect log
             // records, ignoring a particular record or skipping replay.
             // The filter is invoked at startup and is invoked from a single-thread
             // currently.
             WalFilter *wal_filter = nullptr;
-#endif  // ROCKSDB_LITE
+#endif  // DCDB_LITE
 
             // If true, then database::open / create_column_family / drop_column_family
             // / set_options will fail if options file is not detected or properly
@@ -1071,7 +1071,7 @@ namespace nil {
         };
 
 // Options that control read operations
-        struct ReadOptions {
+        struct read_options {
             // If "snapshot" is non-nullptr, read as of the supplied snapshot
             // (which must belong to the database that is being read and which must
             // not have been released).  If "snapshot" is nullptr, use an implicit
@@ -1136,7 +1136,7 @@ namespace nil {
             // added data) and is optimized for sequential reads. It will return records
             // that were inserted into the database after the creation of the iterator.
             // default_environment: false
-            // Not supported in ROCKSDB_LITE mode!
+            // Not supported in DCDB_LITE mode!
             bool tailing;
 
             // This options is not used anymore. It was to turn on a functionality that
@@ -1194,9 +1194,9 @@ namespace nil {
             // default_environment: 0 (don't filter by seqnum, return user keys)
             sequence_number iter_start_seqnum;
 
-            ReadOptions();
+            read_options();
 
-            ReadOptions(bool cksum, bool cache);
+            read_options(bool cksum, bool cache);
         };
 
 // Options that control write operations

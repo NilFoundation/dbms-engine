@@ -1398,16 +1398,16 @@ namespace nil {
 // all non-file-engine tasks to base_env. The caller must delete the result
 // when it is no longer needed.
 // *base_env must remain live while the result is in use.
-        environment_type *NewMemEnv(environment_type *base_env);
+        environment_type *new_mem_env(environment_type *base_env);
 
 // Returns a new environment that is used for HDFS environment.
 // This is a factory method for HdfsEnv declared in hdfs/env_hdfs.h
-        status_type NewHdfsEnv(environment_type **hdfs_env, const std::string &fsname);
+        status_type new_hdfs_env(environment_type **hdfs_env, const std::string &fsname);
 
 // Returns a new environment that measures function call times for filesystem
 // operations, reporting results to variables in PerfContext.
 // This is a factory method for TimedEnv defined in utilities/env_timed.cc.
-        environment_type *NewTimedEnv(environment_type *base_env);
+        environment_type *new_timed_env(environment_type *base_env);
 
     }
 } // namespace nil

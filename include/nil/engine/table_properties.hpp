@@ -97,7 +97,7 @@ namespace nil {
                 return;
             }
 
-            // Finish() will be called when a table has already been built and is ready
+            // finish() will be called when a table has already been built and is ready
             // for writing the properties block.
             // @params properties  User will add their collected statistics to
             // `properties`.

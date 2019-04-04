@@ -1,6 +1,6 @@
 #pragma once
 
-#ifndef ROCKSDB_LITE
+#ifndef DCDB_LITE
 
 #include <nil/engine/iterator.hpp>
 #include <nil/engine/options.hpp>
@@ -24,7 +24,7 @@ namespace nil {
             // Returns a new iterator over the table contents.
             // Most read options provide the same control as we read from database.
             // If "snapshot" is nullptr, the iterator returns only the latest keys.
-            Iterator *NewIterator(const ReadOptions &options);
+            Iterator *NewIterator(const read_options &options);
 
             std::shared_ptr<const table_properties> GetTableProperties() const;
 
@@ -39,4 +39,4 @@ namespace nil {
     }
 } // namespace nil
 
-#endif  // !ROCKSDB_LITE
+#endif  // !DCDB_LITE

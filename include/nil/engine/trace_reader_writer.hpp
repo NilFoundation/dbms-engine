@@ -5,20 +5,20 @@
 namespace nil {
     namespace dcdb {
 
-// Allow custom implementations of TraceWriter and TraceReader.
+// Allow custom implementations of trace_writer and TraceReader.
 // By default, RocksDB provides a way to capture the traces to a file using the
 // factory NewFileTraceWriter(). But users could also choose to export traces to
-// any other system by providing custom implementations of TraceWriter and
+// any other system by providing custom implementations of trace_writer and
 // TraceReader.
 
-// TraceWriter allows exporting RocksDB traces to any system, one operation at
+// trace_writer allows exporting RocksDB traces to any system, one operation at
 // a time.
-        class TraceWriter {
+        class trace_writer {
         public:
-            TraceWriter() {
+            trace_writer() {
             }
 
-            virtual ~TraceWriter() {
+            virtual ~trace_writer() {
             }
 
             virtual status_type Write(const slice &data) = 0;
@@ -45,7 +45,7 @@ namespace nil {
 
 // Factory methods to read/write traces from/to a file.
         status_type NewFileTraceWriter(environment_type *env, const environment_options &env_options,
-                                       const std::string &trace_filename, std::unique_ptr<TraceWriter> *trace_writer);
+                                       const std::string &trace_filename, std::unique_ptr<trace_writer> *trace_writer);
 
         status_type NewFileTraceReader(environment_type *env, const environment_options &env_options,
                                        const std::string &trace_filename, std::unique_ptr<TraceReader> *trace_reader);

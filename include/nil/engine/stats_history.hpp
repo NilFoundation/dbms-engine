@@ -12,12 +12,12 @@ namespace nil {
 
         class DBImpl;
 
-        class StatsHistoryIterator {
+        class stats_history_iterator {
         public:
-            StatsHistoryIterator() {
+            stats_history_iterator() {
             }
 
-            virtual ~StatsHistoryIterator() {
+            virtual ~stats_history_iterator() {
             }
 
             virtual bool Valid() const = 0;

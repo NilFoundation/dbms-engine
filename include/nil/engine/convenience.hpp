@@ -11,7 +11,7 @@
 namespace nil {
     namespace dcdb {
 
-#ifndef ROCKSDB_LITE
+#ifndef DCDB_LITE
 // The following set of functions provide a way to construct RocksDB Options
 // from a string or a string-to-string map.  Here're the general rule of
 // setting option values from strings by type.  Some RocksDB types are also
@@ -209,7 +209,7 @@ namespace nil {
 //   functions:
 //   - BloomFilter: use "bloomfilter:[bits_per_key]:[use_block_based_builder]"
 //     to specify BloomFilter.  The above string is equivalent to calling
-//     NewBloomFilterPolicy(bits_per_key, use_block_based_builder).
+//     new_bloom_filter_policy(bits_per_key, use_block_based_builder).
 //     [Example]:
 //     - Pass {"filter_policy", "bloomfilter:4:true"} in
 //       get_block_based_table_options_from_map to use a BloomFilter with 4-bits
@@ -327,7 +327,7 @@ namespace nil {
         status_type verify_sst_file_checksum(const Options &options, const environment_options &env_options,
                                              const std::string &file_path);
 
-#endif  // ROCKSDB_LITE
+#endif  // DCDB_LITE
 
     }
 } // namespace nil

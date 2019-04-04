@@ -15,7 +15,7 @@
 #include <utility>
 #include <vector>
 
-#if !defined(ROCKSDB_LITE) && \
+#if !defined(DCDB_LITE) && \
     !defined(NROCKSDB_THREAD_STATUS) && \
     defined(ROCKSDB_SUPPORT_THREAD_LOCAL)
 #define ROCKSDB_USING_THREAD_STATUS

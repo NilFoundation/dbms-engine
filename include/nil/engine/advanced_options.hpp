@@ -23,12 +23,12 @@ namespace nil {
         enum compaction_style : char {
             // level based compaction style
                     kCompactionStyleLevel = 0x0, // Universal compaction style
-            // Not supported in ROCKSDB_LITE.
+            // Not supported in DCDB_LITE.
                     kCompactionStyleUniversal = 0x1, // FIFO compaction style
-            // Not supported in ROCKSDB_LITE
+            // Not supported in DCDB_LITE
                     kCompactionStyleFIFO = 0x2, // Disable background compaction. Compaction jobs are submitted
             // via compact_files().
-            // Not supported in ROCKSDB_LITE
+            // Not supported in DCDB_LITE
                     kCompactionStyleNone = 0x3,
         };
 

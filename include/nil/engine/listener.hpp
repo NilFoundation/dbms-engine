@@ -110,7 +110,7 @@ namespace nil {
             } condition;
         };
 
-#ifndef ROCKSDB_LITE
+#ifndef DCDB_LITE
 
         struct TableFileDeletionInfo {
             // The name of the database where the file was deleted.
@@ -449,7 +449,7 @@ namespace nil {
         class event_listener {
         };
 
-#endif  // ROCKSDB_LITE
+#endif  // DCDB_LITE
 
     }
 } // namespace nil

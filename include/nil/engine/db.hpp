@@ -34,7 +34,7 @@ namespace nil {
 
         struct Options;
         struct db_options;
-        struct ReadOptions;
+        struct read_options;
         struct write_options;
         struct flush_options;
         struct compaction_options;
@@ -48,11 +48,11 @@ namespace nil {
 
         class event_listener;
 
-        class StatsHistoryIterator;
+        class stats_history_iterator;
 
-        class TraceWriter;
+        class trace_writer;
 
-#ifdef ROCKSDB_LITE
+#ifdef DCDB_LITE
         class compaction_job_info;
 #endif
 
@@ -151,7 +151,7 @@ namespace nil {
             // If the db is opened in read only mode, then no compactions
             // will happen.
             //
-            // Not supported in ROCKSDB_LITE, in which case the function will
+            // Not supported in DCDB_LITE, in which case the function will
             // return status_type::NotSupported.
             static status_type open_for_read_only(const Options &options, const std::string &name, database **dbptr,
                                                   bool error_if_log_file_exist = false);
@@ -162,7 +162,7 @@ namespace nil {
             // column family. The default column family name is 'default' and it's stored
             // in nil::dcdb::kDefaultColumnFamilyName
             //
-            // Not supported in ROCKSDB_LITE, in which case the function will
+            // Not supported in DCDB_LITE, in which case the function will
             // return status_type::NotSupported.
             static status_type open_for_read_only(const db_options &db_options, const std::string &name,
                                                   const std::vector<column_family_descriptor> &column_families,
@@ -339,7 +339,7 @@ namespace nil {
             // a status for which status_type::IsNotFound() returns true.
             //
             // May return some other status_type on an error.
-            virtual inline status_type get(const ReadOptions &options, column_family_handle *column_family,
+            virtual inline status_type get(const read_options &options, column_family_handle *column_family,
                                            const slice &key, std::string *value) {
                 assert(value != nullptr);
                 PinnableSlice pinnable_val(value);
@@ -351,10 +351,10 @@ namespace nil {
                 return s;
             }
 
-            virtual status_type get(const ReadOptions &options, column_family_handle *column_family, const slice &key,
+            virtual status_type get(const read_options &options, column_family_handle *column_family, const slice &key,
                                     PinnableSlice *value) = 0;
 
-            virtual status_type get(const ReadOptions &options, const slice &key, std::string *value) {
+            virtual status_type get(const read_options &options, const slice &key, std::string *value) {
                 return get(options, default_column_family(), key, value);
             }
 
@@ -368,12 +368,12 @@ namespace nil {
             // Similarly, the number of returned statuses will be the number of keys.
             // Note: keys will not be "de-duplicated". Duplicate keys will return
             // duplicate values in order.
-            virtual std::vector<status_type> multi_get(const ReadOptions &options,
+            virtual std::vector<status_type> multi_get(const read_options &options,
                                                        const std::vector<column_family_handle *> &column_family,
                                                        const std::vector<slice> &keys,
                                                        std::vector<std::string> *values) = 0;
 
-            virtual std::vector<status_type> multi_get(const ReadOptions &options, const std::vector<slice> &keys,
+            virtual std::vector<status_type> multi_get(const read_options &options, const std::vector<slice> &keys,
                                                        std::vector<std::string> *values) {
                 return multi_get(options, std::vector<column_family_handle *>(keys.size(), default_column_family()),
                         keys, values);
@@ -386,7 +386,7 @@ namespace nil {
             // This check is potentially lighter-weight than invoking database::get(). One way
             // to make this lighter weight is to avoid doing any IOs.
             // default_environment implementation here returns true and sets 'value_found' to false
-            virtual bool key_may_exist(const ReadOptions &options, column_family_handle *column_family,
+            virtual bool key_may_exist(const read_options &options, column_family_handle *column_family,
                                        const slice &key, std::string *value, bool *value_found = nullptr) {
                 if (value_found != nullptr) {
                     *value_found = false;
@@ -394,7 +394,7 @@ namespace nil {
                 return true;
             }
 
-            virtual bool key_may_exist(const ReadOptions &options, const slice &key, std::string *value,
+            virtual bool key_may_exist(const read_options &options, const slice &key, std::string *value,
                                        bool *value_found = nullptr) {
                 return key_may_exist(options, default_column_family(), key, value, value_found);
             }
@@ -405,16 +405,16 @@ namespace nil {
             //
             // Caller should delete the iterator when it is no longer needed.
             // The returned iterator should be deleted before this db is deleted.
-            virtual Iterator *new_iterator(const ReadOptions &options, column_family_handle *column_family) = 0;
+            virtual Iterator *new_iterator(const read_options &options, column_family_handle *column_family) = 0;
 
-            virtual Iterator *new_iterator(const ReadOptions &options) {
+            virtual Iterator *new_iterator(const read_options &options) {
                 return new_iterator(options, default_column_family());
             }
 
             // Returns iterators from a consistent database state across multiple
             // column families. Iterators are heap allocated and need to be deleted
             // before the db is deleted
-            virtual status_type new_iterators(const ReadOptions &options,
+            virtual status_type new_iterators(const read_options &options,
                                               const std::vector<column_family_handle *> &column_families,
                                               std::vector<Iterator *> *iterators) = 0;
 
@@ -431,7 +431,7 @@ namespace nil {
             // use "snapshot" after this call.
             virtual void release_snapshot(const Snapshot *snapshot) = 0;
 
-#ifndef ROCKSDB_LITE
+#ifndef DCDB_LITE
             // Contains all valid property arguments for get_property().
             //
             // NOTE: Property names cannot end in numbers since those are interpreted as
@@ -643,7 +643,7 @@ namespace nil {
                 //      of options.statistics
                 static const std::string kOptionsStatistics;
             };
-#endif /* ROCKSDB_LITE */
+#endif /* DCDB_LITE */
 
             // database implementations can export properties about their state via this method.
             // If "property" is a valid property understood by this database implementation (see
@@ -955,7 +955,7 @@ namespace nil {
             // updated, false if user attempted to call if with seqnum <= current value.
             virtual bool set_preserve_deletes_sequence_number(sequence_number seqnum) = 0;
 
-#ifndef ROCKSDB_LITE
+#ifndef DCDB_LITE
 
             // Prevent file deletions. Compactions will continue to occur,
             // but no obsolete files will be deleted. Calling this multiple
@@ -1175,7 +1175,7 @@ namespace nil {
                 return ingest_external_file(default_column_family(), {file_info->file_path}, ifo);
             }
 
-#endif  // ROCKSDB_LITE
+#endif  // DCDB_LITE
 
             // Sets the globally unique ID created at database creation time by invoking
             // environment_type::generate_unique_id(), in identity. Returns status_type::OK if identity could
@@ -1185,7 +1185,7 @@ namespace nil {
             // Returns default column family handle
             virtual column_family_handle *default_column_family() const = 0;
 
-#ifndef ROCKSDB_LITE
+#ifndef DCDB_LITE
 
             virtual status_type get_properties_of_all_tables(column_family_handle *column_family,
                                                              table_properties_collection *props) = 0;
@@ -1208,7 +1208,7 @@ namespace nil {
             }
 
             // Trace database operations. Use end_trace() to stop tracing.
-            virtual status_type start_trace(const trace_options &options, std::unique_ptr<TraceWriter> &&trace_writer) {
+            virtual status_type start_trace(const trace_options &options, std::unique_ptr<trace_writer> &&trace_writer) {
                 return status_type::NotSupported("start_trace() is not implemented.");
             }
 
@@ -1216,7 +1216,7 @@ namespace nil {
                 return status_type::NotSupported("end_trace() is not implemented.");
             }
 
-#endif  // ROCKSDB_LITE
+#endif  // DCDB_LITE
 
             // Needed for StackableDB
             virtual database *get_root_db() {
@@ -1224,9 +1224,9 @@ namespace nil {
             }
 
             // Given a time window, return an iterator for accessing stats history
-            // User is responsible for deleting StatsHistoryIterator after use
+            // User is responsible for deleting stats_history_iterator after use
             virtual status_type get_stats_history(uint64_t start_time, uint64_t end_time,
-                                                  std::unique_ptr<StatsHistoryIterator> *stats_iterator) {
+                                                  std::unique_ptr<stats_history_iterator> *stats_iterator) {
                 return status_type::NotSupported("get_stats_history() is not implemented.");
             }
 
@@ -1243,7 +1243,7 @@ namespace nil {
                                const std::vector<column_family_descriptor> &column_families = std::vector<
                                        column_family_descriptor>());
 
-#ifndef ROCKSDB_LITE
+#ifndef DCDB_LITE
 
 // If a database cannot be opened, you may attempt to call this method to
 // resurrect as much of the contents of the database as possible.

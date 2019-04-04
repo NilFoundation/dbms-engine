@@ -195,7 +195,7 @@ namespace nil {
 
             // If non-nullptr, use the specified filter policy to reduce disk reads.
             // Many applications will benefit from passing the result of
-            // NewBloomFilterPolicy() here.
+            // new_bloom_filter_policy() here.
             std::shared_ptr<const filter_policy> filter_policy = nullptr;
 
             // If true, place whole keys in the filter (not just prefixes).
@@ -278,7 +278,7 @@ namespace nil {
         extern table_factory *new_block_based_table_factory(
                 const block_based_table_options &table_options = block_based_table_options());
 
-#ifndef ROCKSDB_LITE
+#ifndef DCDB_LITE
 
         enum encoding_type : char {
             // Always write full keys without any special encoding.
@@ -430,7 +430,7 @@ namespace nil {
         extern table_factory *new_cuckoo_table_factory(
                 const cuckoo_table_options &table_options = cuckoo_table_options());
 
-#endif  // ROCKSDB_LITE
+#endif  // DCDB_LITE
 
         class random_access_file_reader;
 
@@ -531,7 +531,7 @@ namespace nil {
             }
         };
 
-#ifndef ROCKSDB_LITE
+#ifndef DCDB_LITE
 
 // Create a special table factory that can open either of the supported
 // table formats, based on setting inside the SST files. It should be used to
@@ -547,7 +547,7 @@ namespace nil {
                 std::shared_ptr<table_factory> plain_table_factory = nullptr,
                 std::shared_ptr<table_factory> cuckoo_table_factory = nullptr);
 
-#endif  // ROCKSDB_LITE
+#endif  // DCDB_LITE
 
     }
 } // namespace nil
