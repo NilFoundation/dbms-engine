@@ -11,7 +11,7 @@ namespace nil {
 // Algorithm used to make a compaction request stop picking new files
 // into a single compaction run
 //
-        enum CompactionStopStyle {
+        enum compaction_stop_style {
             kCompactionStopStyleSimilarSize, // pick files of similar size
             kCompactionStopStyleTotalSize    // total size of picked files > next file
         };
@@ -62,7 +62,7 @@ namespace nil {
 
             // The algorithm used to stop picking files into a single compaction run
             // default_environment: kCompactionStopStyleTotalSize
-            CompactionStopStyle stop_style;
+            compaction_stop_style stop_style;
 
             // Option to optimize the universal multi level compaction by enabling
             // trivial move for non overlapping files.

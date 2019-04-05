@@ -36,7 +36,7 @@ namespace nil {
 
         enum info_log_level : unsigned char;
 
-        class SstFileManager;
+        class sst_file_manager;
 
         class filter_policy;
 
@@ -44,19 +44,19 @@ namespace nil {
 
         class merge_operator;
 
-        class Snapshot;
+        class snapshot;
 
         class mem_table_rep_factory;
 
-        class RateLimiter;
+        class rate_limiter;
 
         class slice;
 
-        class Statistics;
+        class statistics;
 
         class internal_key_comparator;
 
-        class WalFilter;
+        class wal_filter;
 
 // database contents are stored in a set of blocks, each of which holds a
 // sequence of key,value pairs.  Each block may be compressed before
@@ -81,48 +81,49 @@ namespace nil {
             // eventually remove the option from the public API.
                     kZSTDNotFinalCompression = 0x40,
 
-            // kDisableCompressionOption is used to disable some compression options.
+            // kDisableCompressionOption is used to disable some compression opts.
                     kDisableCompressionOption = 0xff,
         };
 
-        struct Options;
+        struct options;
         struct db_path;
 
         struct column_family_options : public advanced_column_family_options {
-            // The function recovers options to a previous version. Only 4.6 or later
+            // The function recovers opts to a previous version. Only 4.6 or later
             // versions are supported.
-            column_family_options *OldDefaults(int rocksdb_major_version = 4, int rocksdb_minor_version = 6);
+            column_family_options *old_defaults(int rocksdb_major_version = 4, int rocksdb_minor_version = 6);
 
             // Some functions that make it easier to optimize RocksDB
             // Use this if your database is very small (like under 1GB) and you don't want to
             // spend lots of memory for memtables.
-            column_family_options *OptimizeForSmallDb();
+            column_family_options *optimize_for_small_db();
 
             // Use this if you don't need to keep the data sorted, i.e. you'll never use
             // an iterator, only insert() and get() API calls
             //
             // Not supported in DCDB_LITE
-            column_family_options *OptimizeForPointLookup(uint64_t block_cache_size_mb);
+            column_family_options *optimize_for_point_lookup(uint64_t block_cache_size_mb);
 
             // default_environment values for some parameters in column_family_options are not
             // optimized for heavy workloads and big datasets, which means you might
             // observe write stalls under some conditions. As a starting point for tuning
-            // RocksDB options, use the following two functions:
-            // * OptimizeLevelStyleCompaction -- optimizes level style compaction
-            // * OptimizeUniversalStyleCompaction -- optimizes universal style compaction
+            // RocksDB opts, use the following two functions:
+            // * optimize_level_style_compaction -- optimizes level style compaction
+            // * optimize_universal_style_compaction -- optimizes universal style compaction
             // Universal style compaction is focused on reducing write Amplification
             // Factor for big data sets, but increases Space Amplification. You can learn
             // more about the different styles here:
             // https://github.com/facebook/rocksdb/wiki/Rocksdb-Architecture-Guide
-            // Make sure to also call IncreaseParallelism(), which will provide the
+            // Make sure to also call increase_parallelism(), which will provide the
             // biggest performance gains.
             // Note: we might use more memory than memtable_memory_budget during high
             // write rate period
             //
-            // OptimizeUniversalStyleCompaction is not supported in DCDB_LITE
-            column_family_options *OptimizeLevelStyleCompaction(uint64_t memtable_memory_budget = 512 * 1024 * 1024);
+            // optimize_universal_style_compaction is not supported in DCDB_LITE
+            column_family_options *optimize_level_style_compaction(uint64_t memtable_memory_budget = 512 * 1024 * 1024);
 
-            column_family_options *OptimizeUniversalStyleCompaction(uint64_t memtable_memory_budget = 512 * 1024 * 1024);
+            column_family_options *optimize_universal_style_compaction(
+                    uint64_t memtable_memory_budget = 512 * 1024 * 1024);
 
             // -------------------
             // Parameters that affect behavior
@@ -137,7 +138,7 @@ namespace nil {
 
             // REQUIRES: The client must provide a merge operator if merge operation
             // needs to be accessed. Calling merge on a database without a merge operator
-            // would result in status_type::NotSupported. The client must ensure that the
+            // would result in status_type::not_supported. The client must ensure that the
             // merge operator supplied here has the same name and *exactly* the same
             // semantics as the merge operator provided to previous open calls on
             // the same database. The only exception is reserved for upgrade, where a database
@@ -228,12 +229,12 @@ namespace nil {
             // default_environment: kDisableCompressionOption (Disabled)
             compression_type bottommost_compression = kDisableCompressionOption;
 
-            // different options for compression algorithms used by bottommost_compression
+            // different opts for compression algorithms used by bottommost_compression
             // if it is enabled. To enable it, please see the definition of
             // compression_options.
             compression_options bottommost_compression_opts;
 
-            // different options for compression algorithms
+            // different opts for compression algorithms
             compression_options compression_opts;
 
             // Number of files to trigger level-0 compaction. A value <0 means that
@@ -311,10 +312,10 @@ namespace nil {
             // Create column_family_options with default values for all fields
             column_family_options();
 
-            // Create column_family_options from Options
-            explicit column_family_options(const Options &options);
+            // Create column_family_options from opts
+            explicit column_family_options(const options &options);
 
-            void Dump(Logger *log) const;
+            void dump(Logger *log) const;
         };
 
         enum class wal_recovery_mode : char {
@@ -350,14 +351,14 @@ namespace nil {
 
 
         struct db_options {
-            // The function recovers options to the option as in version 4.6.
-            db_options *OldDefaults(int rocksdb_major_version = 4, int rocksdb_minor_version = 6);
+            // The function recovers opts to the option as in version 4.6.
+            db_options *old_defaults(int rocksdb_major_version = 4, int rocksdb_minor_version = 6);
 
             // Some functions that make it easier to optimize RocksDB
 
             // Use this if your database is very small (like under 1GB) and you don't want to
             // spend lots of memory for memtables.
-            db_options *OptimizeForSmallDb();
+            db_options *optimize_for_small_db();
 
 #ifndef DCDB_LITE
 
@@ -366,7 +367,7 @@ namespace nil {
             // `total_threads` is used. Good value for `total_threads` is the number of
             // cores. You almost definitely want to call this function if your system is
             // bottlenecked by RocksDB.
-            db_options *IncreaseParallelism(int total_threads = 16);
+            db_options *increase_parallelism(int total_threads = 16);
 
 #endif  // DCDB_LITE
 
@@ -399,7 +400,7 @@ namespace nil {
             // priority than compaction. Rate limiting is disabled if nullptr.
             // If rate limiter is enabled, bytes_per_sync is set to 1MB by default.
             // default_environment: nullptr
-            std::shared_ptr<RateLimiter> rate_limiter = nullptr;
+            std::shared_ptr<rate_limiter> rate_limiter = nullptr;
 
             // Use to track SST files and control their file deletion rate.
             //
@@ -415,7 +416,7 @@ namespace nil {
             //    first db_path (db_name if db_paths is empty).
             //
             // default_environment: nullptr
-            std::shared_ptr<SstFileManager> sst_file_manager = nullptr;
+            std::shared_ptr<sst_file_manager> sst_file_manager = nullptr;
 
             // Any internal progress/error information generated by the db will
             // be written to info_log if it is non-nullptr, or to a file stored
@@ -459,7 +460,7 @@ namespace nil {
             uint64_t max_total_wal_size = 0;
 
             // If non-null, then we should collect metrics about database operations
-            std::shared_ptr<Statistics> statistics = nullptr;
+            std::shared_ptr<statistics> statistics = nullptr;
 
             // By default, writes to stable engine use fdatasync (on platforms
             // where this function is available). If this option is true,
@@ -675,7 +676,7 @@ namespace nil {
             // Disable child process inherit open files. default_environment: true
             bool is_fd_close_on_exec = true;
 
-            // NOT SUPPORTED ANYMORE -- this options is no longer used
+            // NOT SUPPORTED ANYMORE -- this opts is no longer used
             bool skip_log_error_on_recovery = false;
 
             // if not zero, dump rocksdb.stats to LOG every stats_dump_period_sec
@@ -730,15 +731,15 @@ namespace nil {
             // Specify the file access pattern once a compaction is started.
             // It will be applied to all input files of a compaction.
             // default_environment: NORMAL
-            enum AccessHint {
+            enum access_hint {
                 NONE, NORMAL, SEQUENTIAL, WILLNEED
             };
-            AccessHint access_hint_on_compaction_start = NORMAL;
+            access_hint access_hint_on_compaction_start = NORMAL;
 
             // If true, always create a new file descriptor and new table reader
             // for compaction inputs. Turn this parameter on may introduce extra
             // memory usage in the table reader, if it allocates extra memory
-            // for indexes. This will allow file descriptor prefetch options
+            // for indexes. This will allow file descriptor prefetch opts
             // to be set for compaction input files and not to impact file
             // descriptors for the same file used by user queries.
             // Suggest to enable block_based_table_options.cache_index_and_filter_blocks
@@ -798,10 +799,10 @@ namespace nil {
             // Create db_options with default values for all fields
             db_options();
 
-            // Create db_options from Options
-            explicit db_options(const Options &options);
+            // Create db_options from opts
+            explicit db_options(const options &options);
 
-            void Dump(Logger *log) const;
+            void dump(Logger *log) const;
 
             // Allows OS to incrementally sync files to disk while they are being
             // written, asynchronously, in the background. This operation can be used
@@ -809,7 +810,7 @@ namespace nil {
             // persistency guarantee.
             // Issue one request for every bytes_per_sync written. 0 turns it off.
             //
-            // You may consider using rate_limiter to regulate write rate to device.
+            // You may consider using limiter to regulate write rate to device.
             // When rate limiter is enabled, it automatically enables bytes_per_sync
             // to 1MB.
             //
@@ -846,7 +847,7 @@ namespace nil {
             // gets behind further.
             // If the value is 0, we will infer a value from `rater_limiter` value
             // if it is not empty, or 16MB if `rater_limiter` is empty. Note that
-            // if users change the rate in `rate_limiter` after database is opened,
+            // if users change the rate in `limiter` after database is opened,
             // `delayed_write_rate` won't be adjusted.
             //
             // Unit: byte per second.
@@ -935,11 +936,11 @@ namespace nil {
             // records, ignoring a particular record or skipping replay.
             // The filter is invoked at startup and is invoked from a single-thread
             // currently.
-            WalFilter *wal_filter = nullptr;
+            wal_filter *wal_filter = nullptr;
 #endif  // DCDB_LITE
 
             // If true, then database::open / create_column_family / drop_column_family
-            // / set_options will fail if options file is not detected or properly
+            // / set_options will fail if opts file is not detected or properly
             // persisted.
             //
             // DEFAULT: false
@@ -1019,22 +1020,22 @@ namespace nil {
             bool atomic_flush = false;
         };
 
-// Options to control the behavior of a database (passed to database::open)
-        struct Options : public db_options, public column_family_options {
-            // Create an Options object with default values for all fields.
-            Options() : db_options(), column_family_options() {
+// opts to control the behavior of a database (passed to database::open)
+        struct options : public db_options, public column_family_options {
+            // Create an opts object with default values for all fields.
+            options() : db_options(), column_family_options() {
             }
 
-            Options(const db_options &input_db_options, const column_family_options &input_column_family_options) : db_options(
-                    input_db_options), column_family_options(input_column_family_options) {
+            options(const db_options &input_db_options, const column_family_options &input_column_family_options)
+                    : db_options(input_db_options), column_family_options(input_column_family_options) {
             }
 
-            // The function recovers options to the option as in version 4.6.
-            Options *OldDefaults(int rocksdb_major_version = 4, int rocksdb_minor_version = 6);
+            // The function recovers opts to the option as in version 4.6.
+            options *old_defaults(int rocksdb_major_version = 4, int rocksdb_minor_version = 6);
 
-            void Dump(Logger *log) const;
+            void dump(Logger *log) const;
 
-            void DumpCFOptions(Logger *log) const;
+            void dump_cf_options(Logger *log) const;
 
             // Some functions that make it easier to optimize RocksDB
 
@@ -1046,11 +1047,11 @@ namespace nil {
             // All data will be in level 0 without any automatic compaction.
             // It's recommended to manually call compact_range(NULL, NULL) before reading
             // from the database, because otherwise the read can be very slow.
-            Options *PrepareForBulkLoad();
+            options *prepare_for_bulk_load();
 
             // Use this if your database is very small (like under 1GB) and you don't want to
             // spend lots of memory for memtables.
-            Options *OptimizeForSmallDb();
+            options *optimize_for_small_db();
         };
 
 //
@@ -1070,21 +1071,21 @@ namespace nil {
                     kMemtableTier = 0x3     // data in memtable. used for memtable-only iterators.
         };
 
-// Options that control read operations
+// opts that control read operations
         struct read_options {
-            // If "snapshot" is non-nullptr, read as of the supplied snapshot
+            // If "snapshot" is non-nullptr, read as of the supplied get_snapshot
             // (which must belong to the database that is being read and which must
-            // not have been released).  If "snapshot" is nullptr, use an implicit
-            // snapshot of the state at the beginning of this read operation.
+            // not have been released).  If "get_snapshot" is nullptr, use an implicit
+            // get_snapshot of the state at the beginning of this read operation.
             // default_environment: nullptr
-            const Snapshot *snapshot;
+            const snapshot *snapshot;
 
             // `iterate_lower_bound` defines the smallest key at which the backward
-            // iterator can return an entry. Once the bound is passed, Valid() will be
+            // iterator can return an entry. Once the bound is passed, valid() will be
             // false. `iterate_lower_bound` is inclusive ie the bound value is a valid
             // entry.
             //
-            // If prefix_extractor is not null, the Seek target and `iterate_lower_bound`
+            // If prefix_extractor is not null, the seek target and `iterate_lower_bound`
             // need to have the same prefix. This is because ordering is not guaranteed
             // outside of prefix domain.
             //
@@ -1092,9 +1093,9 @@ namespace nil {
             const slice *iterate_lower_bound;
 
             // "iterate_upper_bound" defines the extent upto which the forward iterator
-            // can returns entries. Once the bound is reached, Valid() will be false.
+            // can returns entries. Once the bound is reached, valid() will be false.
             // "iterate_upper_bound" is exclusive ie the bound value is
-            // not a valid entry.  If iterator_extractor is not null, the Seek target
+            // not a valid entry.  If iterator_extractor is not null, the seek target
             // and iterate_upper_bound need to have the same prefix.
             // This is because ordering is not guaranteed outside of prefix domain.
             //
@@ -1115,7 +1116,7 @@ namespace nil {
 
             // Specify if this read request should process data that ALREADY
             // resides on a particular cache. If the required data is not
-            // found at the specified cache, then status_type::Incomplete is returned.
+            // found at the specified cache, then status_type::incomplete is returned.
             // default_environment: kReadAllTier
             ReadTier read_tier;
 
@@ -1139,7 +1140,7 @@ namespace nil {
             // Not supported in DCDB_LITE mode!
             bool tailing;
 
-            // This options is not used anymore. It was to turn on a functionality that
+            // This opts is not used anymore. It was to turn on a functionality that
             // has been removed.
             bool managed;
 
@@ -1162,7 +1163,7 @@ namespace nil {
             // Keep the blocks loaded by the iterator pinned in memory as long as the
             // iterator is not deleted, If used when reading from tables created with
             // block_based_table_options::use_delta_encoding = false,
-            // Iterator's property "rocksdb.iterator.is-key-pinned" is guaranteed to
+            // iterator's property "rocksdb.iterator.is-key-pinned" is guaranteed to
             // return 1.
             // default_environment: false
             bool pin_data;
@@ -1188,7 +1189,7 @@ namespace nil {
             std::function<bool(const table_properties &)> table_filter;
 
             // Needed to support differential snapshots. Has 2 effects:
-            // 1) Iterator will skip all internal keys with seqnum < iter_start_seqnum
+            // 1) iterator will skip all internal keys with seqnum < iter_start_seqnum
             // 2) if this param > 0 iterator will return INTERNAL keys instead of
             //    user keys; e.g. return tombstones as well.
             // default_environment: 0 (don't filter by seqnum, return user keys)
@@ -1199,7 +1200,7 @@ namespace nil {
             read_options(bool cksum, bool cache);
         };
 
-// Options that control write operations
+// opts that control write operations
         struct write_options {
             // If true, the write will be flushed from the operating system
             // buffer cache (by calling writable_file::sync()) before the write
@@ -1225,7 +1226,7 @@ namespace nil {
             // you disable write-ahead logs, you must create backups with
             // flush_before_backup=true to avoid losing unflushed memtable data.
             // default_environment: false
-            bool disableWAL;
+            bool disable_wal;
 
             // If true and if user is trying to write to column families that don't exist
             // (they were dropped),  ignore the write (don't return an error). If there
@@ -1234,25 +1235,25 @@ namespace nil {
             bool ignore_missing_column_families;
 
             // If true and we need to wait or sleep for the write request, fails
-            // immediately with status_type::Incomplete().
+            // immediately with status_type::incomplete().
             // default_environment: false
             bool no_slowdown;
 
             // If true, this write request is of lower priority if compaction is
             // behind. In this case, no_slowdown = true, the request will be cancelled
-            // immediately with status_type::Incomplete() returned. Otherwise, it will be
+            // immediately with status_type::incomplete() returned. Otherwise, it will be
             // slowed down. The slowdown value is determined by RocksDB to guarantee
             // it introduces minimum impacts to high priority writes.
             //
             // default_environment: false
             bool low_pri;
 
-            write_options() : sync(false), disableWAL(false), ignore_missing_column_families(false), no_slowdown(false),
+            write_options() : sync(false), disable_wal(false), ignore_missing_column_families(false), no_slowdown(false),
                     low_pri(false) {
             }
         };
 
-// Options that control flush operations
+// opts that control flush operations
         struct flush_options {
             // If true, the flush will wait until the flush is done.
             // default_environment: true
@@ -1312,7 +1313,7 @@ namespace nil {
             // If change_level is true and target_level have non-negative value, compacted
             // files will be moved to target_level.
             int target_level = -1;
-            // Compaction outputs will be placed in options.db_paths[target_path_id].
+            // Compaction outputs will be placed in opts.db_paths[target_path_id].
             // Behavior is undefined if target_path_id is out of range.
             uint32_t target_path_id = 0;
             // By default level based compaction will only compact the bottommost level

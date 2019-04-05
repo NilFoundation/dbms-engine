@@ -36,7 +36,7 @@ This a string that will be used to create a test to be compiled and/or ran.
 
 .. option:: NAME <name>
 
-Name of the test.
+name of the test.
 
 .. option:: ARGS <args>
 
@@ -64,7 +64,7 @@ This creates a test to test the include of a header.
 
 .. option:: NAME <name>
 
-Name of the test.
+name of the test.
 
 .. option:: HEADER <header-file>
 

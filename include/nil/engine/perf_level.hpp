@@ -6,8 +6,8 @@
 namespace nil {
     namespace dcdb {
 
-// How much perf stats to collect. Affects perf_context and iostats_context.
-        enum PerfLevel : unsigned char {
+// How much perf stats to collect. Affects perf_context_ and iostats_context.
+        enum perf_level : unsigned char {
             kUninitialized = 0,             // unknown setting
             kDisable = 1,                   // disable perf stats
             kEnableCount = 2,               // enable only count stats
@@ -20,10 +20,10 @@ namespace nil {
         };
 
 // set the perf stats level for current thread
-        void SetPerfLevel(PerfLevel level);
+        void set_perf_level(perf_level level);
 
 // get current perf stats level for current thread
-        PerfLevel GetPerfLevel();
+        perf_level get_perf_level();
 
     }
 } // namespace nil

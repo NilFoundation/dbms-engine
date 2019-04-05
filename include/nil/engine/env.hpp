@@ -49,7 +49,7 @@ namespace nil {
         struct db_options;
         struct immutable_db_options;
 
-        class RateLimiter;
+        class rate_limiter;
 
         class thread_status_updater;
 
@@ -60,13 +60,13 @@ namespace nil {
 
         const size_t kDefaultPageSize = 4 * 1024;
 
-// Options while opening a file to read/write
+// opts while opening a file to read/write
         struct environment_options {
 
-            // Construct with default Options
+            // Construct with default opts
             environment_options();
 
-            // Construct from Options
+            // Construct from opts
             explicit environment_options(const db_options &options);
 
             // If true, then use mmap to read data
@@ -111,7 +111,7 @@ namespace nil {
             size_t writable_file_max_buffer_size = 1024 * 1024;
 
             // If not nullptr, write rate limiting is enabled for flush and compaction
-            RateLimiter *rate_limiter = nullptr;
+            rate_limiter *rate_limiter = nullptr;
         };
 
         class environment_type {
@@ -137,9 +137,9 @@ namespace nil {
             static environment_type *default_environment();
 
             // Create a brand new sequentially-readable file with the specified name.
-            // On success, stores a pointer to the new file in *result and returns OK.
-            // On failure stores nullptr in *result and returns non-OK.  If the file does
-            // not exist, returns a non-OK status.
+            // On success, stores a pointer to the new file in *result and returns is_ok.
+            // On failure stores nullptr in *result and returns non-is_ok.  If the file does
+            // not exist, returns a non-is_ok status.
             //
             // The returned file will only be accessed by one thread at a time.
             virtual status_type new_sequential_file(const std::string &fname, std::unique_ptr<sequential_file> *result,
@@ -147,8 +147,8 @@ namespace nil {
 
             // Create a brand new random access read-only file with the
             // specified name.  On success, stores a pointer to the new file in
-            // *result and returns OK.  On failure stores nullptr in *result and
-            // returns non-OK.  If the file does not exist, returns a non-OK
+            // *result and returns is_ok.  On failure stores nullptr in *result and
+            // returns non-OK.  If the file does not exist, returns a non-is_ok
             // status.
             //
             // The returned file may be concurrently accessed by multiple threads.
@@ -161,17 +161,17 @@ namespace nil {
             enum write_life_time_hint {
                 WLTH_NOT_SET = 0, // No hint information set
                 WLTH_NONE,        // No hints about write life time
-                WLTH_SHORT,       // Data written has a short life time
-                WLTH_MEDIUM,      // Data written has a medium life time
-                WLTH_LONG,        // Data written has a long life time
-                WLTH_EXTREME,     // Data written has an extremely long life time
+                WLTH_SHORT,       // data written has a short life time
+                WLTH_MEDIUM,      // data written has a medium life time
+                WLTH_LONG,        // data written has a long life time
+                WLTH_EXTREME,     // data written has an extremely long life time
             };
 
             // Create an object that writes to a new file with the specified
             // name.  Deletes any existing file with the same name and creates a
             // new file.  On success, stores a pointer to the new file in
-            // *result and returns OK.  On failure stores nullptr in *result and
-            // returns non-OK.
+            // *result and returns is_ok.  On failure stores nullptr in *result and
+            // returns non-is_ok.
             //
             // The returned file will only be accessed by one thread at a time.
             virtual status_type new_writable_file(const std::string &fname, std::unique_ptr<writable_file> *result,
@@ -180,13 +180,13 @@ namespace nil {
             // Create an object that writes to a new file with the specified
             // name.  Deletes any existing file with the same name and creates a
             // new file.  On success, stores a pointer to the new file in
-            // *result and returns OK.  On failure stores nullptr in *result and
-            // returns non-OK.
+            // *result and returns is_ok.  On failure stores nullptr in *result and
+            // returns non-is_ok.
             //
             // The returned file will only be accessed by one thread at a time.
             virtual status_type reopen_writable_file(const std::string &fname, std::unique_ptr<writable_file> *result,
                                                      const environment_options &options) {
-                return status_type::NotSupported();
+                return status_type::not_supported();
             }
 
             // Reuse an existing file by renaming it and opening it as writable.
@@ -196,12 +196,12 @@ namespace nil {
 
             // open `fname` for random read and write, if file doesn't exist the file
             // will be created.  On success, stores a pointer to the new file in
-            // *result and returns OK.  On failure returns non-OK.
+            // *result and returns OK.  On failure returns non-is_ok.
             //
             // The returned file will only be accessed by one thread at a time.
             virtual status_type new_random_rw_file(const std::string &fname, std::unique_ptr<random_rw_file> *result,
                                                    const environment_options &options) {
-                return status_type::NotSupported("random_rw_file is not implemented in this environment_type");
+                return status_type::not_supported("random_rw_file is not implemented in this environment_type");
             }
 
             // Opens `fname` as a memory-mapped file for read and write (in-place updates
@@ -209,7 +209,7 @@ namespace nil {
             // file in `*result`. The file must exist prior to this call.
             virtual status_type new_memory_mapped_file_buffer(const std::string &fname,
                                                               std::unique_ptr<memory_mapped_file_buffer> *result) {
-                return status_type::NotSupported(
+                return status_type::not_supported(
                         "memory_mapped_file_buffer is not implemented in this environment_type");
             }
 
@@ -218,24 +218,24 @@ namespace nil {
             // and create a new directory object.
             //
             // On success, stores a pointer to the new directory in
-            // *result and returns OK. On failure stores nullptr in *result and
-            // returns non-OK.
+            // *result and returns is_ok. On failure stores nullptr in *result and
+            // returns non-is_ok.
             virtual status_type new_directory(const std::string &name, std::unique_ptr<directory> *result) = 0;
 
-            // Returns OK if the named file exists.
-            //         NotFound if the named file does not exist,
+            // Returns is_ok if the named file exists.
+            //         not_found if the named file does not exist,
             //                  the calling process does not have permission to determine
             //                  whether this file exists, or if the path is invalid.
-            //         IOError if an IO Error was encountered
+            //         io_error if an IO Error was encountered
             virtual status_type file_exists(const std::string &fname) = 0;
 
             // Store in *result the names of the children of the specified directory.
             // The names are relative to "dir".
             // Original contents of *results are dropped.
-            // Returns OK if "dir" exists and "*result" contains its children.
-            //         NotFound if "dir" does not exist, the calling process does not have
+            // Returns is_ok if "dir" exists and "*result" contains its children.
+            //         not_found if "dir" does not exist, the calling process does not have
             //                  permission to access "dir", or if "dir" is invalid.
-            //         IOError if an IO Error was encountered
+            //         io_error if an IO Error was encountered
             virtual status_type get_children(const std::string &dir, std::vector<std::string> *result) = 0;
 
             // Store in *result the attributes of the children of the specified directory.
@@ -244,10 +244,10 @@ namespace nil {
             // result.
             // The name attributes are relative to "dir".
             // Original contents of *results are dropped.
-            // Returns OK if "dir" exists and "*result" contains its children.
-            //         NotFound if "dir" does not exist, the calling process does not have
+            // Returns is_ok if "dir" exists and "*result" contains its children.
+            //         not_found if "dir" does not exist, the calling process does not have
             //                  permission to access "dir", or if "dir" is invalid.
-            //         IOError if an IO Error was encountered
+            //         io_error if an IO Error was encountered
             virtual status_type get_children_file_attributes(const std::string &dir,
                                                              std::vector<file_attributes> *result);
 
@@ -256,7 +256,7 @@ namespace nil {
 
             // truncate the named file to the specified size.
             virtual status_type truncate(const std::string &fname, size_t size) {
-                return status_type::NotSupported("truncate is not supported for this environment_type");
+                return status_type::not_supported("truncate is not supported for this environment_type");
             }
 
             // Create the specified directory. Returns error if directory exists.
@@ -280,24 +280,24 @@ namespace nil {
 
             // Hard Link file src to target.
             virtual status_type link_file(const std::string &src, const std::string &target) {
-                return status_type::NotSupported("link_file is not supported for this environment_type");
+                return status_type::not_supported("link_file is not supported for this environment_type");
             }
 
             virtual status_type num_file_links(const std::string &fname, uint64_t *count) {
-                return status_type::NotSupported(
+                return status_type::not_supported(
                         "Getting number of file links is not supported for this environment_type");
             }
 
             virtual status_type are_files_same(const std::string &first, const std::string &second, bool *res) {
-                return status_type::NotSupported("are_files_same is not supported for this environment_type");
+                return status_type::not_supported("are_files_same is not supported for this environment_type");
             }
 
             // Lock the specified file.  Used to prevent concurrent access to
             // the same db by multiple processes.  On failure, stores nullptr in
-            // *lock and returns non-OK.
+            // *lock and returns non-is_ok.
             //
             // On success, stores a pointer to the object that represents the
-            // acquired lock in *lock and returns OK.  The caller should call
+            // acquired lock in *lock and returns is_ok.  The caller should call
             // unlock_file(*lock) to release the lock.  If the process exits,
             // the lock will be automatically released.
             //
@@ -406,7 +406,7 @@ namespace nil {
             virtual int get_background_threads(Priority pri = LOW) = 0;
 
             virtual status_type set_allow_non_owner_access(bool allow_non_owner_access) {
-                return status_type::NotSupported("Not supported.");
+                return status_type::not_supported("Not supported.");
             }
 
             // Enlarge number of background worker threads of a specific thread pool
@@ -462,7 +462,7 @@ namespace nil {
 
             // Returns the status of all threads that belong to the current environment_type.
             virtual status_type get_thread_list(std::vector<thread_status> *thread_list) {
-                return status_type::NotSupported("Not supported.");
+                return status_type::not_supported("Not supported.");
             }
 
             // Returns the pointer to thread_status_updater.  This function will be
@@ -480,7 +480,7 @@ namespace nil {
 
             // get the amount of free disk space
             virtual status_type get_free_space(const std::string &path, uint64_t *diskfree) {
-                return status_type::NotSupported();
+                return status_type::not_supported();
             }
 
         protected:
@@ -513,7 +513,7 @@ namespace nil {
             // read (including if fewer than "n" bytes were successfully read).
             // May set "*result" to point at data in "scratch[0..n-1]", so
             // "scratch[0..n-1]" must be live when "*result" is used.
-            // If an error was encountered, returns a non-OK status.
+            // If an error was encountered, returns a non-is_ok status.
             //
             // REQUIRES: External synchronization
             virtual status_type read(size_t n, slice *result, char *scratch) = 0;
@@ -522,7 +522,7 @@ namespace nil {
             // slower that reading the same data, but may be faster.
             //
             // If end of file is reached, skipping will stop at the end of the
-            // file, and skip will return OK.
+            // file, and skip will return is_ok.
             //
             // REQUIRES: External synchronization
             virtual status_type skip(uint64_t n) = 0;
@@ -542,14 +542,14 @@ namespace nil {
             // remove any kind of caching of data from the offset to offset+length
             // of this file. If the length is 0, then it refers to the end of file.
             // If the system is not caching the file contents, then this is a noop.
-            virtual status_type invalidate_cache(size_t /*offset*/, size_t /*length*/) {
-                return status_type::NotSupported("invalidate_cache not supported.");
+            virtual status_type invalidate_cache(size_t offset, size_t length) {
+                return status_type::not_supported("invalidate_cache not supported.");
             }
 
             // Positioned read for direct I/O
             // If Direct I/O enabled, offset, n, and scratch should be properly aligned
             virtual status_type positioned_read(uint64_t offset, size_t n, slice *result, char *scratch) {
-                return status_type::NotSupported();
+                return status_type::not_supported();
             }
         };
 
@@ -567,7 +567,7 @@ namespace nil {
             // to the data that was read (including if fewer than "n" bytes were
             // successfully read).  May set "*result" to point at data in
             // "scratch[0..n-1]", so "scratch[0..n-1]" must be live when
-            // "*result" is used.  If an error was encountered, returns a non-OK
+            // "*result" is used.  If an error was encountered, returns a non-is_ok
             // status.
             //
             // Safe for concurrent use by multiple threads.
@@ -622,7 +622,7 @@ namespace nil {
             // of this file. If the length is 0, then it refers to the end of file.
             // If the system is not caching the file contents, then this is a noop.
             virtual status_type invalidate_cache(size_t offset, size_t length) {
-                return status_type::NotSupported("invalidate_cache not supported.");
+                return status_type::not_supported("invalidate_cache not supported.");
             }
         };
 
@@ -663,7 +663,7 @@ namespace nil {
             // positioned_append() requires aligned buffer to be passed in. The alignment
             // required is queried via get_required_buffer_alignment()
             virtual status_type positioned_append(const slice &data, uint64_t offset) {
-                return status_type::NotSupported();
+                return status_type::not_supported();
             }
 
             // truncate is necessary to trim the file to the correct size
@@ -760,7 +760,7 @@ namespace nil {
             // If the system is not caching the file contents, then this is a noop.
             // This call has no effect on dirty pages in the cache.
             virtual status_type invalidate_cache(size_t offset, size_t length) {
-                return status_type::NotSupported("invalidate_cache not supported.");
+                return status_type::not_supported("invalidate_cache not supported.");
             }
 
             // sync a file range with disk.
@@ -843,13 +843,13 @@ namespace nil {
                 return kDefaultPageSize;
             }
 
-            // write bytes in `data` at  offset `offset`, Returns status_type::OK() on success.
+            // write bytes in `data` at  offset `offset`, Returns status_type::is_ok() on success.
             // Pass aligned buffer when use_direct_io() returns true.
             virtual status_type write(uint64_t offset, const slice &data) = 0;
 
             // read up to `n` bytes starting from offset `offset` and store them in
             // result, provided `scratch` size should be at least `n`.
-            // Returns status_type::OK() on success.
+            // Returns status_type::is_ok() on success.
             virtual status_type read(uint64_t offset, size_t n, slice *result, char *scratch) const = 0;
 
             virtual status_type flush() = 0;
@@ -927,7 +927,7 @@ namespace nil {
             virtual ~Logger();
 
             // close the log file. Must be called before destructor. If the return
-            // status is NotSupported(), it means the implementation does cleanup in
+            // status is not_supported(), it means the implementation does cleanup in
             // the destructor
             virtual status_type Close();
 
@@ -997,7 +997,8 @@ namespace nil {
 
         extern void LogFlush(const std::shared_ptr<Logger> &info_log);
 
-        extern void Log(const info_log_level log_level, const std::shared_ptr<Logger> &info_log, const char *format, ...);
+        extern void Log(const info_log_level log_level, const std::shared_ptr<Logger> &info_log, const char *format,
+                        ...);
 
 // a set of log functions with different log levels.
         extern void Header(const std::shared_ptr<Logger> &info_log, const char *format, ...);
@@ -1405,7 +1406,7 @@ namespace nil {
         status_type new_hdfs_env(environment_type **hdfs_env, const std::string &fsname);
 
 // Returns a new environment that measures function call times for filesystem
-// operations, reporting results to variables in PerfContext.
+// operations, reporting results to variables in perf_context_.
 // This is a factory method for TimedEnv defined in utilities/env_timed.cc.
         environment_type *new_timed_env(environment_type *base_env);
 

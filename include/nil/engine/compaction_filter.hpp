@@ -67,12 +67,12 @@ namespace nil {
             //
             // Note that RocksDB snapshots (i.e. call get_snapshot() API on a
             // database* object) will not guarantee to preserve the state of the database with
-            // compaction_filter. Data seen from a snapshot might disppear after a
+            // compaction_filter. data seen from a get_snapshot might disppear after a
             // compaction finishes. If you use snapshots, think twice about whether you
             // want to use compaction filter and whether you are using it in a safe way.
             //
             // If multithreaded compaction is being used *and* a single compaction_filter
-            // instance was supplied via Options::compaction_filter, this method may be
+            // instance was supplied via opts::compaction_filter, this method may be
             // called from different threads concurrently.  The application must ensure
             // that the call is thread-safe.
             //
@@ -120,7 +120,7 @@ namespace nil {
             //      Caveats:
             //       - The keys are skipped even if there are snapshots containing them,
             //         i.e. values removed by kRemoveAndSkipUntil can disappear from a
-            //         snapshot - beware if you're using TransactionDB or
+            //         get_snapshot - beware if you're using TransactionDB or
             //         database::get_snapshot().
             //       - If value for a key was overwritten or merged into (multiple insert()s
             //         or merge()s), and compaction filter skips this key with

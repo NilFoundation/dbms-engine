@@ -14,16 +14,16 @@ namespace nil {
 
         class Logger;
 
-// SstFileManager is used to track SST files in the database and control their
+// sst_file_manager is used to track SST files in the database and control their
 // deletion rate.
-// All SstFileManager public functions are thread-safe.
-// SstFileManager is not extensible.
-        class SstFileManager {
+// All sst_file_manager public functions are thread-safe.
+// sst_file_manager is not extensible.
+        class sst_file_manager {
         public:
-            virtual ~SstFileManager() {
+            virtual ~sst_file_manager() {
             }
 
-            // Update the maximum allowed space that should be used by RocksDB, if
+            // update the maximum allowed space that should be used by RocksDB, if
             // the total size of the SST files exceeds max_allowed_space, writes to
             // RocksDB will fail.
             //
@@ -31,55 +31,55 @@ namespace nil {
             // space will be infinite (default_environment value).
             //
             // thread-safe.
-            virtual void SetMaxAllowedSpaceUsage(uint64_t max_allowed_space) = 0;
+            virtual void set_max_allowed_space_usage(uint64_t max_allowed_space) = 0;
 
             // Set the amount of buffer room each compaction should be able to leave.
             // In other words, at its maximum disk space consumption, the compaction
             // should still leave compaction_buffer_size available on the disk so that
             // other background functions may continue, such as logging and flushing.
-            virtual void SetCompactionBufferSize(uint64_t compaction_buffer_size) = 0;
+            virtual void set_compaction_buffer_size(uint64_t compaction_buffer_size) = 0;
 
             // Return true if the total size of SST files exceeded the maximum allowed
             // space usage.
             //
             // thread-safe.
-            virtual bool IsMaxAllowedSpaceReached() = 0;
+            virtual bool is_max_allowed_space_reached() = 0;
 
             // Returns true if the total size of SST files as well as estimated size
             // of ongoing compactions exceeds the maximums allowed space usage.
-            virtual bool IsMaxAllowedSpaceReachedIncludingCompactions() = 0;
+            virtual bool is_max_allowed_space_reached_including_compactions() = 0;
 
             // Return the total size of all tracked files.
             // thread-safe
-            virtual uint64_t GetTotalSize() = 0;
+            virtual uint64_t get_total_size() = 0;
 
             // Return a map containing all tracked files and their corresponding sizes.
             // thread-safe
-            virtual std::unordered_map<std::string, uint64_t> GetTrackedFiles() = 0;
+            virtual std::unordered_map<std::string, uint64_t> get_tracked_files() = 0;
 
             // Return delete rate limit in bytes per second.
             // thread-safe
-            virtual int64_t GetDeleteRateBytesPerSecond() = 0;
+            virtual int64_t get_delete_rate_bytes_per_second() = 0;
 
-            // Update the delete rate limit in bytes per second.
+            // update the delete rate limit in bytes per second.
             // zero means disable delete rate limiting and delete files immediately
             // thread-safe
-            virtual void SetDeleteRateBytesPerSecond(int64_t delete_rate) = 0;
+            virtual void set_delete_rate_bytes_per_second(int64_t delete_rate) = 0;
 
             // Return trash/database size ratio where new files will be deleted immediately
             // thread-safe
-            virtual double GetMaxTrashDBRatio() = 0;
+            virtual double get_max_trash_db_ratio() = 0;
 
-            // Update trash/database size ratio where new files will be deleted immediately
+            // update trash/database size ratio where new files will be deleted immediately
             // thread-safe
-            virtual void SetMaxTrashDBRatio(double ratio) = 0;
+            virtual void set_max_trash_db_ratio(double ratio) = 0;
 
             // Return the total size of trash files
             // thread-safe
-            virtual uint64_t GetTotalTrashSize() = 0;
+            virtual uint64_t get_total_trash_size() = 0;
         };
 
-// Create a new SstFileManager that can be shared among multiple RocksDB
+// Create a new sst_file_manager that can be shared among multiple RocksDB
 // instances to track SST file and control there deletion rate.
 //
 // @param env: Pointer to environment_type object, please see "rocksdb/env.h".
@@ -105,11 +105,11 @@ namespace nil {
 //    `rate_bytes_per_sec` will be appreciated. NOTE that with this option,
 //    files already renamed as a trash may be partial, so users should not
 //    directly recover them without checking.
-        extern SstFileManager *NewSstFileManager(environment_type *env, std::shared_ptr<Logger> info_log = nullptr,
-                                                 std::string trash_dir = "", int64_t rate_bytes_per_sec = 0,
-                                                 bool delete_existing_trash = true, status_type *status = nullptr,
-                                                 double max_trash_db_ratio = 0.25,
-                                                 uint64_t bytes_max_delete_chunk = 64 * 1024 * 1024);
+        extern sst_file_manager *new_sst_file_manager(environment_type *env, std::shared_ptr<Logger> info_log = nullptr,
+                                                      string trash_dir = "", int64_t rate_bytes_per_sec = 0,
+                                                      bool delete_existing_trash = true, status_type *status = nullptr,
+                                                      double max_trash_db_ratio = 0.25,
+                                                      uint64_t bytes_max_delete_chunk = 64 * 1024 * 1024);
 
     }
 } // namespace nil

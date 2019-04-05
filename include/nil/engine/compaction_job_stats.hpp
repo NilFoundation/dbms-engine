@@ -65,7 +65,7 @@ namespace nil {
             uint64_t num_corrupt_keys;
 
             // Following counters are only populated if
-            // options.report_bg_io_stats = true;
+            // opts.report_bg_io_stats = true;
 
             // Time spent on file's append() call.
             uint64_t file_write_nanos;

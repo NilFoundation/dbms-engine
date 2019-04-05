@@ -3,9 +3,9 @@
 // are provided by this library.  In particular, iterators are provided
 // to access the contents of a Table or a database.
 //
-// Multiple threads can invoke const methods on an Iterator without
+// Multiple threads can invoke const methods on an iterator without
 // external synchronization, but if any of the threads may call a
-// non-const method, all threads accessing the same Iterator must use
+// non-const method, all threads accessing the same iterator must use
 // external synchronization.
 
 #pragma once

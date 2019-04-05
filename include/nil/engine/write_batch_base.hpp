@@ -85,7 +85,7 @@ namespace nil {
             // append a blob of arbitrary size to the records in this batch. The blob will
             // be stored in the transaction log but not in any other file. In particular,
             // it will not be persisted to the SST files. When iterating over this
-            // write_batch, write_batch::handler::LogData will be called with the contents
+            // write_batch, write_batch::handler::log_data will be called with the contents
             // of the blob as it is encountered. Blobs, puts, deletes, and merges will be
             // encountered in the same order in which they were inserted. The blob will
             // NOT consume sequence number(s) and will NOT increase the count of the batch
@@ -98,9 +98,9 @@ namespace nil {
             virtual void clear() = 0;
 
             // Covert this batch into a write_batch.  This is an abstracted way of
-            // converting any write_batch_base(eg WriteBatchWithIndex) into a basic
+            // converting any write_batch_base(eg write_batch_with_index) into a basic
             // write_batch.
-            virtual write_batch *GetWriteBatch() = 0;
+            virtual write_batch *get_write_batch() = 0;
 
             // Records the state of the batch for future calls to rollback_to_save_point().
             // May be called multiple times to set multiple save points.
@@ -113,13 +113,13 @@ namespace nil {
             virtual status_type rollback_to_save_point() = 0;
 
             // Pop the most recent save point.
-            // If there is no previous call to set_save_point(), status_type::NotFound()
+            // If there is no previous call to set_save_point(), status_type::not_found()
             // will be returned.
-            // Otherwise returns status_type::OK().
+            // Otherwise returns status_type::is_ok().
             virtual status_type pop_save_point() = 0;
 
             // Sets the maximum size of the write batch in bytes. 0 means no limit.
-            virtual void SetMaxBytes(size_t max_bytes) = 0;
+            virtual void set_max_bytes(size_t max_bytes) = 0;
         };
 
     }

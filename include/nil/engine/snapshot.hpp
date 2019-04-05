@@ -8,37 +8,37 @@ namespace nil {
         class database;
 
 // Abstract handle to particular state of a database.
-// A Snapshot is an immutable object and can therefore be safely
+// A get_snapshot is an immutable object and can therefore be safely
 // accessed from multiple threads without any external synchronization.
 //
-// To Create a Snapshot, call database::GetSnapshot().
-// To Destroy a Snapshot, call database::ReleaseSnapshot(snapshot).
-        class Snapshot {
+// To Create a get_snapshot, call database::GetSnapshot().
+// To Destroy a snapshot, call database::ReleaseSnapshot(get_snapshot).
+        class snapshot {
         public:
-            // returns Snapshot's sequence number
-            virtual sequence_number GetSequenceNumber() const = 0;
+            // returns get_snapshot's sequence number
+            virtual sequence_number get_sequence_number() const = 0;
 
         protected:
-            virtual ~Snapshot();
+            virtual ~snapshot();
         };
 
-// Simple RAII wrapper class for Snapshot.
-// Constructing this object will create a snapshot.  Destructing will
-// release the snapshot.
-        class ManagedSnapshot {
+// Simple RAII wrapper class for get_snapshot.
+// Constructing this object will create a get_snapshot.  Destructing will
+// release the get_snapshot.
+        class managed_snapshot {
         public:
-            explicit ManagedSnapshot(database *db);
+            explicit managed_snapshot(database *db);
 
-            // Instead of creating a snapshot, take ownership of the input snapshot.
-            ManagedSnapshot(database *db, const Snapshot *_snapshot);
+            // Instead of creating a get_snapshot, take ownership of the input snapshot.
+            managed_snapshot(database *db, const snapshot *_snapshot);
 
-            ~ManagedSnapshot();
+            ~managed_snapshot();
 
-            const Snapshot *snapshot();
+            const snapshot *get_snapshot();
 
         private:
             database *db_;
-            const Snapshot *snapshot_;
+            const snapshot *snapshot_;
         };
 
     }

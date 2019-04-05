@@ -41,7 +41,7 @@ namespace nil {
             // Calculate num of entries fit into a space.
 #if defined(_MSC_VER)
 #pragma warning(push)
-#pragma warning(disable : 4702) // unreachable code
+#pragma warning(disable : 4702) // unreachable get_code
 #endif
 
             virtual int calculate_num_entry(const uint32_t space) {

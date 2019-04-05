@@ -73,7 +73,7 @@ namespace nil {
 
             struct merge_operation_input {
                 explicit merge_operation_input(const slice &_key, const slice *_existing_value,
-                                             const std::vector<slice> &_operand_list, Logger *_logger) : key(_key),
+                                               const std::vector<slice> &_operand_list, Logger *_logger) : key(_key),
                         existing_value(_existing_value), operand_list(_operand_list), logger(_logger) {
                 }
 
@@ -114,10 +114,10 @@ namespace nil {
             // K:    0    +1    +2    +7    +4     +5      2     +1     +2
             //                              ^
             //                              |
-            //                          snapshot
+            //                          get_snapshot
             // In the example above, get(K) operation will call full_merge with a base
             // value of 2 and operands [+1, +2]. Compaction process might decide to
-            // collapse the beginning of the history up to the snapshot by performing
+            // collapse the beginning of the history up to the get_snapshot by performing
             // full merge with base value of 0 and operands [+1, +2, +7, +3].
             virtual bool full_merge_v2(const merge_operation_input &merge_in, merge_operation_output *merge_out) const;
 

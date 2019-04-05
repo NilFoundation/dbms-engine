@@ -13,34 +13,34 @@ namespace nil {
         typedef uint64_t sequence_number;
 
 // User-oriented representation of internal key types.
-        enum EntryType {
+        enum entry_type {
             kEntryPut, kEntryDelete, kEntrySingleDelete, kEntryMerge, kEntryRangeDeletion, kEntryBlobIndex, kEntryOther,
         };
 
 // <user key, sequence number, and entry type> tuple.
-        struct FullKey {
+        struct full_key {
             slice user_key;
             sequence_number sequence;
-            EntryType type;
+            entry_type type;
 
-            FullKey() : sequence(0) {
+            full_key() : sequence(0) {
             }  // Intentionally left uninitialized (for speed)
-            FullKey(const slice &u, const sequence_number &seq, EntryType t) : user_key(u), sequence(seq), type(t) {
+            full_key(const slice &u, const sequence_number &seq, entry_type t) : user_key(u), sequence(seq), type(t) {
             }
 
-            std::string DebugString(bool hex = false) const;
+            std::string debug_string(bool hex = false) const;
 
             void clear() {
                 user_key.clear();
                 sequence = 0;
-                type = EntryType::kEntryPut;
+                type = entry_type::kEntryPut;
             }
         };
 
-// Parse slice representing internal key to FullKey
-// Parsed FullKey is valid for as long as the memory pointed to by
+// Parse slice representing internal key to full_key
+// Parsed full_key is valid for as long as the memory pointed to by
 // internal_key is alive.
-        bool ParseFullKey(const slice &internal_key, FullKey *result);
+        bool parse_full_key(const slice &internal_key, full_key *result);
 
     }
 } // namespace nil

@@ -6,16 +6,16 @@
 #include <nil/engine/perf_level.hpp>
 
 // A thread local context for gathering io-stats efficiently and transparently.
-// Use SetPerfLevel(PerfLevel::kEnableTime) to enable time stats.
+// Use set_perf_level(perf_level::kEnableTime) to enable time stats.
 
 namespace nil {
     namespace dcdb {
 
-        struct IOStatsContext {
+        struct io_stats_context {
             // reset all io-stats counter to zero
-            void Reset();
+            void reset();
 
-            std::string ToString(bool exclude_zero_counters = false) const;
+            std::string to_string(bool exclude_zero_counters = false) const;
 
             // the thread pool id
             uint64_t thread_pool_id;
@@ -47,8 +47,8 @@ namespace nil {
             uint64_t cpu_read_nanos;
         };
 
-// get Thread-local IOStatsContext object pointer
-        IOStatsContext *get_iostats_context();
+// get Thread-local io_stats_context object pointer
+        io_stats_context *get_iostats_context();
 
     }
 } // namespace nil

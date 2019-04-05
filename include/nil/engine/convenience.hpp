@@ -12,7 +12,7 @@ namespace nil {
     namespace dcdb {
 
 #ifndef DCDB_LITE
-// The following set of functions provide a way to construct RocksDB Options
+// The following set of functions provide a way to construct RocksDB opts
 // from a string or a string-to-string map.  Here're the general rule of
 // setting option values from strings by type.  Some RocksDB types are also
 // supported in these APIs.  Please refer to the comment of the function itself
@@ -69,7 +69,7 @@ namespace nil {
 // column_family_options "new_options".
 //
 // Below are the instructions of how to config some non-primitive-typed
-// options in ColumnFOptions:
+// opts in ColumnFOptions:
 //
 // * table_factory:
 //   table_factory can be configured using our custom nested-option syntax.
@@ -116,20 +116,20 @@ namespace nil {
 //     PrefixHash.
 //     [Example]:
 //     * {"memtable", "prefix_hash:1000"} is equivalent to setting
-//       memtable to NewHashSkipListRepFactory(hash_bucket_count).
+//       memtable to new_hash_skip_list_rep_factory(hash_bucket_count).
 //   - HashLinkedList:
 //     Pass "hash_linkedlist:<hash_bucket_count>" to config memtable
 //     to use HashLinkedList, or simply "hash_linkedlist" to use the default
 //     HashLinkedList.
 //     [Example]:
 //     * {"memtable", "hash_linkedlist:1000"} is equivalent to
-//       setting memtable to NewHashLinkListRepFactory(1000).
-//   - VectorRepFactory:
-//     Pass "vector:<count>" to config memtable to use VectorRepFactory,
+//       setting memtable to new_hash_link_list_rep_factory(1000).
+//   - vector_rep_factory:
+//     Pass "vector:<count>" to config memtable to use vector_rep_factory,
 //     or simply "vector" to use the default Vector memtable.
 //     [Example]:
 //     * {"memtable", "vector:1024"} is equivalent to setting memtable
-//       to VectorRepFactory(1024).
+//       to vector_rep_factory(1024).
 //   - HashCuckooRepFactory:
 //     Pass "cuckoo:<write_buffer_size>" to use HashCuckooRepFactory with the
 //     specified write buffer size, or simply "cuckoo" to use the default
@@ -149,17 +149,17 @@ namespace nil {
 //        cf_opt.compression_opts.strategy = 6;
 //        cf_opt.compression_opts.max_dict_bytes = 7;
 //
-// @param base_options the default options of the output "new_options".
+// @param base_options the default opts of the output "new_options".
 // @param opts_map an option name to value map for specifying how "new_options"
 //     should be set.
-// @param new_options the resulting options based on "base_options" with the
+// @param new_options the resulting opts based on "base_options" with the
 //     change specified in "opts_map".
 // @param input_strings_escaped when set to true, each escaped characters
 //     prefixed by '\' in the values of the opts_map will be further converted
-//     back to the raw string before assigning to the associated options.
-// @param ignore_unknown_options when set to true, unknown options are ignored
+//     back to the raw string before assigning to the associated opts.
+// @param ignore_unknown_options when set to true, unknown opts are ignored
 //     instead of resulting in an unknown-option error.
-// @return status_type::OK() on success.  Otherwise, a non-ok status indicating
+// @return status_type::ok() on success.  Otherwise, a non-is_ok status indicating
 //     error will be returned, and "new_options" will be set to "base_options".
         status_type get_column_family_options_from_map(const column_family_options &base_options,
                                                        const std::unordered_map<std::string, std::string> &opts_map,
@@ -172,25 +172,25 @@ namespace nil {
 // db_options "new_options".
 //
 // Below are the instructions of how to config some non-primitive-typed
-// options in db_options:
+// opts in db_options:
 //
 // * rate_limiter_bytes_per_sec:
-//   RateLimiter can be configured directly by specifying its bytes_per_sec.
+//   limiter can be configured directly by specifying its bytes_per_sec.
 //   [Example]:
 //   - Passing {"rate_limiter_bytes_per_sec", "1024"} is equivalent to
-//     passing NewGenericRateLimiter(1024) to rate_limiter_bytes_per_sec.
+//     passing new_generic_rate_limiter(1024) to rate_limiter_bytes_per_sec.
 //
-// @param base_options the default options of the output "new_options".
+// @param base_options the default opts of the output "new_options".
 // @param opts_map an option name to value map for specifying how "new_options"
 //     should be set.
-// @param new_options the resulting options based on "base_options" with the
+// @param new_options the resulting opts based on "base_options" with the
 //     change specified in "opts_map".
 // @param input_strings_escaped when set to true, each escaped characters
 //     prefixed by '\' in the values of the opts_map will be further converted
-//     back to the raw string before assigning to the associated options.
-// @param ignore_unknown_options when set to true, unknown options are ignored
+//     back to the raw string before assigning to the associated opts.
+// @param ignore_unknown_options when set to true, unknown opts are ignored
 //     instead of resulting in an unknown-option error.
-// @return status_type::OK() on success.  Otherwise, a non-ok status indicating
+// @return status_type::ok() on success.  Otherwise, a non-is_ok status indicating
 //     error will be returned, and "new_options" will be set to "base_options".
         status_type get_db_options_from_map(const db_options &base_options,
                                             const std::unordered_map<std::string, std::string> &opts_map,
@@ -202,7 +202,7 @@ namespace nil {
 // block_based_table_options "new_table_options".
 //
 // Below are the instructions of how to config some non-primitive-typed
-// options in block_based_table_options:
+// opts in block_based_table_options:
 //
 // * filter_policy:
 //   We currently only support the following filter_policy in the convenience
@@ -222,17 +222,17 @@ namespace nil {
 //   - Passing {"block_cache", "1M"} in get_block_based_table_options_from_map is
 //     equivalent to setting block_cache using new_lru_cache(1024 * 1024).
 //
-// @param table_options the default options of the output "new_table_options".
+// @param table_options the default opts of the output "new_table_options".
 // @param opts_map an option name to value map for specifying how
 //     "new_table_options" should be set.
-// @param new_table_options the resulting options based on "table_options"
+// @param new_table_options the resulting opts based on "table_options"
 //     with the change specified in "opts_map".
 // @param input_strings_escaped when set to true, each escaped characters
 //     prefixed by '\' in the values of the opts_map will be further converted
-//     back to the raw string before assigning to the associated options.
-// @param ignore_unknown_options when set to true, unknown options are ignored
+//     back to the raw string before assigning to the associated opts.
+// @param ignore_unknown_options when set to true, unknown opts are ignored
 //     instead of resulting in an unknown-option error.
-// @return status_type::OK() on success.  Otherwise, a non-ok status indicating
+// @return status_type::ok() on success.  Otherwise, a non-is_ok status indicating
 //     error will be returned, and "new_table_options" will be set to
 //     "table_options".
         status_type get_block_based_table_options_from_map(const block_based_table_options &table_options,
@@ -245,17 +245,17 @@ namespace nil {
 // map "opts_map" of option name to option value to construct the new
 // plain_table_options "new_table_options".
 //
-// @param table_options the default options of the output "new_table_options".
+// @param table_options the default opts of the output "new_table_options".
 // @param opts_map an option name to value map for specifying how
 //     "new_table_options" should be set.
-// @param new_table_options the resulting options based on "table_options"
+// @param new_table_options the resulting opts based on "table_options"
 //     with the change specified in "opts_map".
 // @param input_strings_escaped when set to true, each escaped characters
 //     prefixed by '\' in the values of the opts_map will be further converted
-//     back to the raw string before assigning to the associated options.
-// @param ignore_unknown_options when set to true, unknown options are ignored
+//     back to the raw string before assigning to the associated opts.
+// @param ignore_unknown_options when set to true, unknown opts are ignored
 //     instead of resulting in an unknown-option error.
-// @return status_type::OK() on success.  Otherwise, a non-ok status indicating
+// @return status_type::ok() on success.  Otherwise, a non-is_ok status indicating
 //     error will be returned, and "new_table_options" will be set to
 //     "table_options".
         status_type get_plain_table_options_from_map(const plain_table_options &table_options,
@@ -265,10 +265,10 @@ namespace nil {
                                                      bool ignore_unknown_options = false);
 
 // Take a string representation of option names and  values, apply them into the
-// base_options, and return the new options as a result. The string has the
+// base_options, and return the new opts as a result. The string has the
 // following format:
 //   "write_buffer_size=1024;max_write_buffer_number=2"
-// Nested options config is also possible. For example, you can define
+// Nested opts config is also possible. For example, you can define
 // block_based_table_options as part of the string for block-based table factory:
 //   "write_buffer_size=1024;block_based_table_factory={block_size=4k};"
 //   "max_write_buffer_num=2"
@@ -301,12 +301,12 @@ namespace nil {
         status_type get_mem_table_rep_factory_from_string(const std::string &opts_str,
                                                           std::unique_ptr<mem_table_rep_factory> *new_mem_factory);
 
-        status_type get_options_from_string(const Options &base_options, const std::string &opts_str,
-                                            Options *new_options);
+        status_type get_options_from_string(const options &base_options, const std::string &opts_str,
+                                            options *new_options);
 
         status_type string_to_map(const std::string &opts_str, std::unordered_map<std::string, std::string> *opts_map);
 
-// Request stopping background work, if wait is true wait until it's done
+// request stopping background work, if wait is true wait until it's done
         void cancel_all_background_work(database *db, bool wait = false);
 
 // remove files which are entirely in the given range
@@ -324,7 +324,7 @@ namespace nil {
                                            size_t n, bool include_end = true);
 
 // Verify the checksum of file
-        status_type verify_sst_file_checksum(const Options &options, const environment_options &env_options,
+        status_type verify_sst_file_checksum(const options &options, const environment_options &env_options,
                                              const std::string &file_path);
 
 #endif  // DCDB_LITE

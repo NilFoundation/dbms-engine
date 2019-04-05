@@ -17,7 +17,7 @@ namespace nil {
 // This operation succeeds only if the files in L0 have disjoint ranges; this
 // is guaranteed to happen, for instance, if keys are inserted in sorted
 // order. Furthermore, all levels between 1 and target_level must be empty.
-// If any of the above condition is violated, InvalidArgument will be
+// If any of the above condition is violated, invalid_argument will be
 // returned.
             status_type promote_l0(database *db, column_family_handle *column_family, int target_level = 1);
 

@@ -11,11 +11,11 @@ namespace nil {
 
 // A thread local context for gathering performance counter efficiently
 // and transparently.
-// Use SetPerfLevel(PerfLevel::kEnableTime) to enable time stats.
+// Use set_perf_level(perf_level::kEnableTime) to enable time stats.
 
 // Break down performance counters by level and store per-level perf context in
-// PerfContextByLevel
-        struct PerfContextByLevel {
+// perf_context_by_level
+        struct perf_context_by_level {
             // # of times bloom filter has avoided file reads, i.e., negatives.
             uint64_t bloom_filter_useful = 0;
             // # of times bloom FullFilter has not avoided the reads.
@@ -34,34 +34,34 @@ namespace nil {
             uint64_t block_cache_hit_count = 0;     // total number of block cache hits
             uint64_t block_cache_miss_count = 0;    // total number of block cache misses
 
-            void Reset(); // reset all performance counters to zero
+            void reset(); // reset all performance counters to zero
         };
 
-        struct PerfContext {
+        struct perf_context {
 
-            ~PerfContext();
+            ~perf_context();
 
-            PerfContext() {
+            perf_context() {
             }
 
-            PerfContext(const PerfContext &);
+            perf_context(const perf_context &pc);
 
-            PerfContext &operator=(const PerfContext &);
+            perf_context &operator=(const perf_context &);
 
-            PerfContext(PerfContext &&) noexcept;
+            perf_context(perf_context &&other) noexcept;
 
-            void Reset(); // reset all performance counters to zero
+            void reset(); // reset all performance counters to zero
 
-            std::string ToString(bool exclude_zero_counters = false) const;
+            std::string to_string(bool exclude_zero_counters = false) const;
 
-            // enable per level perf context and allocate engine for PerfContextByLevel
-            void EnablePerLevelPerfContext();
+            // enable per level perf context and allocate engine for perf_context_by_level
+            void enable_per_level_perf_context();
 
             // temporarily disable per level perf contxt by setting the flag to false
-            void DisablePerLevelPerfContext();
+            void disable_per_level_perf_context();
 
-            // free the space for PerfContextByLevel, also disable per level perf context
-            void ClearPerLevelPerfContext();
+            // free the space for perf_context_by_level, also disable per level perf context
+            void clear_per_level_perf_context();
 
             uint64_t user_key_comparison_count; // total number of user key comparisons
             uint64_t block_cache_hit_count;     // total number of block cache hits
@@ -83,39 +83,39 @@ namespace nil {
 
             // total number of internal keys skipped over during iteration.
             // There are several reasons for it:
-            // 1. when calling Next(), the iterator is in the position of the previous
+            // 1. when calling next(), the iterator is in the position of the previous
             //    key, so that we'll need to skip it. It means this counter will always
-            //    be incremented in Next().
-            // 2. when calling Next(), we need to skip internal entries for the previous
+            //    be incremented in next().
+            // 2. when calling next(), we need to skip internal entries for the previous
             //    keys that are overwritten.
-            // 3. when calling Next(), Seek() or SeekToFirst(), after previous key
-            //    before calling Next(), the seek key in Seek() or the beginning for
-            //    SeekToFirst(), there may be one or more deleted keys before the next
+            // 3. when calling next(), seek() or seek_to_first(), after previous key
+            //    before calling next(), the seek key in seek() or the beginning for
+            //    seek_to_first(), there may be one or more deleted keys before the next
             //    valid key that the operation should place the iterator to. We need
             //    to skip both of the tombstone and updates hidden by the tombstones. The
             //    tombstones are not included in this counter, while previous updates
             //    hidden by the tombstones will be included here.
-            // 4. symmetric cases for Prev() and SeekToLast()
+            // 4. symmetric cases for prev() and seek_to_last()
             // internal_recent_skipped_count is not included in this counter.
             //
             uint64_t internal_key_skipped_count;
             // Total number of deletes and single deletes skipped over during iteration
-            // When calling Next(), Seek() or SeekToFirst(), after previous position
-            // before calling Next(), the seek key in Seek() or the beginning for
-            // SeekToFirst(), there may be one or more deleted keys before the next valid
+            // When calling next(), seek() or seek_to_first(), after previous position
+            // before calling next(), the seek key in seek() or the beginning for
+            // seek_to_first(), there may be one or more deleted keys before the next valid
             // key. Every deleted key is counted once. We don't recount here if there are
             // still older updates invalidated by the tombstones.
             //
             uint64_t internal_delete_skipped_count;
             // How many times iterators skipped over internal keys that are more recent
-            // than the snapshot that iterator is using.
+            // than the get_snapshot that iterator is using.
             //
             uint64_t internal_recent_skipped_count;
             // How many values were fed into merge operator by iterators.
             //
             uint64_t internal_merge_count;
 
-            uint64_t get_snapshot_time;       // total nanos spent on getting snapshot
+            uint64_t get_snapshot_time;       // total nanos spent on getting get_snapshot
             uint64_t get_from_memtable_time;  // total nanos spent on querying memtables
             uint64_t get_from_memtable_count;    // number of mem tables queried
             // total nanos spent after get() finds a key
@@ -124,11 +124,11 @@ namespace nil {
             // total nanos spent on seeking memtable
             uint64_t seek_on_memtable_time;
             // number of seeks issued on memtable
-            // (including SeekForPrev but not SeekToFirst and SeekToLast)
+            // (including seek_for_prev but not seek_to_first and seek_to_last)
             uint64_t seek_on_memtable_count;
-            // number of Next()s issued on memtable
+            // number of next()s issued on memtable
             uint64_t next_on_memtable_count;
-            // number of Prev()s issued on memtable
+            // number of prev()s issued on memtable
             uint64_t prev_on_memtable_count;
             // total nanos spent on seeking child iters
             uint64_t seek_child_seek_time;
@@ -218,13 +218,13 @@ namespace nil {
 
             uint64_t get_cpu_nanos;
 
-            std::map<uint32_t, PerfContextByLevel> *level_to_perf_context = nullptr;
+            std::map<uint32_t, perf_context_by_level> *level_to_perf_context = nullptr;
             bool per_level_perf_context_enabled = false;
         };
 
-// get Thread-local PerfContext object pointer
+// get Thread-local perf_context_ object pointer
 // if defined(NPERF_CONTEXT), then the pointer is not thread-local
-        PerfContext *get_perf_context();
+        perf_context * get_perf_context();
 
     }
 }

@@ -2,14 +2,14 @@
 // to be used as the backing store for a MemTable. Such a collection must
 // satisfy the following properties:
 //  (1) It does not store duplicate items.
-//  (2) It uses MemTableRep::KeyComparator to compare items for iteration and
+//  (2) It uses mem_table_rep::key_comparator to compare items for iteration and
 //     equality.
 //  (3) It can be accessed concurrently by multiple readers and can support
 //     during reads. However, it needn't support multiple concurrent writes.
 //  (4) Items are never deleted.
 // The liberal use of assertions is encouraged to enforce (1).
 //
-// The factory will be passed an MemTableAllocator object when a new MemTableRep
+// The factory will be passed an MemTableAllocator object when a new mem_table_rep
 // is requested.
 //
 // Users can implement their own memtable representations. We include three
@@ -20,7 +20,7 @@
 //  common and iteration across different prefixes is rare. It is backed by
 //  a hash map where each bucket is a skip list.
 //  - VectorRep: This is backed by an unordered std::vector. On iteration, the
-// vector is sorted. It is intelligent about sorting; once the MarkReadOnly()
+// vector is sorted. It is intelligent about sorting; once the mark_read_only()
 // has been called, the vector will only be sorted once. It is optimized for
 // random-write-heavy workloads.
 //
@@ -42,7 +42,7 @@ namespace nil {
 
         class Arena;
 
-        class Allocator;
+        class allocator;
 
         class LookupKey;
 
@@ -52,20 +52,20 @@ namespace nil {
 
         typedef void *KeyHandle;
 
-        extern slice GetLengthPrefixedSlice(const char *data);
+        extern slice get_length_prefixed_slice(const char *data);
 
-        class MemTableRep {
+        class mem_table_rep {
         public:
-            // KeyComparator provides a means to compare keys, which are internal keys
+            // key_comparator provides a means to compare keys, which are internal keys
             // concatenated with values.
-            class KeyComparator {
+            class key_comparator {
             public:
-                typedef nil::dcdb::slice DecodedType;
+                typedef nil::dcdb::slice decoded_type;
 
-                virtual DecodedType decode_key(const char *key) const {
+                virtual decoded_type decode_key(const char *key) const {
                     // The format of key is frozen and can be terated as a part of the API
                     // contract. Refer to MemTable::add for details.
-                    return GetLengthPrefixedSlice(key);
+                    return get_length_prefixed_slice(key);
                 }
 
                 // compare a and b. Return a negative value if a is less than b, 0 if they
@@ -74,11 +74,11 @@ namespace nil {
 
                 virtual int operator()(const char *prefix_len_key, const slice &key) const = 0;
 
-                virtual ~KeyComparator() {
+                virtual ~key_comparator() {
                 }
             };
 
-            explicit MemTableRep(Allocator *allocator) : allocator_(allocator) {
+            explicit mem_table_rep(allocator *a) : allocator_(a) {
             }
 
             // allocate a buf of len size for storing key. The idea is that a
@@ -86,19 +86,19 @@ namespace nil {
             // better. By allowing it to allocate memory, it can possibly insert
             // correlated stuff in consecutive memory area to make processor
             // prefetching more efficient.
-            virtual KeyHandle Allocate(const size_t len, char **buf);
+            virtual KeyHandle allocate(const size_t len, char **buf);
 
             // insert key into the collection. (The caller will pack key and value into a
             // single buffer and pass that in as the parameter to insert).
             // REQUIRES: nothing that compares equal to key is currently in the
             // collection, and no concurrent modifications to the table in progress
-            virtual void Insert(KeyHandle handle) = 0;
+            virtual void insert(KeyHandle handle) = 0;
 
             // Same as ::insert
-            // Returns false if mem_table_rep_factory::CanHandleDuplicatedKey() is true and
+            // Returns false if mem_table_rep_factory::can_handle_duplicated_key() is true and
             // the <key, seq> already exists.
-            virtual bool InsertKey(KeyHandle handle) {
-                Insert(handle);
+            virtual bool insert_key(KeyHandle handle) {
+                insert(handle);
                 return true;
             }
 
@@ -108,51 +108,51 @@ namespace nil {
             //
             // Currently only skip-list based memtable implement the interface. Other
             // implementations will fallback to insert() by default.
-            virtual void InsertWithHint(KeyHandle handle, void ** /*hint*/) {
+            virtual void insert_with_hint(KeyHandle handle, void **hint) {
                 // Ignore the hint by default.
-                Insert(handle);
+                insert(handle);
             }
 
-            // Same as ::InsertWithHint
-            // Returns false if mem_table_rep_factory::CanHandleDuplicatedKey() is true and
+            // Same as ::insert_with_hint
+            // Returns false if mem_table_rep_factory::can_handle_duplicated_key() is true and
             // the <key, seq> already exists.
-            virtual bool InsertKeyWithHint(KeyHandle handle, void **hint) {
-                InsertWithHint(handle, hint);
+            virtual bool insert_key_with_hint(KeyHandle handle, void **hint) {
+                insert_with_hint(handle, hint);
                 return true;
             }
 
             // Like insert(handle), but may be called concurrent with other calls
-            // to InsertConcurrently for other handles.
+            // to insert_concurrently for other handles.
             //
-            // Returns false if mem_table_rep_factory::CanHandleDuplicatedKey() is true and
+            // Returns false if mem_table_rep_factory::can_handle_duplicated_key() is true and
             // the <key, seq> already exists.
-            virtual void InsertConcurrently(KeyHandle handle);
+            virtual void insert_concurrently(KeyHandle handle);
 
-            // Same as ::InsertConcurrently
-            // Returns false if mem_table_rep_factory::CanHandleDuplicatedKey() is true and
+            // Same as ::insert_concurrently
+            // Returns false if mem_table_rep_factory::can_handle_duplicated_key() is true and
             // the <key, seq> already exists.
-            virtual bool InsertKeyConcurrently(KeyHandle handle) {
-                InsertConcurrently(handle);
+            virtual bool insert_key_concurrently(KeyHandle handle) {
+                insert_concurrently(handle);
                 return true;
             }
 
             // Returns true iff an entry that compares equal to key is in the collection.
-            virtual bool Contains(const char *key) const = 0;
+            virtual bool contains(const char *key) const = 0;
 
             // Notify this table rep that it will no longer be added to. By default,
-            // does nothing.  After MarkReadOnly() is called, this table rep will
+            // does nothing.  After mark_read_only() is called, this table rep will
             // not be written to (ie No more calls to allocate(), insert(),
             // or any writes done directly to entries accessed through the iterator.)
-            virtual void MarkReadOnly() {
+            virtual void mark_read_only() {
             }
 
             // Notify this table rep that it has been flushed to stable engine.
             // By default, does nothing.
             //
-            // Invariant: MarkReadOnly() is called, before MarkFlushed().
+            // Invariant: mark_read_only() is called, before mark_flushed().
             // Note that this method if overridden, should not run for an extended period
             // of time. Otherwise, RocksDB may be blocked.
-            virtual void MarkFlushed() {
+            virtual void mark_flushed() {
             }
 
             // Look up key from the mem table, since the first key in the mem table whose
@@ -167,125 +167,125 @@ namespace nil {
             // default_environment:
             // get() function with a default value of dynamically construct an iterator,
             // seek and call the call back function.
-            virtual void Get(const LookupKey &k, void *callback_args,
+            virtual void get(const LookupKey &k, void *callback_args,
                              bool (*callback_func)(void *arg, const char *entry));
 
-            virtual uint64_t ApproximateNumEntries(const slice & /*start_ikey*/, const slice & /*end_key*/) {
+            virtual uint64_t approximate_num_entries(const slice &start_ikey, const slice &end_key) {
                 return 0;
             }
 
             // Report an approximation of how much memory has been used other than memory
             // that was allocated through the allocator.  Safe to call from any thread.
-            virtual size_t ApproximateMemoryUsage() = 0;
+            virtual size_t approximate_memory_usage() = 0;
 
-            virtual ~MemTableRep() {
+            virtual ~mem_table_rep() {
             }
 
             // Iteration over the contents of a skip collection
-            class Iterator {
+            class iterator {
             public:
                 // Initialize an iterator over the specified collection.
                 // The returned iterator is not valid.
-                // explicit Iterator(const MemTableRep* collection);
-                virtual ~Iterator() {
+                // explicit iterator(const mem_table_rep* collection);
+                virtual ~iterator() {
                 }
 
                 // Returns true iff the iterator is positioned at a valid node.
-                virtual bool Valid() const = 0;
+                virtual bool valid() const = 0;
 
                 // Returns the key at the current position.
-                // REQUIRES: Valid()
+                // REQUIRES: valid()
                 virtual const char *key() const = 0;
 
                 // Advances to the next position.
-                // REQUIRES: Valid()
-                virtual void Next() = 0;
+                // REQUIRES: valid()
+                virtual void next() = 0;
 
                 // Advances to the previous position.
-                // REQUIRES: Valid()
-                virtual void Prev() = 0;
+                // REQUIRES: valid()
+                virtual void prev() = 0;
 
                 // Advance to the first entry with a key >= target
-                virtual void Seek(const slice &internal_key, const char *memtable_key) = 0;
+                virtual void seek(const slice &internal_key, const char *memtable_key) = 0;
 
                 // retreat to the first entry with a key <= target
-                virtual void SeekForPrev(const slice &internal_key, const char *memtable_key) = 0;
+                virtual void seek_for_prev(const slice &internal_key, const char *memtable_key) = 0;
 
                 // Position at the first entry in collection.
-                // Final state of iterator is Valid() iff collection is not empty.
-                virtual void SeekToFirst() = 0;
+                // Final state of iterator is valid() iff collection is not empty.
+                virtual void seek_to_first() = 0;
 
                 // Position at the last entry in collection.
-                // Final state of iterator is Valid() iff collection is not empty.
-                virtual void SeekToLast() = 0;
+                // Final state of iterator is valid() iff collection is not empty.
+                virtual void seek_to_last() = 0;
             };
 
             // Return an iterator over the keys in this representation.
-            // arena: If not null, the arena needs to be used to allocate the Iterator.
+            // arena: If not null, the arena needs to be used to allocate the iterator.
             //        When destroying the iterator, the caller will not call "delete"
-            //        but Iterator::~Iterator() directly. The destructor needs to destroy
+            //        but iterator::iterator() directly. The destructor needs to destroy
             //        all the states but those allocated in arena.
-            virtual Iterator *GetIterator(Arena *arena = nullptr) = 0;
+            virtual iterator *get_iterator(Arena *arena = nullptr) = 0;
 
-            // Return an iterator that has a special Seek semantics. The result of
-            // a Seek might only include keys with the same prefix as the target key.
-            // arena: If not null, the arena is used to allocate the Iterator.
+            // Return an iterator that has a special seek semantics. The result of
+            // a seek might only include keys with the same prefix as the target key.
+            // arena: If not null, the arena is used to allocate the iterator.
             //        When destroying the iterator, the caller will not call "delete"
-            //        but Iterator::~Iterator() directly. The destructor needs to destroy
+            //        but iterator::iterator() directly. The destructor needs to destroy
             //        all the states but those allocated in arena.
-            virtual Iterator *GetDynamicPrefixIterator(Arena *arena = nullptr) {
-                return GetIterator(arena);
+            virtual iterator *get_dynamic_prefix_iterator(Arena *arena = nullptr) {
+                return get_iterator(arena);
             }
 
-            // Return true if the current MemTableRep supports merge operator.
+            // Return true if the current mem_table_rep supports merge operator.
             // default_environment: true
-            virtual bool IsMergeOperatorSupported() const {
+            virtual bool is_merge_operator_supported() const {
                 return true;
             }
 
-            // Return true if the current MemTableRep supports snapshot
+            // Return true if the current mem_table_rep supports get_snapshot
             // default_environment: true
-            virtual bool IsSnapshotSupported() const {
+            virtual bool is_snapshot_supported() const {
                 return true;
             }
 
         protected:
             // When *key is an internal key concatenated with the value, returns the
             // user key.
-            virtual slice UserKey(const char *key) const;
+            virtual slice user_key(const char *key) const;
 
-            Allocator *allocator_;
+            allocator *allocator_;
         };
 
 // This is the base class for all factories that are used by RocksDB to create
-// new MemTableRep objects
+// new mem_table_rep objects
         class mem_table_rep_factory {
         public:
             virtual ~mem_table_rep_factory() {
             }
 
-            virtual MemTableRep *CreateMemTableRep(const MemTableRep::KeyComparator &, Allocator *,
-                                                   const slice_transform *, Logger *logger) = 0;
+            virtual mem_table_rep *create_mem_table_rep(const mem_table_rep::key_comparator &key_cmp, allocator *a,
+                                                        const slice_transform *st, Logger *l) = 0;
 
-            virtual MemTableRep *CreateMemTableRep(const MemTableRep::KeyComparator &key_cmp, Allocator *allocator,
-                                                   const slice_transform *slice_transform, Logger *logger,
-                                                   uint32_t /* column_family_id */) {
-                return CreateMemTableRep(key_cmp, allocator, slice_transform, logger);
+            virtual mem_table_rep *create_mem_table_rep(const mem_table_rep::key_comparator &key_cmp,
+                                                        allocator *allocator, const slice_transform *slice_transform,
+                                                        Logger *logger, uint32_t column_family_id) {
+                return create_mem_table_rep(key_cmp, allocator, slice_transform, logger);
             }
 
-            virtual const char *Name() const = 0;
+            virtual const char *name() const = 0;
 
-            // Return true if the current MemTableRep supports concurrent inserts
+            // Return true if the current mem_table_rep supports concurrent inserts
             // default_environment: false
-            virtual bool IsInsertConcurrentlySupported() const {
+            virtual bool is_insert_concurrently_supported() const {
                 return false;
             }
 
-            // Return true if the current MemTableRep supports detecting duplicate
-            // <key,seq> at insertion time. If true, then MemTableRep::insert* returns
+            // Return true if the current mem_table_rep supports detecting duplicate
+            // <key,seq> at insertion time. If true, then mem_table_rep::insert* returns
             // false when if the <key,seq> already exists.
             // default_environment: false
-            virtual bool CanHandleDuplicatedKey() const {
+            virtual bool can_handle_duplicated_key() const {
                 return false;
             }
         };
@@ -302,20 +302,20 @@ namespace nil {
             explicit skip_list_factory(size_t lookahead = 0) : lookahead_(lookahead) {
             }
 
-            using mem_table_rep_factory::CreateMemTableRep;
+            using mem_table_rep_factory::create_mem_table_rep;
 
-            virtual MemTableRep *CreateMemTableRep(const MemTableRep::KeyComparator &, Allocator *,
-                                                   const slice_transform *, Logger *logger) override;
+            virtual mem_table_rep *create_mem_table_rep(const mem_table_rep::key_comparator &key_cmp, allocator *a,
+                                                        const slice_transform *st, Logger *l) override;
 
-            virtual const char *Name() const override {
+            virtual const char *name() const override {
                 return "skip_list_factory";
             }
 
-            bool IsInsertConcurrentlySupported() const override {
+            bool is_insert_concurrently_supported() const override {
                 return true;
             }
 
-            bool CanHandleDuplicatedKey() const override {
+            bool can_handle_duplicated_key() const override {
                 return true;
             }
 
@@ -333,20 +333,20 @@ namespace nil {
 //   count: Passed to the constructor of the underlying std::vector of each
 //     VectorRep. On initialization, the underlying array will be at least count
 //     bytes reserved for usage.
-        class VectorRepFactory : public mem_table_rep_factory {
+        class vector_rep_factory : public mem_table_rep_factory {
             const size_t count_;
 
         public:
-            explicit VectorRepFactory(size_t count = 0) : count_(count) {
+            explicit vector_rep_factory(size_t count = 0) : count_(count) {
             }
 
-            using mem_table_rep_factory::CreateMemTableRep;
+            using mem_table_rep_factory::create_mem_table_rep;
 
-            virtual MemTableRep *CreateMemTableRep(const MemTableRep::KeyComparator &, Allocator *,
-                                                   const slice_transform *, Logger *logger) override;
+            virtual mem_table_rep *create_mem_table_rep(const mem_table_rep::key_comparator &key_cmp, allocator *a,
+                                                        const slice_transform *st, Logger *l) override;
 
-            virtual const char *Name() const override {
-                return "VectorRepFactory";
+            virtual const char *name() const override {
+                return "vector_rep_factory";
             }
         };
 
@@ -356,8 +356,9 @@ namespace nil {
 // skiplist_height: the max height of the skiplist
 // skiplist_branching_factor: probabilistic size ratio between adjacent
 //                            link lists in the skiplist
-        extern mem_table_rep_factory *NewHashSkipListRepFactory(size_t bucket_count = 1000000, int32_t skiplist_height = 4,
-                                                             int32_t skiplist_branching_factor = 4);
+        extern mem_table_rep_factory *new_hash_skip_list_rep_factory(size_t bucket_count = 1000000,
+                                                                     int32_t skiplist_height = 4,
+                                                                     int32_t skiplist_branching_factor = 4);
 
 // The factory is to create memtables based on a hash table:
 // it contains a fixed array of buckets, each pointing to either a linked list
@@ -375,10 +376,11 @@ namespace nil {
 //                                 entries when flushing.
 // @threshold_use_skiplist: a bucket switches to skip list if number of
 //                          entries exceed this parameter.
-        extern mem_table_rep_factory *NewHashLinkListRepFactory(size_t bucket_count = 50000, size_t huge_page_tlb_size = 0,
-                                                             int bucket_entries_logging_threshold = 4096,
-                                                             bool if_log_bucket_dist_when_flash = true,
-                                                             uint32_t threshold_use_skiplist = 256);
+        extern mem_table_rep_factory *new_hash_link_list_rep_factory(size_t bucket_count = 50000,
+                                                                     size_t huge_page_tlb_size = 0,
+                                                                     int bucket_entries_logging_threshold = 4096,
+                                                                     bool if_log_bucket_dist_when_flash = true,
+                                                                     uint32_t threshold_use_skiplist = 256);
 
 #endif  // DCDB_LITE
     }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <stdio.h>
+#include <cstdio>
 #include <map>
 #include <memory>
 #include <string>
@@ -32,7 +32,7 @@
 namespace nil {
     namespace dcdb {
 
-        struct Options;
+        struct options;
         struct db_options;
         struct read_options;
         struct write_options;
@@ -86,8 +86,8 @@ namespace nil {
             // Fills "*desc" with the up-to-date descriptor of the column family
             // associated with this handle. Since it fills "*desc" with the up-to-date
             // information, this call might internally lock and release database mutex to
-            // access the up-to-date CF options.  In addition, all the pointer-typed
-            // options cannot be referenced any longer than the original options exist.
+            // access the up-to-date CF opts.  In addition, all the pointer-typed
+            // opts cannot be referenced any longer than the original opts exist.
             //
             // Note that this function is not supported in RocksDBLite.
             virtual status_type get_descriptor(column_family_descriptor *desc) = 0;
@@ -141,10 +141,10 @@ namespace nil {
         public:
             // open the database with the specified "name".
             // Stores a pointer to a heap-allocated database in *dbptr and returns
-            // OK on success.
-            // Stores nullptr in *dbptr and returns a non-OK status on error.
+            // is_ok on success.
+            // Stores nullptr in *dbptr and returns a non-is_ok status on error.
             // Caller should delete *dbptr when it is no longer needed.
-            static status_type open(const Options &options, const std::string &name, database **dbptr);
+            static status_type open(const options &options, const std::string &name, database **dbptr);
 
             // open the database for read only. All database interfaces
             // that modify data, like insert/delete, will return error.
@@ -152,8 +152,8 @@ namespace nil {
             // will happen.
             //
             // Not supported in DCDB_LITE, in which case the function will
-            // return status_type::NotSupported.
-            static status_type open_for_read_only(const Options &options, const std::string &name, database **dbptr,
+            // return status_type::not_supported.
+            static status_type open_for_read_only(const options &options, const std::string &name, database **dbptr,
                                                   bool error_if_log_file_exist = false);
 
             // open the database for read only with column families. When opening database with
@@ -163,22 +163,22 @@ namespace nil {
             // in nil::dcdb::kDefaultColumnFamilyName
             //
             // Not supported in DCDB_LITE, in which case the function will
-            // return status_type::NotSupported.
+            // return status_type::not_supported.
             static status_type open_for_read_only(const db_options &db_options, const std::string &name,
                                                   const std::vector<column_family_descriptor> &column_families,
                                                   std::vector<column_family_handle *> *handles, database **dbptr,
                                                   bool error_if_log_file_exist = false);
 
             // open database with column families.
-            // db_options specify database specific options
+            // db_options specify database specific opts
             // column_families is the vector of all column families in the database,
-            // containing column family name and options. You need to open ALL column
+            // containing column family name and opts. You need to open ALL column
             // families in the database. To get the list of column families, you can use
             // list_column_families(). Also, you can open only a subset of column families
             // for read-only access.
             // The default column family name is 'default' and it's stored
             // in nil::dcdb::kDefaultColumnFamilyName.
-            // If everything is OK, handles will on return be the same size
+            // If everything is is_ok, handles will on return be the same size
             // as column_families --- handles[i] will be a handle that you
             // will use to operate on column family column_family[i].
             // Before delete database, you have to close All column families by calling
@@ -188,7 +188,7 @@ namespace nil {
                                     std::vector<column_family_handle *> *handles, database **dbptr);
 
             virtual status_type resume() {
-                return status_type::NotSupported();
+                return status_type::not_supported();
             }
 
             // close the database by releasing resources, closing files etc. This should be
@@ -197,10 +197,10 @@ namespace nil {
             // If syncing is required, the caller must first call sync_wal(), or write()
             // using an empty write batch with write_options.sync=true.
             // Regardless of the return status, the database must be freed. If the return
-            // status is NotSupported(), then the database implementation does cleanup in the
+            // status is not_supported(), then the database implementation does cleanup in the
             // destructor
             virtual status_type close() {
-                return status_type::NotSupported();
+                return status_type::not_supported();
             }
 
             // list_column_families will open the database specified by argument name
@@ -221,7 +221,7 @@ namespace nil {
                                                      const std::string &column_family_name,
                                                      column_family_handle **handle);
 
-            // Bulk create column families with the same column family options.
+            // Bulk create column families with the same column family opts.
             // Return the handles of the column families through the argument handles.
             // In case of error, the request may succeed partially, and handles will
             // contain column family handles that it managed to create, and have size
@@ -257,8 +257,8 @@ namespace nil {
 
             // Set the database entry for "key" to "value".
             // If "key" already exists, it will be overwritten.
-            // Returns OK on success, and a non-OK status on error.
-            // Note: consider setting options.sync = true.
+            // Returns OK on success, and a non-is_ok status on error.
+            // Note: consider setting opts.sync = true.
             virtual status_type insert(const write_options &options, column_family_handle *column_family,
                                        const slice &key, const slice &value) = 0;
 
@@ -266,10 +266,10 @@ namespace nil {
                 return insert(options, default_column_family(), key, value);
             }
 
-            // remove the database entry (if any) for "key".  Returns OK on
-            // success, and a non-OK status on error.  It is not an error if "key"
+            // remove the database entry (if any) for "key".  Returns is_ok on
+            // success, and a non-is_ok status on error.  It is not an error if "key"
             // did not exist in the database.
-            // Note: consider setting options.sync = true.
+            // Note: consider setting opts.sync = true.
             virtual status_type remove(const write_options &options, column_family_handle *column_family,
                                        const slice &key) = 0;
 
@@ -278,7 +278,7 @@ namespace nil {
             }
 
             // remove the database entry for "key". Requires that the key exists
-            // and was not overwritten. Returns OK on success, and a non-OK status
+            // and was not overwritten. Returns is_ok on success, and a non-OK status
             // on error.  It is not an error if "key" did not exist in the database.
             //
             // If a key is overwritten (by calling insert() multiple times), then the result
@@ -292,7 +292,7 @@ namespace nil {
             // written using merge().  Mixing single_remove operations with Deletes and
             // Merges can result in undefined behavior.
             //
-            // Note: consider setting options.sync = true.
+            // Note: consider setting opts.sync = true.
             virtual status_type single_delete(const write_options &options, column_family_handle *column_family,
                                               const slice &key) = 0;
 
@@ -301,8 +301,8 @@ namespace nil {
             }
 
             // Removes the database entries in the range ["begin_key", "end_key"), i.e.,
-            // including "begin_key" and excluding "end_key". Returns OK on success, and
-            // a non-OK status on error. It is not an error if no keys exist in the range
+            // including "begin_key" and excluding "end_key". Returns is_ok on success, and
+            // a non-is_ok status on error. It is not an error if no keys exist in the range
             // ["begin_key", "end_key").
             //
             // This feature is now usable in production, with the following caveats:
@@ -314,10 +314,10 @@ namespace nil {
             virtual status_type delete_range(const write_options &options, column_family_handle *column_family,
                                              const slice &begin_key, const slice &end_key);
 
-            // merge the database entry for "key" with "value".  Returns OK on success,
-            // and a non-OK status on error. The semantics of this operation is
+            // merge the database entry for "key" with "value".  Returns is_ok on success,
+            // and a non-is_ok status on error. The semantics of this operation is
             // determined by the user provided merge_operator when opening database.
-            // Note: consider setting options.sync = true.
+            // Note: consider setting opts.sync = true.
             virtual status_type merge(const write_options &options, column_family_handle *column_family,
                                       const slice &key, const slice &value) = 0;
 
@@ -327,41 +327,41 @@ namespace nil {
 
             // Apply the specified updates to the database.
             // If `updates` contains no update, WAL will still be synced if
-            // options.sync=true.
-            // Returns OK on success, non-OK on failure.
-            // Note: consider setting options.sync = true.
+            // opts.sync=true.
+            // Returns OK on success, non-is_ok on failure.
+            // Note: consider setting opts.sync = true.
             virtual status_type write(const write_options &options, write_batch *updates) = 0;
 
             // If the database contains an entry for "key" store the
-            // corresponding value in *value and return OK.
+            // corresponding value in *value and return is_ok.
             //
             // If there is no entry for "key" leave *value unchanged and return
-            // a status for which status_type::IsNotFound() returns true.
+            // a status for which status_type::is_not_found() returns true.
             //
             // May return some other status_type on an error.
             virtual inline status_type get(const read_options &options, column_family_handle *column_family,
                                            const slice &key, std::string *value) {
                 assert(value != nullptr);
-                PinnableSlice pinnable_val(value);
-                assert(!pinnable_val.IsPinned());
+                pinnable_slice pinnable_val(value);
+                assert(!pinnable_val.is_pinned());
                 auto s = get(options, column_family, key, &pinnable_val);
-                if (s.ok() && pinnable_val.IsPinned()) {
+                if (s.is_ok() && pinnable_val.is_pinned()) {
                     value->assign(pinnable_val.data(), pinnable_val.size());
                 }  // else value is already assigned
                 return s;
             }
 
             virtual status_type get(const read_options &options, column_family_handle *column_family, const slice &key,
-                                    PinnableSlice *value) = 0;
+                                    pinnable_slice *value) = 0;
 
             virtual status_type get(const read_options &options, const slice &key, std::string *value) {
                 return get(options, default_column_family(), key, value);
             }
 
             // If keys[i] does not exist in the database, then the i'th returned
-            // status will be one for which status_type::IsNotFound() is true, and
+            // status will be one for which status_type::is_not_found() is true, and
             // (*values)[i] will be set to some arbitrary value (often ""). Otherwise,
-            // the i'th returned status will have status_type::ok() true, and (*values)[i]
+            // the i'th returned status will have status_type::is_ok() true, and (*values)[i]
             // will store the value associated with keys[i].
             //
             // (*values) will always be resized to be the same size as (keys).
@@ -401,13 +401,13 @@ namespace nil {
 
             // Return a heap-allocated iterator over the contents of the database.
             // The result of new_iterator() is initially invalid (caller must
-            // call one of the Seek methods on the iterator before using it).
+            // call one of the seek methods on the iterator before using it).
             //
             // Caller should delete the iterator when it is no longer needed.
             // The returned iterator should be deleted before this db is deleted.
-            virtual Iterator *new_iterator(const read_options &options, column_family_handle *column_family) = 0;
+            virtual iterator *new_iterator(const read_options &options, column_family_handle *column_family) = 0;
 
-            virtual Iterator *new_iterator(const read_options &options) {
+            virtual iterator *new_iterator(const read_options &options) {
                 return new_iterator(options, default_column_family());
             }
 
@@ -416,23 +416,23 @@ namespace nil {
             // before the db is deleted
             virtual status_type new_iterators(const read_options &options,
                                               const std::vector<column_family_handle *> &column_families,
-                                              std::vector<Iterator *> *iterators) = 0;
+                                              std::vector<iterator *> *iterators) = 0;
 
             // Return a handle to the current database state.  Iterators created with
-            // this handle will all observe a stable snapshot of the current database
+            // this handle will all observe a stable get_snapshot of the current database
             // state.  The caller must call release_snapshot(result) when the
-            // snapshot is no longer needed.
+            // get_snapshot is no longer needed.
             //
-            // nullptr will be returned if the database fails to take a snapshot or does
-            // not support snapshot.
-            virtual const Snapshot *get_snapshot() = 0;
+            // nullptr will be returned if the database fails to take a get_snapshot or does
+            // not support get_snapshot.
+            virtual const snapshot *get_snapshot() = 0;
 
-            // release a previously acquired snapshot.  The caller must not
-            // use "snapshot" after this call.
-            virtual void release_snapshot(const Snapshot *snapshot) = 0;
+            // release a previously acquired get_snapshot.  The caller must not
+            // use "get_snapshot" after this call.
+            virtual void release_snapshot(const snapshot *snapshot) = 0;
 
 #ifndef DCDB_LITE
-            // Contains all valid property arguments for get_property().
+            // contains all valid property arguments for get_property().
             //
             // NOTE: Property names cannot end in numbers since those are interpreted as
             //       arguments, e.g., see kNumFilesAtLevelPrefix.
@@ -558,8 +558,8 @@ namespace nil {
                 //      database.
                 static const std::string kNumSnapshots;
 
-                //  "rocksdb.oldest-snapshot-time" - returns number representing unix
-                //      timestamp of oldest unreleased snapshot.
+                //  "rocksdb.oldest-get_snapshot-time" - returns number representing unix
+                //      timestamp of oldest unreleased get_snapshot.
                 static const std::string kOldestSnapshotTime;
 
                 //  "rocksdb.num-live-versions" - returns number of live versions. `Version`
@@ -639,15 +639,15 @@ namespace nil {
                 //      entries being pinned.
                 static const std::string kBlockCachePinnedUsage;
 
-                // "rocksdb.options-statistics" - returns multi-line string
-                //      of options.statistics
+                // "rocksdb.opts-statistics" - returns multi-line string
+                //      of opts.statistics
                 static const std::string kOptionsStatistics;
             };
 #endif /* DCDB_LITE */
 
             // database implementations can export properties about their state via this method.
             // If "property" is a valid property understood by this database implementation (see
-            // properties struct above for valid options), fills "*value" with its current
+            // properties struct above for valid opts), fills "*value" with its current
             // value and returns true.  Otherwise, returns false.
             virtual bool get_property(column_family_handle *column_family, const slice &property,
                                       std::string *value) = 0;
@@ -681,7 +681,7 @@ namespace nil {
             //  "rocksdb.estimate-table-readers-mem"
             //  "rocksdb.is-file-deletions-enabled"
             //  "rocksdb.num-snapshots"
-            //  "rocksdb.oldest-snapshot-time"
+            //  "rocksdb.oldest-get_snapshot-time"
             //  "rocksdb.num-live-versions"
             //  "rocksdb.current-super-version-number"
             //  "rocksdb.estimate-live-data-size"
@@ -707,10 +707,10 @@ namespace nil {
             }
 
             // reset internal stats for database and all column families.
-            // Note this doesn't reset options.statistics as it is not owned by
+            // Note this doesn't reset opts.statistics as it is not owned by
             // database.
             virtual status_type reset_stats() {
-                return status_type::NotSupported("Not implemented");
+                return status_type::not_supported("Not implemented");
             }
 
             // Same as get_int_property(), but this one returns the aggregated int
@@ -782,13 +782,13 @@ namespace nil {
             // begin==nullptr is treated as a key before all keys in the database.
             // end==nullptr is treated as a key after all keys in the database.
             // Therefore the following call will compact the entire database:
-            //    db->compact_range(options, nullptr, nullptr);
+            //    db->compact_range(opts, nullptr, nullptr);
             // Note that after the entire database is compacted, all data are pushed
             // down to the last level containing any data. If the total data size after
             // compaction is reduced, that level might not be appropriate for hosting all
-            // the files. In this case, client could set options.change_level to true, to
+            // the files. In this case, client could set opts.change_level to true, to
             // move the files back to the minimum level capable of holding the data set
-            // or a given level (specified by non-negative options.target_level).
+            // or a given level (specified by non-negative opts.target_level).
             virtual status_type compact_range(const compact_range_options &options, column_family_handle *column_family,
                                               const slice *begin, const slice *end) = 0;
 
@@ -820,7 +820,7 @@ namespace nil {
 
             virtual status_type set_options(column_family_handle *column_family,
                                             const std::unordered_map<std::string, std::string> &new_options) {
-                return status_type::NotSupported("Not implemented");
+                return status_type::not_supported("Not implemented");
             }
 
             virtual status_type set_options(const std::unordered_map<std::string, std::string> &new_options) {
@@ -840,13 +840,13 @@ namespace nil {
                                               column_family_handle *column_family,
                                               const std::vector<std::string> &input_file_names, const int output_level,
                                               const int output_path_id = -1,
-                                              std::vector<std::string>* const output_file_names = nullptr,
+                                              std::vector<std::string> *const output_file_names = nullptr,
                                               compaction_job_info *compaction_job_inf = nullptr) = 0;
 
             virtual status_type compact_files(const compaction_options &compact_options,
                                               const std::vector<std::string> &input_file_names, const int output_level,
                                               const int output_path_id = -1,
-                                              std::vector<std::string>* const output_file_names = nullptr,
+                                              std::vector<std::string> *const output_file_names = nullptr,
                                               compaction_job_info *compaction_job_info = nullptr) {
                 return compact_files(compact_options, default_column_family(), input_file_names, output_level,
                         output_path_id, output_file_names, compaction_job_info);
@@ -900,13 +900,13 @@ namespace nil {
             // get environment_type object from the database
             virtual environment_type *get_env() const = 0;
 
-            // get database Options that we use.  During the process of opening the
-            // column family, the options provided when calling database::open() or
+            // get database opts that we use.  During the process of opening the
+            // column family, the opts provided when calling database::open() or
             // database::create_column_family() will have been "sanitized" and transformed
             // in an implementation-defined manner.
-            virtual Options get_options(column_family_handle *column_family) const = 0;
+            virtual options get_options(column_family_handle *column_family) const = 0;
 
-            virtual Options get_options() const {
+            virtual options get_options() const {
                 return get_options(default_column_family());
             }
 
@@ -914,7 +914,7 @@ namespace nil {
 
             // flush all mem-table data.
             // flush a single column family, even when atomic flush is enabled. To flush
-            // multiple column families, use flush(options, column_families).
+            // multiple column families, use flush(opts, column_families).
             virtual status_type flush(const flush_options &options, column_family_handle *column_family) = 0;
 
             virtual status_type flush(const flush_options &options) {
@@ -922,9 +922,9 @@ namespace nil {
             }
 
             // Flushes multiple column families.
-            // If atomic flush is not enabled, flush(options, column_families) is
-            // equivalent to calling flush(options, column_family) multiple times.
-            // If atomic flush is enabled, flush(options, column_families) will flush all
+            // If atomic flush is not enabled, flush(opts, column_families) is
+            // equivalent to calling flush(opts, column_family) multiple times.
+            // If atomic flush is enabled, flush(opts, column_families) will flush all
             // column families specified in 'column_families' up to the latest sequence
             // number at the time when flush is requested.
             // Note that RocksDB 5.15 and earlier may not be able to open later versions
@@ -935,13 +935,13 @@ namespace nil {
             // flush the WAL memory buffer to the file. If sync is true, it calls sync_wal
             // afterwards.
             virtual status_type flush_wal(bool sync) {
-                return status_type::NotSupported("flush_wal not implemented");
+                return status_type::not_supported("flush_wal not implemented");
             }
 
             // sync the wal. Note that write() followed by sync_wal() is not exactly the
             // same as write() with sync=true: in the latter case the changes won't be
             // visible until the sync is done.
-            // Currently only works if allow_mmap_writes = false in Options.
+            // Currently only works if allow_mmap_writes = false in opts.
             virtual status_type sync_wal() = 0;
 
             // The sequence number of the most recent transaction.
@@ -980,7 +980,7 @@ namespace nil {
             // paths, the file names begin with "/". The valid size of the manifest file
             // is returned in manifest_file_size. The manifest file is an ever growing
             // file, but only the portion specified by manifest_file_size is valid for
-            // this snapshot. Setting flush_memtable to true does flush before recording
+            // this get_snapshot. Setting flush_memtable to true does flush before recording
             // the live files. Setting flush_memtable to false is useful when we don't
             // want to wait for flush which may have to wait for compaction to complete
             // taking an indeterminate time.
@@ -993,13 +993,13 @@ namespace nil {
                                                bool flush_memtable) = 0;
 
             // Retrieve the sorted list of all wal files with earliest file first
-            virtual status_type get_sorted_wal_files(VectorLogPtr &files) = 0;
+            virtual status_type get_sorted_wal_files(log_ptr_vector &files) = 0;
 
             // Note: this API is not yet consistent with WritePrepared transactions.
             // Sets iter to an iterator that is positioned at a write-batch containing
             // seq_number. If the sequence number is non existent, it returns an iterator
             // at the first available seq_no after the requested seq_no
-            // Returns status_type::OK if iterator is valid
+            // Returns status_type::is_ok if iterator is valid
             // Must set WAL_ttl_seconds or WAL_size_limit_MB to large values to
             // use this api, else the WAL files will get
             // cleared aggressively and the iterator might keep getting invalid before
@@ -1042,7 +1042,7 @@ namespace nil {
             // In the second mode we will always ingest in the bottom most level (see
             // docs to ingest_external_file_options::ingest_behind).
             //
-            // (1) External SST files can be created using SstFileWriter
+            // (1) External SST files can be created using sst_file_writer
             // (2) We will try to ingest the files to the lowest possible level
             //     even if the file compression doesn't match the level compression
             // (3) If ingest_external_file_options->ingest_behind is set to true,
@@ -1059,14 +1059,14 @@ namespace nil {
 
             // ingest_external_files() will ingest files for multiple column families, and
             // record the result atomically to the MANIFEST.
-            // If this function returns OK, all column families' ingestion must succeed.
+            // If this function returns is_ok, all column families' ingestion must succeed.
             // If this function returns NOK, or the process crashes, then non-of the
             // files will be ingested into the database after recovery.
             // Note that it is possible for application to observe a mixed state during
             // the execution of this function. If the user performs range scan over the
             // column families with iterators, iterator on one column family may return
             // ingested data, while iterator on other column family returns old data.
-            // Users can use snapshot for a consistent view of data.
+            // Users can use get_snapshot for a consistent view of data.
             // If your db ingests multiple SST files using this API, i.e. args.size()
             // > 1, then RocksDB 5.15 and earlier will not be able to open it.
             //
@@ -1178,7 +1178,7 @@ namespace nil {
 #endif  // DCDB_LITE
 
             // Sets the globally unique ID created at database creation time by invoking
-            // environment_type::generate_unique_id(), in identity. Returns status_type::OK if identity could
+            // environment_type::generate_unique_id(), in identity. Returns status_type::is_ok if identity could
             // be set properly
             virtual status_type get_db_identity(std::string &identity) const = 0;
 
@@ -1200,20 +1200,21 @@ namespace nil {
 
             virtual status_type suggest_compact_range(column_family_handle *column_family, const slice *begin,
                                                       const slice *end) {
-                return status_type::NotSupported("suggest_compact_range() is not implemented.");
+                return status_type::not_supported("suggest_compact_range() is not implemented.");
             }
 
             virtual status_type promote_l0(column_family_handle *column_family, int target_level) {
-                return status_type::NotSupported("promote_l0() is not implemented.");
+                return status_type::not_supported("promote_l0() is not implemented.");
             }
 
             // Trace database operations. Use end_trace() to stop tracing.
-            virtual status_type start_trace(const trace_options &options, std::unique_ptr<trace_writer> &&trace_writer) {
-                return status_type::NotSupported("start_trace() is not implemented.");
+            virtual status_type start_trace(const trace_options &options,
+                                            std::unique_ptr<trace_writer> &&trace_writer) {
+                return status_type::not_supported("start_trace() is not implemented.");
             }
 
             virtual status_type end_trace() {
-                return status_type::NotSupported("end_trace() is not implemented.");
+                return status_type::not_supported("end_trace() is not implemented.");
             }
 
 #endif  // DCDB_LITE
@@ -1227,7 +1228,7 @@ namespace nil {
             // User is responsible for deleting stats_history_iterator after use
             virtual status_type get_stats_history(uint64_t start_time, uint64_t end_time,
                                                   std::unique_ptr<stats_history_iterator> *stats_iterator) {
-                return status_type::NotSupported("get_stats_history() is not implemented.");
+                return status_type::not_supported("get_stats_history() is not implemented.");
             }
 
         private:
@@ -1239,7 +1240,7 @@ namespace nil {
 
 // Destroy the contents of the specified database.
 // Be very careful using this method.
-        status_type destroy_db(const std::string &name, const Options &options,
+        status_type destroy_db(const std::string &name, const options &options,
                                const std::vector<column_family_descriptor> &column_families = std::vector<
                                        column_family_descriptor>());
 
@@ -1257,15 +1258,15 @@ namespace nil {
         status_type repair_db(const std::string &dbname, const db_options &db_options,
                               const std::vector<column_family_descriptor> &column_families);
 
-// @param unknown_cf_opts Options for column families encountered during the
+// @param unknown_cf_opts opts for column families encountered during the
 //                        repair that were not specified in column_families.
         status_type repair_db(const std::string &dbname, const db_options &db_options,
                               const std::vector<column_family_descriptor> &column_families,
                               const column_family_options &unknown_cf_opts);
 
-// @param options These options will be used for the database and for ALL column
+// @param opts These opts will be used for the database and for ALL column
 //                families encountered during the repair
-        status_type repair_db(const std::string &dbname, const Options &options);
+        status_type repair_db(const std::string &dbname, const options &options);
 
 #endif
 

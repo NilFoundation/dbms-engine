@@ -18,7 +18,7 @@ namespace nil {
 
         class table_factory;
 
-        struct Options;
+        struct options;
 
         enum compaction_style : char {
             // level based compaction style
@@ -55,9 +55,9 @@ namespace nil {
             uint64_t max_table_files_size;
 
             // If true, try to do compaction to compact smaller files into larger ones.
-            // Minimum files to compact follows options.level0_file_num_compaction_trigger
+            // Minimum files to compact follows opts.level0_file_num_compaction_trigger
             // and compaction won't trigger if average compact bytes per del file is
-            // larger than options.write_buffer_size. This is to protect large files
+            // larger than opts.write_buffer_size. This is to protect large files
             // from being compacted again.
             // default_environment: false;
             bool allow_compaction = false;
@@ -70,7 +70,7 @@ namespace nil {
             }
         };
 
-// Compression options for different compression algorithms like Zlib
+// Compression opts for different compression algorithms like Zlib
         struct compression_options {
             // RocksDB's generic default compression level. Internally it'll be translated
             // to the default compression level specific to the library being used (see
@@ -111,13 +111,13 @@ namespace nil {
             // default_environment: 0.
             uint32_t zstd_max_train_bytes;
 
-            // When the compression options are set by the user, it will be set to "true".
+            // When the compression opts are set by the user, it will be set to "true".
             // For bottommost_compression_opts, to enable it, user must set enabled=true.
             // Otherwise, bottommost compression will use compression_opts as default
-            // compression options.
+            // compression opts.
             //
             // For compression_opts, if compression_opts.enabled=false, it is still
-            // used as compression options for compression process.
+            // used as compression opts for compression process.
             //
             // default_environment: false.
             bool enabled;
@@ -145,7 +145,7 @@ namespace nil {
             // is being flushed to engine, new writes can continue to the other
             // write buffer.
             // If max_write_buffer_number > 3, writing will be slowed down to
-            // options.delayed_write_rate if we are writing to the last write buffer
+            // opts.delayed_write_rate if we are writing to the last write buffer
             // allowed.
             //
             // default_environment: 2
@@ -189,7 +189,7 @@ namespace nil {
             int max_write_buffer_number_to_maintain = 0;
 
             // Allows thread-safe inplace updates. If this is true, there is no way to
-            // achieve point-in-time consistency using snapshot or iterator (assuming
+            // achieve point-in-time consistency using get_snapshot or iterator (assuming
             // concurrent updates). Hence iterator and multi-get will return results
             // which are not consistent as of any point-in-time.
             // If inplace_callback function is not set,
@@ -225,8 +225,8 @@ namespace nil {
             // then this function can update the 'existing_value' buffer inplace and
             // the corresponding 'existing_value'_size pointer, if it wishes to.
             // The callback should return update_status::UPDATED_INPLACE.
-            // In this case. (In this case, the snapshot-semantics of the rocksdb
-            // Iterator is not atomic anymore).
+            // In this case. (In this case, the get_snapshot-semantics of the rocksdb
+            // iterator is not atomic anymore).
 
             // If the merged value is larger in size than the 'existing_value' or the
             // application does not wish to modify the 'existing_value' buffer inplace,
@@ -341,7 +341,7 @@ namespace nil {
             // For example, if we have three 5 levels, and we determine to merge L0
             // data to L4 (which means L1..L3 will be empty), then the new files go to
             // L4 uses compression type compression_per_level[1].
-            // If now L0 is merged to L2. Data goes to L2 will be compressed
+            // If now L0 is merged to L2. data goes to L2 will be compressed
             // according to compression_per_level[1], L3 using compression_per_level[2]
             // and L4 using compression_per_level[3]. Compaction for each level can
             // change when data grows.
@@ -514,21 +514,21 @@ namespace nil {
             // default_environment: kMinOverlappingRatio
             compaction_pri compaction_pri = kMinOverlappingRatio;
 
-            // The options needed to support Universal Style compactions
+            // The opts needed to support Universal Style compactions
             //
             // Dynamically changeable through set_options() API
             // Dynamic change example:
             // set_options("universal_compaction_options", "{size_ratio=2;}")
             compaction_options_universal universal_compaction_options;
 
-            // The options for FIFO compaction style
+            // The opts for FIFO compaction style
             //
             // Dynamically changeable through set_options() API
             // Dynamic change example:
             // set_options("compaction_options_fifo", "{max_table_files_size=100;}")
             compaction_options_fifo compaction_options_fifo;
 
-            // An iteration->Next() sequentially skips over keys with the same
+            // An iteration->next() sequentially skips over keys with the same
             // user-key unless this option is set. This number specifies the number
             // of keys (with the same userkey) that will be sequentially
             // skipped before a reseek is issued.
@@ -538,14 +538,14 @@ namespace nil {
             // Dynamically changeable through set_options() API
             uint64_t max_sequential_skip_in_iterations = 8;
 
-            // This is a factory that provides MemTableRep objects.
+            // This is a factory that provides mem_table_rep objects.
             // default_environment: a factory that provides a skip-list-based implementation of
-            // MemTableRep.
+            // mem_table_rep.
             std::shared_ptr<mem_table_rep_factory> memtable_factory = std::shared_ptr<skip_list_factory>(
                     new skip_list_factory);
 
-            // Block-based table related options are moved to block_based_table_options.
-            // Related options that were originally here but now moved include:
+            // Block-based table related opts are moved to block_based_table_options.
+            // Related opts that were originally here but now moved include:
             //   no_block_cache
             //   block_cache
             //   block_cache_compressed
@@ -554,7 +554,7 @@ namespace nil {
             //   block_restart_interval
             //   filter_policy
             //   whole_key_filtering
-            // If you'd like to customize some of these options, you will need to
+            // If you'd like to customize some of these opts, you will need to
             // use new_block_based_table_factory() to construct a new table factory.
 
             // This option allows user to collect their own interested statistics of
@@ -636,8 +636,8 @@ namespace nil {
             // Create column_family_options with default values for all fields
             advanced_column_family_options();
 
-            // Create column_family_options from Options
-            explicit advanced_column_family_options(const Options &options);
+            // Create column_family_options from opts
+            explicit advanced_column_family_options(const options &options);
 
             // ---------------- OPTIONS NOT SUPPORTED ANYMORE ----------------
 
@@ -645,8 +645,8 @@ namespace nil {
             // This does not do anything anymore.
             int max_mem_compaction_level;
 
-            // NOT SUPPORTED ANYMORE -- this options is no longer used
-            // Puts are delayed to options.delayed_write_rate when any level has a
+            // NOT SUPPORTED ANYMORE -- this opts is no longer used
+            // Puts are delayed to opts.delayed_write_rate when any level has a
             // compaction score that exceeds soft_rate_limit. This is ignored when == 0.0.
             //
             // default_environment: 0 (disabled)
@@ -654,10 +654,10 @@ namespace nil {
             // Dynamically changeable through set_options() API
             double soft_rate_limit = 0.0;
 
-            // NOT SUPPORTED ANYMORE -- this options is no longer used
+            // NOT SUPPORTED ANYMORE -- this opts is no longer used
             double hard_rate_limit = 0.0;
 
-            // NOT SUPPORTED ANYMORE -- this options is no longer used
+            // NOT SUPPORTED ANYMORE -- this opts is no longer used
             unsigned int rate_limit_delay_max_milliseconds = 100;
 
             // NOT SUPPORTED ANYMORE

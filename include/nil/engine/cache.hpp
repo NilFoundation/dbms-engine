@@ -61,7 +61,7 @@ namespace nil {
             // Caveat: when the cache is used as block cache, the memory allocator is
             // ignored when dealing with compression libraries that allocate memory
             // internally (currently only XPRESS).
-            std::shared_ptr<MemoryAllocator> memory_allocator;
+            std::shared_ptr<memory_allocator> allocator;
 
             // Whether to use adaptive mutexes for cache shards. Note that adaptive
             // mutexes need to be supported by the platform in order for this to have any
@@ -73,10 +73,11 @@ namespace nil {
             }
 
             lru_cache_options(size_t _capacity, int _num_shard_bits, bool _strict_capacity_limit,
-                              double _high_pri_pool_ratio, std::shared_ptr<MemoryAllocator> _memory_allocator = nullptr,
+                              double _high_pri_pool_ratio, std::shared_ptr<memory_allocator> _memory_allocator =
+                                      nullptr,
                               bool _use_adaptive_mutex = kDefaultToAdaptiveMutex) : capacity(_capacity),
                     num_shard_bits(_num_shard_bits), strict_capacity_limit(_strict_capacity_limit),
-                    high_pri_pool_ratio(_high_pri_pool_ratio), memory_allocator(std::move(_memory_allocator)),
+                    high_pri_pool_ratio(_high_pri_pool_ratio), allocator(std::move(_memory_allocator)),
                     use_adaptive_mutex(_use_adaptive_mutex) {
             }
         };
@@ -92,7 +93,7 @@ namespace nil {
         extern std::shared_ptr<cache> new_lru_cache(size_t capacity, int num_shard_bits = -1,
                                                     bool strict_capacity_limit = false,
                                                     double high_pri_pool_ratio = 0.0,
-                                                    std::shared_ptr<MemoryAllocator> memory_allocator = nullptr,
+                                                    std::shared_ptr<memory_allocator> memory_allocator = nullptr,
                                                     bool use_adaptive_mutex = kDefaultToAdaptiveMutex);
 
         extern std::shared_ptr<cache> new_lru_cache(const lru_cache_options &cache_opts);
@@ -113,7 +114,7 @@ namespace nil {
                 HIGH, LOW
             };
 
-            cache(std::shared_ptr<MemoryAllocator> allocator = nullptr) : memory_allocator_(std::move(allocator)) {
+            cache(std::shared_ptr<memory_allocator> allocator = nullptr) : memory_allocator_(std::move(allocator)) {
             }
 
             // Destroys all existing entries by calling the "deleter"
@@ -133,7 +134,7 @@ namespace nil {
             // insert a mapping from key->value into the cache and assign it
             // the specified charge against the total cache capacity.
             // If strict_capacity_limit is true and cache reaches its full capacity,
-            // return status_type::Incomplete.
+            // return status_type::incomplete.
             //
             // If handle is not nullptr, returns a handle that corresponds to the
             // mapping. The caller must call this->release(handle) when the returned
@@ -156,7 +157,7 @@ namespace nil {
             // longer needed.
             // If stats is not nullptr, relative tickers could be used inside the
             // function.
-            virtual handle *lookup(const slice &key, Statistics *stats = nullptr) = 0;
+            virtual handle *lookup(const slice &key, statistics *stats = nullptr) = 0;
 
             // Increments the reference count for the handle if it refers to an entry in
             // the cache. Returns true if refcount was incremented; otherwise, returns
@@ -245,10 +246,10 @@ namespace nil {
 
             // Mark the last inserted object as being a raw data block. This will be used
             // in tests. The default implementation does nothing.
-            virtual void TEST_mark_as_data_block(const slice & /*key*/, size_t /*charge*/) {
+            virtual void TEST_mark_as_data_block(const slice &key, size_t charge) {
             }
 
-            MemoryAllocator *memory_allocator() const {
+            memory_allocator *get_memory_allocator() const {
                 return memory_allocator_.get();
             }
 
@@ -258,7 +259,7 @@ namespace nil {
 
             cache &operator=(const cache &);
 
-            std::shared_ptr<MemoryAllocator> memory_allocator_;
+            std::shared_ptr<memory_allocator> memory_allocator_;
         };
 
     }

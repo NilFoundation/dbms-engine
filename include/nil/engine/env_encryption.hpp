@@ -139,7 +139,7 @@ namespace nil {
             };
 
             // get_prefix_length returns the length of the prefix that is added to every file
-            // and used for storing encryption options.
+            // and used for storing encryption opts.
             // For optimal performance, the prefix length should be a multiple of
             // the page size.
             virtual size_t get_prefix_length() = 0;
@@ -149,9 +149,10 @@ namespace nil {
             virtual status_type create_new_prefix(const std::string &fname, char *prefix, size_t prefixLength) = 0;
 
             // create_cipher_stream creates a block access cipher stream for a file given
-            // given name and options.
+            // given name and opts.
             virtual status_type create_cipher_stream(const std::string &fname, const environment_options &options,
-                                                     slice &prefix, std::unique_ptr<block_access_cipher_stream> *result) = 0;
+                                                     slice &prefix,
+                                                     std::unique_ptr<block_access_cipher_stream> *result) = 0;
         };
 
 // This encryption provider uses a CTR cipher stream, with a given block cipher 
@@ -173,7 +174,7 @@ namespace nil {
             }
 
             // get_prefix_length returns the length of the prefix that is added to every file
-            // and used for storing encryption options.
+            // and used for storing encryption opts.
             // For optimal performance, the prefix length should be a multiple of
             // the page size.
             virtual size_t get_prefix_length() override;
@@ -183,9 +184,10 @@ namespace nil {
             virtual status_type create_new_prefix(const std::string &fname, char *prefix, size_t prefixLength) override;
 
             // create_cipher_stream creates a block access cipher stream for a file given
-            // given name and options.
+            // given name and opts.
             virtual status_type create_cipher_stream(const std::string &fname, const environment_options &options,
-                                                     slice &prefix, std::unique_ptr<block_access_cipher_stream> *result) override;
+                                                     slice &prefix,
+                                                     std::unique_ptr<block_access_cipher_stream> *result) override;
 
         protected:
             // populate_secret_prefix_part initializes the data into a new prefix block
@@ -196,7 +198,7 @@ namespace nil {
             virtual size_t populate_secret_prefix_part(char *prefix, size_t prefixLength, size_t blockSize);
 
             // create_cipher_stream_from_prefix creates a block access cipher stream for a file given
-            // given name and options. The given prefix is already decrypted.
+            // given name and opts. The given prefix is already decrypted.
             virtual status_type create_cipher_stream_from_prefix(const std::string &fname,
                                                                  const environment_options &options,
                                                                  uint64_t initialCounter, const slice &iv,
