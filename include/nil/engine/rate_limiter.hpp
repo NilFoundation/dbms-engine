@@ -29,8 +29,8 @@ namespace nil {
             virtual void set_bytes_per_second(int64_t bytes_per_second) = 0;
 
             // Deprecated. New limiter derived classes should override
-            // request(const int64_t, const environment_type::io_priority, statistics*) or
-            // request(const int64_t, const environment_type::io_priority, statistics*, op_type)
+            // request(const int64_t, const environment_type::io_priority, get_statistics*) or
+            // request(const int64_t, const environment_type::io_priority, get_statistics*, op_type)
             // instead.
             //
             // request for token for bytes. If this request can not be satisfied, the call
@@ -40,16 +40,16 @@ namespace nil {
                 assert(false);
             }
 
-            // request for token for bytes and potentially update statistics. If this
+            // request for token for bytes and potentially update get_statistics. If this
             // request can not be satisfied, the call is blocked. Caller is responsible to
             // make sure bytes <= get_single_burst_bytes().
             virtual void request(const int64_t bytes, const environment_type::io_priority pri, statistics *stats) {
                 // For API compatibility, default implementation calls the older API in
-                // which statistics are unsupported.
+                // which get_statistics are unsupported.
                 request(bytes, pri);
             }
 
-            // Requests token to read or write bytes and potentially updates statistics.
+            // Requests token to read or write bytes and potentially updates get_statistics.
             //
             // If this request can not be satisfied, the call is blocked. Caller is
             // responsible to make sure bytes <= get_single_burst_bytes().
@@ -60,7 +60,7 @@ namespace nil {
                 }
             }
 
-            // Requests token to read or write bytes and potentially updates statistics.
+            // Requests token to read or write bytes and potentially updates get_statistics.
             // Takes into account get_single_burst_bytes() and alignment (e.g., in case of
             // direct I/O) to allocate an appropriate number of bytes, which may be less
             // than the number of bytes requested.

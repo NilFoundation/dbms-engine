@@ -557,9 +557,9 @@ namespace nil {
             // If you'd like to customize some of these opts, you will need to
             // use new_block_based_table_factory() to construct a new table factory.
 
-            // This option allows user to collect their own interested statistics of
+            // This option allows user to collect their own interested get_statistics of
             // the tables.
-            // default_environment: empty vector -- no user-defined statistics collection will be
+            // default_environment: empty vector -- no user-defined get_statistics collection will be
             // performed.
             typedef std::vector<
                     std::shared_ptr<table_properties_collector_factory>> table_properties_collector_factories_type;

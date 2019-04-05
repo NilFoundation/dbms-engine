@@ -218,7 +218,7 @@ namespace nil {
                     ROW_CACHE_HIT,
             ROW_CACHE_MISS,
 
-            // read amplification statistics.
+            // read amplification get_statistics.
             // read amplification can be calculated using this formula
             // (READ_AMP_TOTAL_READ_BYTES / READ_AMP_ESTIMATE_USEFUL_BYTES)
             //
@@ -432,7 +432,7 @@ namespace nil {
             double percentile99;
             double average;
             double standard_deviation;
-            // zero-initialize new members since old statistics::get_histogram_data()
+            // zero-initialize new members since old get_statistics::get_histogram_data()
             // implementations won't write them.
             double max = 0.0;
             uint64_t count = 0;
@@ -481,7 +481,7 @@ namespace nil {
             }
 
             // The function is here only for backward compatibility reason.
-            // Users implementing their own statistics class should override
+            // Users implementing their own get_statistics class should override
             // record_in_histogram() instead and leave measure_time() as it is.
             virtual void measure_time(uint32_t histogramType, uint64_t time) {
                 // This is not supposed to be called.
@@ -491,7 +491,7 @@ namespace nil {
             virtual void record_in_histogram(uint32_t histogramType, uint64_t time) {
                 // measure_time() is the old and inaccurate function name.
                 // To keep backward compatible. If users implement their own
-                // statistics, which overrides meareTime() but doesn't override
+                // get_statistics, which overrides meareTime() but doesn't override
                 // this function. We forward to measure_time().
                 measure_time(histogramType, time);
             }

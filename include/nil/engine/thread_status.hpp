@@ -52,7 +52,7 @@ namespace nil {
                 OP_UNKNOWN = 0, OP_COMPACTION, OP_FLUSH, NUM_OP_TYPES
             };
 
-            enum operation_stage : int {
+            enum operation_stage_type : int {
                 STAGE_UNKNOWN = 0,
                 STAGE_FLUSH_RUN,
                 STAGE_FLUSH_WRITE_L0,
@@ -95,10 +95,11 @@ namespace nil {
 
             thread_status(const uint64_t _id, const thread_type _thread_type, const std::string &_db_name,
                           const std::string &_cf_name, const operation_type _operation_type,
-                          const uint64_t _op_elapsed_micros, const operation_stage _operation_stage,
+                          const uint64_t _op_elapsed_micros, const operation_stage_type _operation_stage,
                           const uint64_t _op_props[], const state_type _state_type) : thread_id(_id),
-                    thread_type(_thread_type), db_name(_db_name), cf_name(_cf_name), operation_type(_operation_type),
-                    op_elapsed_micros(_op_elapsed_micros), operation_stage(_operation_stage), state_type(_state_type) {
+                    thread_type_value(_thread_type), db_name(_db_name), cf_name(_cf_name),
+                    operation_type_value(_operation_type), op_elapsed_micros(_op_elapsed_micros),
+                    operation_stage(_operation_stage), state_type_value(_state_type) {
                 for (int i = 0; i < kNumOperationProperties; ++i) {
                     op_properties[i] = _op_props[i];
                 }
@@ -109,7 +110,7 @@ namespace nil {
 
             // The type of the thread, it could be HIGH_PRIORITY,
             // LOW_PRIORITY, and USER
-            const thread_type thread_type;
+            const thread_type thread_type_value;
 
             // The name of the database instance where the thread is currently
             // involved with.  It would be set to empty string if the thread
@@ -122,14 +123,14 @@ namespace nil {
             const std::string cf_name;
 
             // The operation (high-level action) that the current thread is involved.
-            const operation_type operation_type;
+            const operation_type operation_type_value;
 
             // The elapsed time of the current thread operation in microseconds.
             const uint64_t op_elapsed_micros;
 
             // An integer showing the current stage where the thread is involved
             // in the current operation.
-            const operation_stage operation_stage;
+            const operation_stage_type operation_stage;
 
             // A list of properties that describe some details about the current
             // operation.  Same field in op_properties[] might have different
@@ -137,32 +138,32 @@ namespace nil {
             uint64_t op_properties[kNumOperationProperties];
 
             // The state (lower-level action) that the current thread is involved.
-            const state_type state_type;
+            const state_type state_type_value;
 
             // The followings are a set of utility functions for interpreting
             // the information of thread_status
 
-            static std::string get_thread_type_name(enum thread_type thread_type);
+            static std::string get_thread_type_name(thread_type t_type);
 
             // Obtain the name of an operation given its type.
-            static const std::string &get_operation_name(enum operation_type op_type);
+            static const std::string &get_operation_name(operation_type op_type);
 
             static const std::string micros_to_string(uint64_t op_elapsed_time);
 
             // Obtain a human-readable string describing the specified operation stage.
-            static const std::string &get_operation_stage_name(enum operation_stage stage);
+            static const std::string &get_operation_stage_name(operation_stage_type stage);
 
             // Obtain the name of the "i"th operation property of the
             // specified operation.
-            static const std::string &get_operation_property_name(enum operation_type op_type, int i);
+            static const std::string &get_operation_property_name(operation_type op_type, int i);
 
             // Translate the "i"th property of the specified operation given
             // a property value.
-            static std::map<std::string, uint64_t> interpret_operation_properties(enum operation_type op_type,
+            static std::map<std::string, uint64_t> interpret_operation_properties(operation_type op_type,
                                                                                   const uint64_t *op_properties);
 
             // Obtain the name of a state given its type.
-            static const std::string &get_state_name(enum state_type state_type);
+            static const std::string &get_state_name(state_type st);
         };
 
 

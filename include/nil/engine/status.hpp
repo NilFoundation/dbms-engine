@@ -367,7 +367,7 @@ namespace nil {
             status_type(code _code, const slice &msg, const slice &msg2) : status_type(_code, kNone, msg, msg2) {
             }
 
-            static const char *copy_state(const char *s);
+            static const char *copy_state(const char *state);
         };
 
         inline status_type::status_type(const status_type &s) : code_(s.code_), subcode_(s.subcode_), sev_(s.sev_) {

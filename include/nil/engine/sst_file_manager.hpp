@@ -106,7 +106,7 @@ namespace nil {
 //    files already renamed as a trash may be partial, so users should not
 //    directly recover them without checking.
         extern sst_file_manager *new_sst_file_manager(environment_type *env, std::shared_ptr<Logger> info_log = nullptr,
-                                                      string trash_dir = "", int64_t rate_bytes_per_sec = 0,
+                                                      std::string trash_dir = "", int64_t rate_bytes_per_sec = 0,
                                                       bool delete_existing_trash = true, status_type *status = nullptr,
                                                       double max_trash_db_ratio = 0.25,
                                                       uint64_t bytes_max_delete_chunk = 64 * 1024 * 1024);

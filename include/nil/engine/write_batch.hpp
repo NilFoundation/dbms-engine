@@ -176,13 +176,13 @@ namespace nil {
             // most recent call to set_save_point() and removes the most recent save point.
             // If there is no previous call to set_save_point(), status_type::not_found()
             // will be returned.
-            // Otherwise returns status_type::is_ok().
+            // Otherwise returns status_type::ok().
             status_type rollback_to_save_point() override;
 
             // Pop the most recent save point.
             // If there is no previous call to set_save_point(), status_type::not_found()
             // will be returned.
-            // Otherwise returns status_type::is_ok().
+            // Otherwise returns status_type::ok().
             status_type pop_save_point() override;
 
             // Support for iterating over the contents of a batch.
@@ -200,7 +200,7 @@ namespace nil {
                     if (column_family_id == 0) {
                         // insert() historically doesn't return status. We didn't want to be
                         // backwards incompatible so we didn't change the return status
-                        // (this is a public API). We do an ordinary get and return status_type::is_ok()
+                        // (this is a public API). We do an ordinary get and return status_type::ok()
                         insert(key, value);
                         return status_type();
                     }

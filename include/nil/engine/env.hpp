@@ -843,13 +843,13 @@ namespace nil {
                 return kDefaultPageSize;
             }
 
-            // write bytes in `data` at  offset `offset`, Returns status_type::is_ok() on success.
+            // write bytes in `data` at  offset `offset`, Returns status_type::ok() on success.
             // Pass aligned buffer when use_direct_io() returns true.
             virtual status_type write(uint64_t offset, const slice &data) = 0;
 
             // read up to `n` bytes starting from offset `offset` and store them in
             // result, provided `scratch` size should be at least `n`.
-            // Returns status_type::is_ok() on success.
+            // Returns status_type::ok() on success.
             virtual status_type read(uint64_t offset, size_t n, slice *result, char *scratch) const = 0;
 
             virtual status_type flush() = 0;

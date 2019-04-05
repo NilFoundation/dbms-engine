@@ -115,7 +115,7 @@ namespace nil {
             // Pop the most recent save point.
             // If there is no previous call to set_save_point(), status_type::not_found()
             // will be returned.
-            // Otherwise returns status_type::is_ok().
+            // Otherwise returns status_type::ok().
             virtual status_type pop_save_point() = 0;
 
             // Sets the maximum size of the write batch in bytes. 0 means no limit.

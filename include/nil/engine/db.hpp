@@ -361,7 +361,7 @@ namespace nil {
             // If keys[i] does not exist in the database, then the i'th returned
             // status will be one for which status_type::is_not_found() is true, and
             // (*values)[i] will be set to some arbitrary value (often ""). Otherwise,
-            // the i'th returned status will have status_type::is_ok() true, and (*values)[i]
+            // the i'th returned status will have status_type::ok() true, and (*values)[i]
             // will store the value associated with keys[i].
             //
             // (*values) will always be resized to be the same size as (keys).
@@ -639,8 +639,8 @@ namespace nil {
                 //      entries being pinned.
                 static const std::string kBlockCachePinnedUsage;
 
-                // "rocksdb.opts-statistics" - returns multi-line string
-                //      of opts.statistics
+                // "rocksdb.opts-get_statistics" - returns multi-line string
+                //      of opts.get_statistics
                 static const std::string kOptionsStatistics;
             };
 #endif /* DCDB_LITE */
@@ -707,7 +707,7 @@ namespace nil {
             }
 
             // reset internal stats for database and all column families.
-            // Note this doesn't reset opts.statistics as it is not owned by
+            // Note this doesn't reset opts.get_statistics as it is not owned by
             // database.
             virtual status_type reset_stats() {
                 return status_type::not_supported("Not implemented");

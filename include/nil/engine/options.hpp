@@ -909,7 +909,7 @@ namespace nil {
             // default_environment: 3
             uint64_t write_thread_slow_yield_usec = 3;
 
-            // If true, then database::open() will not update the statistics used to optimize
+            // If true, then database::open() will not update the get_statistics used to optimize
             // compaction decision by loading table properties from many files.
             // Turning off this feature will improve DBOpen time especially in
             // disk environment.

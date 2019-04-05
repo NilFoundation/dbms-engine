@@ -388,7 +388,7 @@ namespace nil {
             // A callback function for RocksDB which will be called before setting the
             // background error status to a non-is_ok value. The new background error status
             // is provided in `bg_error` and can be modified by the callback. E.g., a
-            // callback can suppress errors by resetting it to status_type::is_ok(), thus
+            // callback can suppress errors by resetting it to status_type::ok(), thus
             // preventing the database from entering read-only mode. We do not provide any
             // guarantee when failed flushes/compactions will be rescheduled if the user
             // suppresses an error.
