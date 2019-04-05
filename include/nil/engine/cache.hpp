@@ -1,12 +1,3 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-//
-// Copyright (c) 2011 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
-//
 // A cache is an interface that maps keys to values.  It has internal
 // synchronization and may be safely accessed concurrently from
 // multiple threads.  It may automatically evict entries to make room
@@ -26,10 +17,10 @@
 #include <memory>
 #include <string>
 
-#include <nil/storage/memory_allocator.hpp>
-#include <nil/storage/slice.hpp>
-#include <nil/storage/statistics.hpp>
-#include <nil/storage/status.hpp>
+#include <nil/engine/memory_allocator.hpp>
+#include <nil/engine/slice.hpp>
+#include <nil/engine/statistics.hpp>
+#include <nil/engine/status.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -43,7 +34,7 @@ namespace nil {
             size_t capacity = 0;
 
             // cache is sharded into 2^num_shard_bits shards,
-            // by hash of key. Refer to NewLRUCache for further
+            // by hash of key. Refer to new_lru_cache for further
             // information.
             int num_shard_bits = -1;
 
@@ -70,7 +61,7 @@ namespace nil {
             // Caveat: when the cache is used as block cache, the memory allocator is
             // ignored when dealing with compression libraries that allocate memory
             // internally (currently only XPRESS).
-            std::shared_ptr<MemoryAllocator> memory_allocator;
+            std::shared_ptr<memory_allocator> allocator;
 
             // Whether to use adaptive mutexes for cache shards. Note that adaptive
             // mutexes need to be supported by the platform in order for this to have any
@@ -82,10 +73,11 @@ namespace nil {
             }
 
             lru_cache_options(size_t _capacity, int _num_shard_bits, bool _strict_capacity_limit,
-                              double _high_pri_pool_ratio, std::shared_ptr<MemoryAllocator> _memory_allocator = nullptr,
+                              double _high_pri_pool_ratio, std::shared_ptr<memory_allocator> _memory_allocator =
+                                      nullptr,
                               bool _use_adaptive_mutex = kDefaultToAdaptiveMutex) : capacity(_capacity),
                     num_shard_bits(_num_shard_bits), strict_capacity_limit(_strict_capacity_limit),
-                    high_pri_pool_ratio(_high_pri_pool_ratio), memory_allocator(std::move(_memory_allocator)),
+                    high_pri_pool_ratio(_high_pri_pool_ratio), allocator(std::move(_memory_allocator)),
                     use_adaptive_mutex(_use_adaptive_mutex) {
             }
         };
@@ -98,20 +90,21 @@ namespace nil {
 // high_pri_pool_pct.
 // num_shard_bits = -1 means it is automatically determined: every shard
 // will be at least 512KB and number of shard bits will not exceed 6.
-        extern std::shared_ptr<cache> NewLRUCache(size_t capacity, int num_shard_bits = -1,
-                                                  bool strict_capacity_limit = false, double high_pri_pool_ratio = 0.0,
-                                                  std::shared_ptr<MemoryAllocator> memory_allocator = nullptr,
-                                                  bool use_adaptive_mutex = kDefaultToAdaptiveMutex);
+        extern std::shared_ptr<cache> new_lru_cache(size_t capacity, int num_shard_bits = -1,
+                                                    bool strict_capacity_limit = false,
+                                                    double high_pri_pool_ratio = 0.0,
+                                                    std::shared_ptr<memory_allocator> memory_allocator = nullptr,
+                                                    bool use_adaptive_mutex = kDefaultToAdaptiveMutex);
 
-        extern std::shared_ptr<cache> NewLRUCache(const lru_cache_options &cache_opts);
+        extern std::shared_ptr<cache> new_lru_cache(const lru_cache_options &cache_opts);
 
-// Similar to NewLRUCache, but create a cache based on CLOCK algorithm with
+// Similar to new_lru_cache, but create a cache based on CLOCK algorithm with
 // better concurrent performance in some cases. See utilities/clock_cache.cc for
 // more detail.
 //
 // Return nullptr if it is not supported.
-        extern std::shared_ptr<cache> NewClockCache(size_t capacity, int num_shard_bits = -1,
-                                                    bool strict_capacity_limit = false);
+        extern std::shared_ptr<cache> new_clock_cache(size_t capacity, int num_shard_bits = -1,
+                                                      bool strict_capacity_limit = false);
 
         class cache {
         public:
@@ -121,7 +114,7 @@ namespace nil {
                 HIGH, LOW
             };
 
-            cache(std::shared_ptr<MemoryAllocator> allocator = nullptr) : memory_allocator_(std::move(allocator)) {
+            cache(std::shared_ptr<memory_allocator> allocator = nullptr) : memory_allocator_(std::move(allocator)) {
             }
 
             // Destroys all existing entries by calling the "deleter"
@@ -141,7 +134,7 @@ namespace nil {
             // insert a mapping from key->value into the cache and assign it
             // the specified charge against the total cache capacity.
             // If strict_capacity_limit is true and cache reaches its full capacity,
-            // return status_type::Incomplete.
+            // return status_type::incomplete.
             //
             // If handle is not nullptr, returns a handle that corresponds to the
             // mapping. The caller must call this->release(handle) when the returned
@@ -164,7 +157,7 @@ namespace nil {
             // longer needed.
             // If stats is not nullptr, relative tickers could be used inside the
             // function.
-            virtual handle *lookup(const slice &key, Statistics *stats = nullptr) = 0;
+            virtual handle *lookup(const slice &key, statistics *stats = nullptr) = 0;
 
             // Increments the reference count for the handle if it refers to an entry in
             // the cache. Returns true if refcount was incremented; otherwise, returns
@@ -213,7 +206,7 @@ namespace nil {
             // capacity.
             virtual void set_strict_capacity_limit(bool strict_capacity_limit) = 0;
 
-            // Get the flag whether to return error on insertion when cache reaches its
+            // get the flag whether to return error on insertion when cache reaches its
             // full capacity.
             virtual bool has_strict_capacity_limit() const = 0;
 
@@ -233,7 +226,7 @@ namespace nil {
             // any underlying data and will not free it on delete. This call will leak
             // memory - call this only if you're shutting down the process.
             // Any attempts of using cache after this call will fail terribly.
-            // Always delete the DB object before calling this method!
+            // Always delete the database object before calling this method!
             virtual void disown_data() {
                 // default implementation is noop
             };
@@ -253,10 +246,10 @@ namespace nil {
 
             // Mark the last inserted object as being a raw data block. This will be used
             // in tests. The default implementation does nothing.
-            virtual void TEST_mark_as_data_block(const slice & /*key*/, size_t /*charge*/) {
+            virtual void TEST_mark_as_data_block(const slice &key, size_t charge) {
             }
 
-            MemoryAllocator *memory_allocator() const {
+            memory_allocator *get_memory_allocator() const {
                 return memory_allocator_.get();
             }
 
@@ -266,7 +259,7 @@ namespace nil {
 
             cache &operator=(const cache &);
 
-            std::shared_ptr<MemoryAllocator> memory_allocator_;
+            std::shared_ptr<memory_allocator> memory_allocator_;
         };
 
     }

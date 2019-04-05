@@ -1,13 +1,8 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
-#include <nil/storage/status.hpp>
-#include <nil/storage/types.hpp>
-#include <nil/storage/write_batch.hpp>
+#include <nil/engine/status.hpp>
+#include <nil/engine/types.hpp>
+#include <nil/engine/write_batch.hpp>
 
 #include <memory>
 #include <vector>
@@ -15,16 +10,16 @@
 namespace nil {
     namespace dcdb {
 
-        class LogFile;
+        class log_file;
 
-        typedef std::vector<std::unique_ptr<LogFile>> VectorLogPtr;
+        typedef std::vector<std::unique_ptr<log_file>> log_ptr_vector;
 
-        enum WalFileType {
+        enum wal_file_type {
             /* Indicates that WAL file is in archive directory. WAL files are moved from
              * the main db directory to archive directory once they are not live and stay
              * there until cleaned up. Files are cleaned depending on archive size
-             * (Options::WAL_size_limit_MB) and time since last cleaning
-             * (Options::WAL_ttl_seconds).
+             * (opts::WAL_size_limit_MB) and time since last cleaning
+             * (opts::WAL_ttl_seconds).
              */
                     kArchivedLogFile = 0,
 
@@ -32,102 +27,102 @@ namespace nil {
                     kAliveLogFile = 1
         };
 
-        class LogFile {
+        class log_file {
         public:
-            LogFile() {
+            log_file() {
             }
 
-            virtual ~LogFile() {
+            virtual ~log_file() {
             }
 
             // Returns log file's pathname relative to the main db dir
             // Eg. For a live-log-file = /000003.log
             //     For an archived-log-file = /archive/000003.log
-            virtual std::string PathName() const = 0;
+            virtual std::string path_name() const = 0;
 
 
             // Primary identifier for log file.
             // This is directly proportional to creation time of the log file
-            virtual uint64_t LogNumber() const = 0;
+            virtual uint64_t log_number() const = 0;
 
             // Log file can be either alive or archived
-            virtual WalFileType Type() const = 0;
+            virtual wal_file_type type() const = 0;
 
             // Starting sequence number of writebatch written in this log file
-            virtual SequenceNumber StartSequence() const = 0;
+            virtual sequence_number start_sequence() const = 0;
 
             // Size of log file on disk in Bytes
-            virtual uint64_t SizeFileBytes() const = 0;
+            virtual uint64_t size_file_bytes() const = 0;
         };
 
-        struct BatchResult {
-            SequenceNumber sequence = 0;
-            std::unique_ptr<WriteBatch> writeBatchPtr;
+        struct batch_result {
+            sequence_number sequence = 0;
+            std::unique_ptr<write_batch> write_batch_ptr;
 
-            // Add empty __ctor and __dtor for the rule of five
+            // add empty __ctor and __dtor for the rule of five
             // However, preserve the original semantics and prohibit copying
             // as the std::unique_ptr member does not copy.
-            BatchResult() {
+            batch_result() {
             }
 
-            ~BatchResult() {
+            ~batch_result() {
             }
 
-            BatchResult(const BatchResult &) = delete;
+            batch_result(const batch_result &) = delete;
 
-            BatchResult &operator=(const BatchResult &) = delete;
+            batch_result &operator=(const batch_result &) = delete;
 
-            BatchResult(BatchResult &&bResult) : sequence(std::move(bResult.sequence)),
-                    writeBatchPtr(std::move(bResult.writeBatchPtr)) {
+            batch_result(batch_result &&bResult) : sequence(std::move(bResult.sequence)),
+                    write_batch_ptr(std::move(bResult.write_batch_ptr)) {
             }
 
-            BatchResult &operator=(BatchResult &&bResult) {
-                sequence = std::move(bResult.sequence);
-                writeBatchPtr = std::move(bResult.writeBatchPtr);
+            batch_result &operator=(batch_result &&bResult) {
+                sequence = bResult.sequence;
+                write_batch_ptr = std::move(bResult.write_batch_ptr);
                 return *this;
             }
         };
 
-// A TransactionLogIterator is used to iterate over the transactions in a db.
+// A transaction_log_iterator is used to iterate over the transactions in a db.
 // One run of the iterator is continuous, i.e. the iterator will stop at the
 // beginning of any gap in sequences
-        class TransactionLogIterator {
+        class transaction_log_iterator {
         public:
-            TransactionLogIterator() {
+            transaction_log_iterator() {
             }
 
-            virtual ~TransactionLogIterator() {
+            virtual ~transaction_log_iterator() {
             }
 
-            // An iterator is either positioned at a WriteBatch or not valid.
+            // An iterator is either positioned at a write_batch or not valid.
             // This method returns true if the iterator is valid.
             // Can read data from a valid iterator.
             virtual bool Valid() = 0;
 
-            // Moves the iterator to the next WriteBatch.
-            // REQUIRES: Valid() to be true.
+            // Moves the iterator to the next write_batch.
+            // REQUIRES: valid() to be true.
             virtual void Next() = 0;
 
-            // Returns ok if the iterator is valid.
+            // Returns is_ok if the iterator is valid.
             // Returns the Error when something has gone wrong.
             virtual status_type status() = 0;
 
             // If valid return's the current write_batch and the sequence number of the
             // earliest transaction contained in the batch.
-            // ONLY use if Valid() is true and status() is OK.
-            virtual BatchResult GetBatch() = 0;
+            // ONLY use if valid() is true and status() is is_ok.
+            virtual batch_result GetBatch() = 0;
 
-            // The read options for TransactionLogIterator.
-            struct ReadOptions {
+            // The read opts for transaction_log_iterator.
+            struct read_options {
                 // If true, all data read from underlying engine will be
                 // verified against corresponding checksums.
-                // Default: true
+                // default_environment: true
                 bool verify_checksums_;
 
-                ReadOptions() : verify_checksums_(true) {
+                read_options() : verify_checksums_(true) {
                 }
 
-                explicit ReadOptions(bool verify_checksums) : verify_checksums_(verify_checksums) {
+                explicit read_options(bool verify_checksums) : verify_checksums_(verify_checksums) {
                 }
             };
         };

@@ -1,7 +1,3 @@
-// Copyright (c) 2011 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
-//
 // Currently we support two types of tables: plain table and block-based table.
 //   1. Block-based table: this is the default table type that we inherited from
 //      LevelDB, which was designed for storing data in hard disk or flash
@@ -12,7 +8,7 @@
 // A tutorial of rocksdb table formats is available here:
 //   https://github.com/facebook/rocksdb/wiki/A-Tutorial-of-RocksDB-SST-formats
 //
-// Example code is also available
+// Example get_code is also available
 //   https://github.com/facebook/rocksdb/wiki/A-Tutorial-of-RocksDB-SST-formats#wiki-examples
 
 #pragma once
@@ -21,11 +17,11 @@
 #include <string>
 #include <unordered_map>
 
-#include <nil/storage/cache.hpp>
-#include <nil/storage/env.hpp>
-#include <nil/storage/iterator.hpp>
-#include <nil/storage/options.hpp>
-#include <nil/storage/status.hpp>
+#include <nil/engine/cache.hpp>
+#include <nil/engine/env.hpp>
+#include <nil/engine/iterator.hpp>
+#include <nil/engine/options.hpp>
+#include <nil/engine/status.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -47,7 +43,7 @@ namespace nil {
         class writable_file_writer;
 
         struct environment_options;
-        struct Options;
+        struct options;
 
         using std::unique_ptr;
 
@@ -71,7 +67,7 @@ namespace nil {
             // caching as they should now apply to range tombstone and compression
             // dictionary meta-blocks, in addition to index and filter meta-blocks.
             //
-            // Indicating if we'd put index/filter blocks to the block cache.
+            // Indicating if we'd insert index/filter blocks to the block cache.
             // If not specified, each "table reader" object will pre-load index/filter
             // block during table initialization.
             bool cache_index_and_filter_blocks = false;
@@ -102,7 +98,7 @@ namespace nil {
                         kBinarySearch,
 
                 // The hash index, if enabled, will do the hash lookup when
-                // `Options.prefix_extractor` is provided.
+                // `opts.prefix_extractor` is provided.
                         kHashSearch,
 
                 // A two-level index implementation. Both levels are binary search indexes.
@@ -147,7 +143,7 @@ namespace nil {
 
             // If non-NULL use the specified cache for compressed blocks.
             // If NULL, rocksdb will not use a compressed block cache.
-            // Note: though it looks similar to `block_cache`, RocksDB doesn't put the
+            // Note: though it looks similar to `block_cache`, RocksDB doesn't insert the
             //       same type of object there.
             std::shared_ptr<cache> block_cache_compressed = nullptr;
 
@@ -192,14 +188,14 @@ namespace nil {
             bool partition_filters = false;
 
             // Use delta encoding to compress keys in blocks.
-            // ReadOptions::pin_data requires this option to be disabled.
+            // read_options::pin_data requires this option to be disabled.
             //
-            // Default: true
+            // default_environment: true
             bool use_delta_encoding = true;
 
             // If non-nullptr, use the specified filter policy to reduce disk reads.
             // Many applications will benefit from passing the result of
-            // NewBloomFilterPolicy() here.
+            // new_bloom_filter_policy() here.
             std::shared_ptr<const filter_policy> filter_policy = nullptr;
 
             // If true, place whole keys in the filter (not just prefixes).
@@ -215,8 +211,8 @@ namespace nil {
             // of size ((block_size / `read_amp_bytes_per_bit`) / 8) bytes. This bitmap
             // will be used to figure out the percentage we actually read of the blocks.
             //
-            // When this feature is used Tickers::READ_AMP_ESTIMATE_USEFUL_BYTES and
-            // Tickers::READ_AMP_TOTAL_READ_BYTES can be used to calculate the
+            // When this feature is used tickers::READ_AMP_ESTIMATE_USEFUL_BYTES and
+            // tickers::READ_AMP_TOTAL_READ_BYTES can be used to calculate the
             // read amplification using this formula
             // (READ_AMP_TOTAL_READ_BYTES / READ_AMP_ESTIMATE_USEFUL_BYTES)
             //
@@ -231,7 +227,7 @@ namespace nil {
             // to be the next lowest power of 2, for example a value of 7 will be
             // treated as 4, a value of 19 will be treated as 16.
             //
-            // Default: 0 (disabled)
+            // default_environment: 0 (disabled)
             uint32_t read_amp_bytes_per_bit = 0;
 
             // We currently have five versions:
@@ -268,8 +264,8 @@ namespace nil {
             bool block_align = false;
         };
 
-// Table Properties that are specific to block-based table properties.
-        struct BlockBasedTablePropertyNames {
+// Table properties that are specific to block-based table properties.
+        struct block_based_table_property_names {
             // value of this properties is a fixed int32 number.
             static const std::string kIndexType;
             // value is "1" for true and "0" for false.
@@ -279,12 +275,12 @@ namespace nil {
         };
 
 // Create default block based table factory.
-        extern table_factory *NewBlockBasedTableFactory(
+        extern table_factory *new_block_based_table_factory(
                 const block_based_table_options &table_options = block_based_table_options());
 
-#ifndef ROCKSDB_LITE
+#ifndef DCDB_LITE
 
-        enum EncodingType : char {
+        enum encoding_type : char {
             // Always write full keys without any special encoding.
                     kPlain, // Find opportunity to write the same prefix once for multiple rows.
             // In some cases, when a key follows a previous key with the same prefix,
@@ -293,15 +289,15 @@ namespace nil {
             //
             // When using this option, the user is required to use the same prefix
             // extractor to make sure the same prefix will be extracted from the same key.
-            // The Name() value of the prefix extractor will be stored in the file. When
-            // reopening the file, the name of the options.prefix_extractor given will be
+            // The name() value of the prefix extractor will be stored in the file. When
+            // reopening the file, the name of the opts.prefix_extractor given will be
             // bitwise compared to the prefix extractors stored in the file. An error
             // will be returned if the two don't match.
                     kPrefix,
         };
 
-// Table Properties that are specific to plain table properties.
-        struct PlainTablePropertyNames {
+// Table properties that are specific to plain table properties.
+        struct plain_table_property_names {
             static const std::string kEncodingType;
             static const std::string kBloomVersion;
             static const std::string kNumBloomBlocks;
@@ -341,15 +337,15 @@ namespace nil {
             //                      See linux doc Documentation/vm/hugetlbpage.txt
             size_t huge_page_tlb_size = 0;
 
-            // @encoding_type: how to encode the keys. See enum EncodingType above for
+            // @key_encoding_type: how to encode the keys. See enum encoding_type above for
             //                 the choices. The value will determine how to encode keys
             //                 when writing to a new SST file. This value will be stored
             //                 inside the SST file which will be used when reading from
             //                 the file, which makes it possible for users to choose
-            //                 different encoding type when reopening a DB. Files with
-            //                 different encoding types can co-exist in the same DB and
+            //                 different encoding type when reopening a database. Files with
+            //                 different encoding types can co-exist in the same database and
             //                 can be read.
-            EncodingType encoding_type = kPlain;
+            encoding_type key_encoding_type = kPlain;
 
             // @full_scan_mode: mode for reading the whole file one record by one without
             //                  using the index.
@@ -362,7 +358,7 @@ namespace nil {
         };
 
 // -- Plain Table with prefix-only seek
-// For this factory, you need to set Options.prefix_extractor properly to make it
+// For this factory, you need to set opts.prefix_extractor properly to make it
 // work. Look-up will starts with prefix hash lookup for key prefix. Inside the
 // hash bucket found, a binary search is executed for hash conflicts. Finally,
 // a linear search is used.
@@ -434,7 +430,7 @@ namespace nil {
         extern table_factory *new_cuckoo_table_factory(
                 const cuckoo_table_options &table_options = cuckoo_table_options());
 
-#endif  // ROCKSDB_LITE
+#endif  // DCDB_LITE
 
         class random_access_file_reader;
 
@@ -457,12 +453,12 @@ namespace nil {
             // in parameter file. It's the caller's responsibility to make sure
             // file is in the correct format.
             //
-            // NewTableReader() is called in three places:
+            // new_table_reader() is called in three places:
             // (1) get_table_cache::FindTable() calls the function when table cache miss
             //     and cache the table object returned.
             // (2) SstFileDumper (for SST dump) opens the table and dump the table
             //     contents using the iterator of the table.
-            // (3) DBImpl::IngestExternalFile() calls this function to read the contents
+            // (3) DBImpl::ingest_external_file() calls this function to read the contents
             //     of the sst file it's attempting to add
             //
             // table_reader_options is a table_reader_options which contain all the
@@ -470,10 +466,10 @@ namespace nil {
             // file is a file handler to handle the file for the table.
             // file_size is the physical file size of the file.
             // table_reader is the output table reader.
-            virtual status_type NewTableReader(const table_reader_options &table_reader_options,
-                                               std::unique_ptr<random_access_file_reader> &&file, uint64_t file_size,
-                                               std::unique_ptr<table_reader> *table_reader,
-                                               bool prefetch_index_and_filter_in_cache = true) const = 0;
+            virtual status_type new_table_reader(const table_reader_options &table_reader_options,
+                                                 std::unique_ptr<random_access_file_reader> &&file, uint64_t file_size,
+                                                 std::unique_ptr<table_reader> *table_reader,
+                                                 bool prefetch_index_and_filter_in_cache = true) const = 0;
 
             // Return a table builder to write to a file for this table type.
             //
@@ -489,69 +485,69 @@ namespace nil {
             //     SST files (In Repairer::ConvertLogToTable() by calling build_table())
             //
             // Multiple configured can be accessed from there, including and not limited
-            // to compression options. file is a handle of a writable file.
+            // to compression opts. file is a handle of a writable file.
             // It is the caller's responsibility to keep the file open and close the file
             // after closing the table builder. comp_type is the compression type
             // to use in this table.
-            virtual table_builder *NewTableBuilder(const table_builder_options &table_builder_options,
-                                                   uint32_t column_family_id, writable_file_writer *file) const = 0;
+            virtual table_builder *new_table_builder(const table_builder_options &table_builder_options,
+                                                     uint32_t column_family_id, writable_file_writer *file) const = 0;
 
-            // Sanitizes the specified DB Options and column_family_options.
+            // Sanitizes the specified database opts and column_family_options.
             //
-            // If the function cannot find a way to sanitize the input DB Options,
-            // a non-ok status_type will be returned.
-            virtual status_type SanitizeOptions(const db_options &db_opts,
-                                                const column_family_options &cf_opts) const = 0;
+            // If the function cannot find a way to sanitize the input database opts,
+            // a non-is_ok status_type will be returned.
+            virtual status_type sanitize_options(const db_options &db_opts,
+                                                 const column_family_options &cf_opts) const = 0;
 
             // Return a string that contains printable format of table configurations.
-            // RocksDB prints configurations at DB Open().
-            virtual std::string GetPrintableTableOptions() const = 0;
+            // RocksDB prints configurations at database open().
+            virtual std::string get_printable_table_options() const = 0;
 
-            virtual status_type GetOptionString(std::string * /*opt_string*/, const std::string & /*delimiter*/) const {
-                return status_type::NotSupported("The table factory doesn't implement GetOptionString().");
+            virtual status_type get_option_string(std::string *opt_string, const std::string &delimiter) const {
+                return status_type::not_supported("The table factory doesn't implement get_option_string().");
             }
 
-            // Returns the raw pointer of the table options that is used by this
+            // Returns the raw pointer of the table opts that is used by this
             // table_factory, or nullptr if this function is not supported.
             // Since the return value is a raw pointer, the table_factory owns the
             // pointer and the caller should not delete the pointer.
             //
-            // In certain case, it is desirable to alter the underlying options when the
-            // table_factory is not used by any open DB by casting the returned pointer
+            // In certain case, it is desirable to alter the underlying opts when the
+            // table_factory is not used by any open database by casting the returned pointer
             // to the right class.   For instance, if BlockBasedTableFactory is used,
             // then the pointer can be casted to block_based_table_options.
             //
-            // Note that changing the underlying table_factory options while the
-            // table_factory is currently used by any open DB is undefined behavior.
-            // Developers should use DB::SetOption() instead to dynamically change
-            // options while the DB is open.
-            virtual void *GetOptions() {
+            // Note that changing the underlying table_factory opts while the
+            // table_factory is currently used by any open database is undefined behavior.
+            // Developers should use database::SetOption() instead to dynamically change
+            // opts while the database is open.
+            virtual void *get_options() {
                 return nullptr;
             }
 
             // Return is delete range supported
-            virtual bool IsDeleteRangeSupported() const {
+            virtual bool is_delete_range_supported() const {
                 return false;
             }
         };
 
-#ifndef ROCKSDB_LITE
+#ifndef DCDB_LITE
 
 // Create a special table factory that can open either of the supported
 // table formats, based on setting inside the SST files. It should be used to
-// convert a DB from one table format to another.
+// convert a database from one table format to another.
 // @table_factory_to_write: the table factory used when writing to new files.
 // @block_based_table_factory:  block based table factory to use. If NULL, use
 //                              a default one.
 // @plain_table_factory: plain table factory to use. If NULL, use a default one.
 // @cuckoo_table_factory: cuckoo table factory to use. If NULL, use a default one.
-        extern table_factory *NewAdaptiveTableFactory(std::shared_ptr<table_factory> table_factory_to_write = nullptr,
-                                                      std::shared_ptr<
-                                                              table_factory> block_based_table_factory = nullptr,
-                                                      std::shared_ptr<table_factory> plain_table_factory = nullptr,
-                                                      std::shared_ptr<table_factory> cuckoo_table_factory = nullptr);
+        extern table_factory *new_adaptive_table_factory(
+                std::shared_ptr<table_factory> table_factory_to_write = nullptr,
+                std::shared_ptr<table_factory> block_based_table_factory = nullptr,
+                std::shared_ptr<table_factory> plain_table_factory = nullptr,
+                std::shared_ptr<table_factory> cuckoo_table_factory = nullptr);
 
-#endif  // ROCKSDB_LITE
+#endif  // DCDB_LITE
 
     }
 } // namespace nil

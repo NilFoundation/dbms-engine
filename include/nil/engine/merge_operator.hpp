@@ -1,8 +1,3 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
 #include <deque>
@@ -10,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include <nil/storage/slice.hpp>
+#include <nil/engine/slice.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -19,9 +14,9 @@ namespace nil {
 
         class Logger;
 
-// The Merge Operator
+// The merge Operator
 //
-// Essentially, a MergeOperator specifies the SEMANTICS of a merge, which only
+// Essentially, a merge_operator specifies the SEMANTICS of a merge, which only
 // client knows. It could be numeric addition, list append, string
 // concatenation, edit data structure, ... , anything.
 // The library, on the other hand, is concerned with the exercise of this
@@ -29,25 +24,25 @@ namespace nil {
 //
 // To use merge, the client needs to provide an object implementing one of
 // the following interfaces:
-//  a) AssociativeMergeOperator - for most simple semantics (always take
-//    two values, and merge them into one value, which is then put back
+//  a) associative_merge_operator - for most simple semantics (always take
+//    two values, and merge them into one value, which is then insert back
 //    into rocksdb); numeric addition and string concatenation are examples;
 //
-//  b) MergeOperator - the generic class for all the more abstract / complex
-//    operations; one method (FullMergeV2) to merge a Put/Delete value with a
-//    merge operand; and another method (PartialMerge) that merges multiple
+//  b) merge_operator - the generic class for all the more abstract / complex
+//    operations; one method (full_merge_v2) to merge a insert/remove value with a
+//    merge operand; and another method (partial_merge) that merges multiple
 //    operands together. this is especially useful if your key values have
 //    complex structures but you would still like to support client-specific
 //    incremental updates.
 //
-// AssociativeMergeOperator is simpler to implement. MergeOperator is simply
+// associative_merge_operator is simpler to implement. merge_operator is simply
 // more powerful.
 //
 // Refer to rocksdb-merge wiki for more details and example implementations.
 //
-        class MergeOperator {
+        class merge_operator {
         public:
-            virtual ~MergeOperator() {
+            virtual ~merge_operator() {
             }
 
             // Gives the client a way to express the read -> modify -> write semantics
@@ -68,17 +63,17 @@ namespace nil {
             // internal corruption. This will be treated as an error by the library.
             //
             // Also make use of the *logger for error messages.
-            virtual bool FullMerge(const slice & /*key*/, const slice * /*existing_value*/,
-                                   const std::deque<std::string> & /*operand_list*/, std::string * /*new_value*/,
-                                   Logger * /*logger*/) const {
-                // deprecated, please use FullMergeV2()
+            virtual bool full_merge(const slice &key, const slice *existing_value,
+                                    const std::deque<std::string> &operand_list, std::string *new_value,
+                                    Logger *logger) const {
+                // deprecated, please use full_merge_v2()
                 assert(false);
                 return false;
             }
 
-            struct MergeOperationInput {
-                explicit MergeOperationInput(const slice &_key, const slice *_existing_value,
-                                             const std::vector<slice> &_operand_list, Logger *_logger) : key(_key),
+            struct merge_operation_input {
+                explicit merge_operation_input(const slice &_key, const slice *_existing_value,
+                                               const std::vector<slice> &_operand_list, Logger *_logger) : key(_key),
                         existing_value(_existing_value), operand_list(_operand_list), logger(_logger) {
                 }
 
@@ -94,8 +89,8 @@ namespace nil {
                 Logger *logger;
             };
 
-            struct MergeOperationOutput {
-                explicit MergeOperationOutput(std::string &_new_value, slice &_existing_operand) : new_value(
+            struct merge_operation_output {
+                explicit merge_operation_output(std::string &_new_value, slice &_existing_operand) : new_value(
                         _new_value), existing_operand(_existing_operand) {
                 }
 
@@ -110,119 +105,118 @@ namespace nil {
             // This function applies a stack of merge operands in chrionological order
             // on top of an existing value. There are two ways in which this method is
             // being used:
-            // a) During Get() operation, it used to calculate the final value of a key
+            // a) During get() operation, it used to calculate the final value of a key
             // b) During compaction, in order to collapse some operands with the based
             //    value.
             //
             // Note: The name of the method is somewhat misleading, as both in the cases
-            // of Get() or compaction it may be called on a subset of operands:
+            // of get() or compaction it may be called on a subset of operands:
             // K:    0    +1    +2    +7    +4     +5      2     +1     +2
             //                              ^
             //                              |
-            //                          snapshot
-            // In the example above, Get(K) operation will call FullMerge with a base
+            //                          get_snapshot
+            // In the example above, get(K) operation will call full_merge with a base
             // value of 2 and operands [+1, +2]. Compaction process might decide to
-            // collapse the beginning of the history up to the snapshot by performing
-            // full Merge with base value of 0 and operands [+1, +2, +7, +3].
-            virtual bool FullMergeV2(const MergeOperationInput &merge_in, MergeOperationOutput *merge_out) const;
+            // collapse the beginning of the history up to the get_snapshot by performing
+            // full merge with base value of 0 and operands [+1, +2, +7, +3].
+            virtual bool full_merge_v2(const merge_operation_input &merge_in, merge_operation_output *merge_out) const;
 
             // This function performs merge(left_op, right_op)
             // when both the operands are themselves merge operation types
-            // that you would have passed to a DB::Merge() call in the same order
-            // (i.e.: DB::Merge(key,left_op), followed by DB::Merge(key,right_op)).
+            // that you would have passed to a database::merge() call in the same order
+            // (i.e.: database::merge(key,left_op), followed by database::merge(key,right_op)).
             //
-            // PartialMerge should combine them into a single merge operation that is
+            // partial_merge should combine them into a single merge operation that is
             // saved into *new_value, and then it should return true.
             // *new_value should be constructed such that a call to
-            // DB::Merge(key, *new_value) would yield the same result as a call
-            // to DB::Merge(key, left_op) followed by DB::Merge(key, right_op).
+            // database::merge(key, *new_value) would yield the same result as a call
+            // to database::merge(key, left_op) followed by database::merge(key, right_op).
             //
             // The string that new_value is pointing to will be empty.
             //
-            // The default implementation of PartialMergeMulti will use this function
+            // The default implementation of partial_merge_multi will use this function
             // as a helper, for backward compatibility.  Any successor class of
-            // MergeOperator should either implement PartialMerge or PartialMergeMulti,
-            // although implementing PartialMergeMulti is suggested as it is in general
+            // merge_operator should either implement partial_merge or partial_merge_multi,
+            // although implementing partial_merge_multi is suggested as it is in general
             // more effective to merge multiple operands at a time instead of two
             // operands at a time.
             //
             // If it is impossible or infeasible to combine the two operations,
             // leave new_value unchanged and return false. The library will
             // internally keep track of the operations, and apply them in the
-            // correct order once a base-value (a Put/Delete/End-of-Database) is seen.
+            // correct order once a base-value (a insert/remove/End-of-Database) is seen.
             //
             // TODO: Presently there is no way to differentiate between error/corruption
             // and simply "return false". For now, the client should simply return
             // false in any case it cannot perform partial-merge, regardless of reason.
-            // If there is corruption in the data, handle it in the FullMergeV2() function
-            // and return false there.  The default implementation of PartialMerge will
+            // If there is corruption in the data, handle it in the full_merge_v2() function
+            // and return false there.  The default implementation of partial_merge will
             // always return false.
-            virtual bool PartialMerge(const slice & /*key*/, const slice & /*left_operand*/,
-                                      const slice & /*right_operand*/, std::string * /*new_value*/,
-                                      Logger * /*logger*/) const {
+            virtual bool partial_merge(const slice &key, const slice &left_operand, const slice &right_operand,
+                                       std::string *new_value, Logger *logger) const {
                 return false;
             }
 
             // This function performs merge when all the operands are themselves merge
-            // operation types that you would have passed to a DB::Merge() call in the
+            // operation types that you would have passed to a database::merge() call in the
             // same order (front() first)
-            // (i.e. DB::Merge(key, operand_list[0]), followed by
-            //  DB::Merge(key, operand_list[1]), ...)
+            // (i.e. database::merge(key, operand_list[0]), followed by
+            //  database::merge(key, operand_list[1]), ...)
             //
-            // PartialMergeMulti should combine them into a single merge operation that is
+            // partial_merge_multi should combine them into a single merge operation that is
             // saved into *new_value, and then it should return true.  *new_value should
-            // be constructed such that a call to DB::Merge(key, *new_value) would yield
-            // the same result as subquential individual calls to DB::Merge(key, operand)
+            // be constructed such that a call to database::merge(key, *new_value) would yield
+            // the same result as subquential individual calls to database::merge(key, operand)
             // for each operand in operand_list from front() to back().
             //
             // The string that new_value is pointing to will be empty.
             //
-            // The PartialMergeMulti function will be called when there are at least two
+            // The partial_merge_multi function will be called when there are at least two
             // operands.
             //
-            // In the default implementation, PartialMergeMulti will invoke PartialMerge
+            // In the default implementation, partial_merge_multi will invoke partial_merge
             // multiple times, where each time it only merges two operands.  Developers
-            // should either implement PartialMergeMulti, or implement PartialMerge which
-            // is served as the helper function of the default PartialMergeMulti.
-            virtual bool PartialMergeMulti(const slice &key, const std::deque<slice> &operand_list,
-                                           std::string *new_value, Logger *logger) const;
+            // should either implement partial_merge_multi, or implement partial_merge which
+            // is served as the helper function of the default partial_merge_multi.
+            virtual bool partial_merge_multi(const slice &key, const std::deque<slice> &operand_list,
+                                             std::string *new_value, Logger *logger) const;
 
-            // The name of the MergeOperator. Used to check for MergeOperator
-            // mismatches (i.e., a DB created with one MergeOperator is
-            // accessed using a different MergeOperator)
+            // The name of the merge_operator. Used to check for merge_operator
+            // mismatches (i.e., a database created with one merge_operator is
+            // accessed using a different merge_operator)
             // TODO: the name is currently not stored persistently and thus
             //       no checking is enforced. Client is responsible for providing
-            //       consistent MergeOperator between DB opens.
-            virtual const char *Name() const = 0;
+            //       consistent merge_operator between database opens.
+            virtual const char *name() const = 0;
 
-            // Determines whether the PartialMerge can be called with just a single
+            // Determines whether the partial_merge can be called with just a single
             // merge operand.
-            // Override and return true for allowing a single operand. PartialMerge
-            // and PartialMergeMulti should be overridden and implemented
+            // Override and return true for allowing a single operand. partial_merge
+            // and partial_merge_multi should be overridden and implemented
             // correctly to properly handle a single operand.
-            virtual bool AllowSingleOperand() const {
+            virtual bool allow_single_operand() const {
                 return false;
             }
 
-            // Allows to control when to invoke a full merge during Get.
+            // Allows to control when to invoke a full merge during get.
             // This could be used to limit the number of merge operands that are looked at
             // during a point lookup, thereby helping in limiting the number of levels to
             // read from.
             // Doesn't help with iterators.
             //
             // Note: the merge operands are passed to this function in the reversed order
-            // relative to how they were merged (passed to FullMerge or FullMergeV2)
+            // relative to how they were merged (passed to full_merge or full_merge_v2)
             // for performance reasons, see also:
             // https://github.com/facebook/rocksdb/issues/3865
-            virtual bool ShouldMerge(const std::vector<slice> & /*operands*/) const {
+            virtual bool should_merge(const std::vector<slice> &operands) const {
                 return false;
             }
         };
 
 // The simpler, associative merge operator.
-        class AssociativeMergeOperator : public MergeOperator {
+        class associative_merge_operator : public merge_operator {
         public:
-            ~AssociativeMergeOperator() override {
+            ~associative_merge_operator() override {
             }
 
             // Gives the client a way to express the read -> modify -> write semantics
@@ -238,16 +232,16 @@ namespace nil {
             // returns false, it is because client specified bad data or there was
             // internal corruption. The client should assume that this will be treated
             // as an error by the library.
-            virtual bool Merge(const slice &key, const slice *existing_value, const slice &value,
+            virtual bool merge(const slice &key, const slice *existing_value, const slice &value,
                                std::string *new_value, Logger *logger) const = 0;
 
 
         private:
-            // Default implementations of the MergeOperator functions
-            bool FullMergeV2(const MergeOperationInput &merge_in, MergeOperationOutput *merge_out) const override;
+            // default_environment implementations of the merge_operator functions
+            bool full_merge_v2(const merge_operation_input &merge_in, merge_operation_output *merge_out) const override;
 
-            bool PartialMerge(const slice &key, const slice &left_operand, const slice &right_operand,
-                              std::string *new_value, Logger *logger) const override;
+            bool partial_merge(const slice &key, const slice &left_operand, const slice &right_operand,
+                               std::string *new_value, Logger *logger) const override;
         };
 
     }

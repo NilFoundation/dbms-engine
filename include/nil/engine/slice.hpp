@@ -1,12 +1,4 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-// Copyright (c) 2011 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
-//
-// slice is a simple structure containing a pointer into some external
+// Slice is a simple structure containing a pointer into some external
 // engine and a size.  The user of a slice must ensure that the slice
 // is not used after the corresponding external engine has been
 // deallocated.
@@ -28,7 +20,7 @@
 #include <string_view>
 #endif
 
-#include <nil/storage/cleanable.hpp>
+#include <nil/engine/cleanable.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -60,9 +52,9 @@ namespace nil {
                 size_ = (s == nullptr) ? 0 : strlen(s);
             }
 
-            // Create a single slice from SliceParts using buf as engine.
+            // Create a single slice from slice_parts using buf as engine.
             // buf must exist as long as the returned slice exists.
-            slice(const struct SliceParts &parts, std::string *buf);
+            slice(const struct slice_parts &parts, std::string *buf);
 
             // Return a pointer to the beginning of the referenced data
             const char *data() const {
@@ -106,21 +98,21 @@ namespace nil {
 
             // Return a string that contains the copy of the referenced data.
             // when hex is true, returns a string of twice the length hex encoded (0-9A-F)
-            std::string ToString(bool hex = false) const;
+            std::string to_string(bool hex = false) const;
 
 #ifdef __cpp_lib_string_view
             // Return a string_view that references the same data as this slice.
-            std::string_view ToStringView() const {
+            std::string_view to_string_view() const {
               return std::string_view(data_, size_);
             }
 #endif
 
             // Decodes the current slice interpreted as an hexadecimal string into result,
             // if successful returns true, if this isn't a valid hex string
-            // (e.g not coming from slice::ToString(true)) DecodeHex returns false.
+            // (e.g not coming from slice::to_string(true)) decode_hex returns false.
             // This slice is expected to have an even number of 0-9A-F characters
             // also accepts lowercase (a-f)
-            bool DecodeHex(std::string *result) const;
+            bool decode_hex(std::string *result) const;
 
             // Three-way comparison.  Returns value:
             //   <  0 iff "*this" <  "b",
@@ -137,7 +129,7 @@ namespace nil {
                 return ((size_ >= x.size_) && (memcmp(data_ + size_ - x.size_, x.data_, x.size_) == 0));
             }
 
-            // Compare two slices and returns the first byte where they differ
+            // compare two slices and returns the first byte where they differ
             size_t difference_offset(const slice &b) const;
 
             // private: make these public for rocksdbjni access
@@ -153,22 +145,22 @@ namespace nil {
  * to avoid memcpy by having the PinnableSlice object referring to the data
  * that is locked in the memory and release them after the data is consumed.
  */
-        class PinnableSlice : public slice, public cleanable {
+        class pinnable_slice : public slice, public cleanable {
         public:
-            PinnableSlice() {
+            pinnable_slice() {
                 buf_ = &self_space_;
             }
 
-            explicit PinnableSlice(std::string *buf) {
+            explicit pinnable_slice(std::string *buf) {
                 buf_ = buf;
             }
 
             // No copy constructor and copy assignment allowed.
-            PinnableSlice(PinnableSlice &) = delete;
+            pinnable_slice(pinnable_slice &) = delete;
 
-            PinnableSlice &operator=(PinnableSlice &) = delete;
+            pinnable_slice &operator=(pinnable_slice &) = delete;
 
-            inline void PinSlice(const slice &s, CleanupFunction f, void *arg1, void *arg2) {
+            inline void pin_slice(const slice &s, cleanup_function f, void *arg1, void *arg2) {
                 assert(!pinned_);
                 pinned_ = true;
                 data_ = s.data();
@@ -177,7 +169,7 @@ namespace nil {
                 assert(pinned_);
             }
 
-            inline void PinSlice(const slice &s, cleanable *cleanable) {
+            inline void pin_slice(const slice &s, cleanable *cleanable) {
                 assert(!pinned_);
                 pinned_ = true;
                 data_ = s.data();
@@ -186,7 +178,7 @@ namespace nil {
                 assert(pinned_);
             }
 
-            inline void PinSelf(const slice &slice) {
+            inline void pin_self(const slice &slice) {
                 assert(!pinned_);
                 buf_->assign(slice.data(), slice.size());
                 data_ = buf_->data();
@@ -194,7 +186,7 @@ namespace nil {
                 assert(!pinned_);
             }
 
-            inline void PinSelf() {
+            inline void pin_self() {
                 assert(!pinned_);
                 data_ = buf_->data();
                 size_ = buf_->size();
@@ -207,11 +199,11 @@ namespace nil {
                     size_ -= n;
                 } else {
                     buf_->erase(size() - n, n);
-                    PinSelf();
+                    pin_self();
                 }
             }
 
-            void remove_prefix(size_t /*n*/) {
+            void remove_prefix(size_t n) {
                 assert(0);  // Not implemented
             }
 
@@ -221,16 +213,16 @@ namespace nil {
                 size_ = 0;
             }
 
-            inline std::string *GetSelf() {
+            inline std::string *get_self() {
                 return buf_;
             }
 
-            inline bool IsPinned() {
+            inline bool is_pinned() {
                 return pinned_;
             }
 
         private:
-            friend class PinnableSlice4Test;
+            friend class pinnable_slice4_test;
 
             std::string self_space_;
             std::string *buf_;
@@ -239,11 +231,11 @@ namespace nil {
 
 // A set of Slices that are virtually concatenated together.  'parts' points
 // to an array of Slices.  The number of elements in the array is 'num_parts'.
-        struct SliceParts {
-            SliceParts(const slice *_parts, int _num_parts) : parts(_parts), num_parts(_num_parts) {
+        struct slice_parts {
+            slice_parts(const slice *_parts, int _num_parts) : parts(_parts), num_parts(_num_parts) {
             }
 
-            SliceParts() : parts(nullptr), num_parts(0) {
+            slice_parts() : parts(nullptr), num_parts(0) {
             }
 
             const slice *parts;

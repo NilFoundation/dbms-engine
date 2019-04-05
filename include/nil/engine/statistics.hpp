@@ -1,8 +1,3 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
 #include <atomic>
@@ -13,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include <nil/storage/status.hpp>
+#include <nil/engine/status.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -26,7 +21,7 @@ namespace nil {
  *  4. Add the enum conversions from Java and C++ to portal.h's toJavaTickerType
  * and toCppTickers
  */
-        enum Tickers : uint32_t {
+        enum tickers : uint32_t {
             // total block cache misses
             // REQUIRES: BLOCK_CACHE_MISS == BLOCK_CACHE_INDEX_MISS +
             //                               BLOCK_CACHE_FILTER_MISS +
@@ -97,11 +92,11 @@ namespace nil {
             // # of memtable misses.
                     MEMTABLE_MISS,
 
-            // # of Get() queries served by L0
+            // # of get() queries served by L0
                     GET_HIT_L0,
-            // # of Get() queries served by L1
+            // # of get() queries served by L1
                     GET_HIT_L1,
-            // # of Get() queries served by L2 and up
+            // # of get() queries served by L2 and up
                     GET_HIT_L2_AND_UP,
 
             /**
@@ -119,18 +114,18 @@ namespace nil {
             // If a compaction was cancelled in sfm to prevent ENOSPC
                     COMPACTION_CANCELLED,
 
-            // Number of keys written to the database via the Put and Write call's
+            // Number of keys written to the database via the insert and write call's
                     NUMBER_KEYS_WRITTEN,
             // Number of Keys read,
                     NUMBER_KEYS_READ,
             // Number keys updated, if inplace update is enabled
                     NUMBER_KEYS_UPDATED,
-            // The number of uncompressed bytes issued by DB::Put(), DB::Delete(),
-            // DB::Merge(), and DB::Write().
+            // The number of uncompressed bytes issued by database::insert(), database::remove(),
+            // database::merge(), and database::write().
                     BYTES_WRITTEN,
-            // The number of uncompressed bytes read from DB::Get().  It could be
+            // The number of uncompressed bytes read from database::get().  It could be
             // either from memtables, cache, or table files.
-            // For the number of logical bytes read from DB::MultiGet(),
+            // For the number of logical bytes read from database::multi_get(),
             // please use NUMBER_MULTIGET_BYTES_READ.
                     BYTES_READ,
             // The number of calls to seek/next/prev
@@ -162,7 +157,7 @@ namespace nil {
             // DEPRECATED number of iterators currently open
                     NO_ITERATORS,
 
-            // Number of MultiGet calls, keys read, and bytes read
+            // Number of multi_get calls, keys read, and bytes read
                     NUMBER_MULTIGET_CALLS,
             NUMBER_MULTIGET_KEYS_READ,
             NUMBER_MULTIGET_BYTES_READ,
@@ -199,7 +194,7 @@ namespace nil {
                     WRITE_DONE_BY_SELF,
             WRITE_DONE_BY_OTHER,  // Equivalent to writes done for others
             WRITE_TIMEDOUT,       // Number of writes ending up with timed-out.
-            WRITE_WITH_WAL,       // Number of Write calls that request WAL
+            WRITE_WITH_WAL,       // Number of write calls that request WAL
             COMPACT_READ_BYTES,   // Bytes read during compaction
             COMPACT_WRITE_BYTES,  // Bytes written during compaction
             FLUSH_WRITE_BYTES,    // Bytes written during flush
@@ -223,34 +218,34 @@ namespace nil {
                     ROW_CACHE_HIT,
             ROW_CACHE_MISS,
 
-            // Read amplification statistics.
-            // Read amplification can be calculated using this formula
+            // read amplification get_statistics.
+            // read amplification can be calculated using this formula
             // (READ_AMP_TOTAL_READ_BYTES / READ_AMP_ESTIMATE_USEFUL_BYTES)
             //
-            // REQUIRES: ReadOptions::read_amp_bytes_per_bit to be enabled
+            // REQUIRES: read_options::read_amp_bytes_per_bit to be enabled
                     READ_AMP_ESTIMATE_USEFUL_BYTES,  // Estimate of total bytes actually used.
             READ_AMP_TOTAL_READ_BYTES,       // Total size of loaded data blocks.
 
             // Number of refill intervals where rate limiter's bytes are fully consumed.
                     NUMBER_RATE_LIMITER_DRAINS,
 
-            // Number of internal keys skipped by Iterator
+            // Number of internal keys skipped by iterator
                     NUMBER_ITER_SKIP,
 
             // BlobDB specific stats
-            // # of Put/PutTTL/PutUntil to BlobDB.
+            // # of insert/PutTTL/PutUntil to BlobDB.
                     BLOB_DB_NUM_PUT,
-            // # of Write to BlobDB.
+            // # of write to BlobDB.
                     BLOB_DB_NUM_WRITE,
-            // # of Get to BlobDB.
+            // # of get to BlobDB.
                     BLOB_DB_NUM_GET,
-            // # of MultiGet to BlobDB.
+            // # of multi_get to BlobDB.
                     BLOB_DB_NUM_MULTIGET,
-            // # of Seek/SeekToFirst/SeekToLast/SeekForPrev to BlobDB iterator.
+            // # of seek/seek_to_first/seek_to_last/seek_for_prev to BlobDB iterator.
                     BLOB_DB_NUM_SEEK,
-            // # of Next to BlobDB iterator.
+            // # of next to BlobDB iterator.
                     BLOB_DB_NUM_NEXT,
-            // # of Prev to BlobDB iterator.
+            // # of prev to BlobDB iterator.
                     BLOB_DB_NUM_PREV,
             // # of keys written to BlobDB.
                     BLOB_DB_NUM_KEYS_WRITTEN,
@@ -274,16 +269,16 @@ namespace nil {
                     BLOB_DB_BLOB_FILE_BYTES_READ,
             // # of times a blob files being synced.
                     BLOB_DB_BLOB_FILE_SYNCED,
-            // # of blob index evicted from base DB by BlobDB compaction filter because
+            // # of blob index evicted from base database by BlobDB compaction filter because
             // of expiration.
                     BLOB_DB_BLOB_INDEX_EXPIRED_COUNT,
-            // size of blob index evicted from base DB by BlobDB compaction filter
+            // size of blob index evicted from base database by BlobDB compaction filter
             // because of expiration.
                     BLOB_DB_BLOB_INDEX_EXPIRED_SIZE,
-            // # of blob index evicted from base DB by BlobDB compaction filter because
+            // # of blob index evicted from base database by BlobDB compaction filter because
             // of corresponding file deleted.
                     BLOB_DB_BLOB_INDEX_EVICTED_COUNT,
-            // size of blob index evicted from base DB by BlobDB compaction filter
+            // size of blob index evicted from base database by BlobDB compaction filter
             // because of corresponding file deleted.
                     BLOB_DB_BLOB_INDEX_EVICTED_SIZE,
             // # of blob files being garbage collected.
@@ -324,7 +319,7 @@ namespace nil {
             // # of times snapshot_mutex_ is acquired in the fast path.
                     TXN_SNAPSHOT_MUTEX_OVERHEAD,
 
-            // Number of keys actually found in MultiGet calls (vs number requested by
+            // Number of keys actually found in multi_get calls (vs number requested by
             // caller)
             // NUMBER_MULTIGET_KEYS_READ gives the number requested by caller
                     NUMBER_MULTIGET_KEYS_FOUND,
@@ -340,9 +335,9 @@ namespace nil {
             TICKER_ENUM_MAX
         };
 
-// The order of items listed in  Tickers should be the same as
-// the order listed in TickersNameMap
-        extern const std::vector<std::pair<Tickers, std::string>> TickersNameMap;
+// The order of items listed in  tickers should be the same as
+// the order listed in tickers_name_map
+        extern const std::vector<std::pair<tickers, std::string>> tickers_name_map;
 
 /**
  * Keep adding histogram's here.
@@ -352,7 +347,7 @@ namespace nil {
  * And increment HISTOGRAM_ENUM_MAX
  * Add a corresponding enum value to HistogramType.java in the java API
  */
-        enum Histograms : uint32_t {
+        enum histograms : uint32_t {
             DB_GET = 0,
             DB_WRITE,
             COMPACTION_TIME,
@@ -399,17 +394,17 @@ namespace nil {
                     BLOB_DB_KEY_SIZE,
             // Size of values written to BlobDB.
                     BLOB_DB_VALUE_SIZE,
-            // BlobDB Put/PutWithTTL/PutUntil/Write latency.
+            // BlobDB insert/PutWithTTL/PutUntil/write latency.
                     BLOB_DB_WRITE_MICROS,
-            // BlobDB Get lagency.
+            // BlobDB get lagency.
                     BLOB_DB_GET_MICROS,
-            // BlobDB MultiGet latency.
+            // BlobDB multi_get latency.
                     BLOB_DB_MULTIGET_MICROS,
-            // BlobDB Seek/SeekToFirst/SeekToLast/SeekForPrev latency.
+            // BlobDB seek/seek_to_first/seek_to_last/seek_for_prev latency.
                     BLOB_DB_SEEK_MICROS,
-            // BlobDB Next latency.
+            // BlobDB next latency.
                     BLOB_DB_NEXT_MICROS,
-            // BlobDB Prev latency.
+            // BlobDB prev latency.
                     BLOB_DB_PREV_MICROS,
             // Blob file write latency.
                     BLOB_DB_BLOB_FILE_WRITE_MICROS,
@@ -429,15 +424,15 @@ namespace nil {
             HISTOGRAM_ENUM_MAX,
         };
 
-        extern const std::vector<std::pair<Histograms, std::string>> HistogramsNameMap;
+        extern const std::vector<std::pair<histograms, std::string>> histograms_name_map;
 
-        struct HistogramData {
+        struct histogram_data {
             double median;
             double percentile95;
             double percentile99;
             double average;
             double standard_deviation;
-            // zero-initialize new members since old Statistics::histogramData()
+            // zero-initialize new members since old get_statistics::get_histogram_data()
             // implementations won't write them.
             double max = 0.0;
             uint64_t count = 0;
@@ -445,9 +440,9 @@ namespace nil {
             double min = 0.0;
         };
 
-        enum StatsLevel : uint8_t {
+        enum stats_level : uint8_t {
             // Disable timer stats, and skip histogram stats
-                    kExceptHistogramOrTimers, // Skip timer stats
+                    kExceptHistogramOrTimers, // skip timer stats
             kExceptTimers, // Collect all stats except time inside mutex lock AND time spent on
             // compression.
                     kExceptDetailedTimers, // Collect all stats except the counters requiring to get time inside the
@@ -459,83 +454,83 @@ namespace nil {
         };
 
 // Analyze the performance of a db
-        class Statistics {
+        class statistics {
         public:
-            virtual ~Statistics() {
+            virtual ~statistics() {
             }
 
-            virtual uint64_t getTickerCount(uint32_t tickerType) const = 0;
+            virtual uint64_t get_ticker_count(uint32_t tickerType) const = 0;
 
-            virtual void histogramData(uint32_t type, HistogramData *const data) const = 0;
+            virtual void get_histogram_data(uint32_t type, histogram_data *const data) const = 0;
 
-            virtual std::string getHistogramString(uint32_t /*type*/) const {
+            virtual std::string get_histogram_string(uint32_t type) const {
                 return "";
             }
 
-            virtual void recordTick(uint32_t tickerType, uint64_t count = 0) = 0;
+            virtual void record_tick(uint32_t tickerType, uint64_t count = 0) = 0;
 
-            virtual void setTickerCount(uint32_t tickerType, uint64_t count) = 0;
+            virtual void set_ticker_count(uint32_t tickerType, uint64_t count) = 0;
 
-            virtual uint64_t getAndResetTickerCount(uint32_t tickerType) = 0;
+            virtual uint64_t get_and_reset_ticker_count(uint32_t tickerType) = 0;
 
-            virtual void reportTimeToHistogram(uint32_t histogramType, uint64_t time) {
-                if (get_stats_level() <= StatsLevel::kExceptTimers) {
+            virtual void report_time_to_histogram(uint32_t histogramType, uint64_t time) {
+                if (get_stats_level() <= stats_level::kExceptTimers) {
                     return;
                 }
-                recordInHistogram(histogramType, time);
+                record_in_histogram(histogramType, time);
             }
 
             // The function is here only for backward compatibility reason.
-            // Users implementing their own Statistics class should override
-            // recordInHistogram() instead and leave measureTime() as it is.
-            virtual void measureTime(uint32_t /*histogramType*/, uint64_t /*time*/) {
+            // Users implementing their own get_statistics class should override
+            // record_in_histogram() instead and leave measure_time() as it is.
+            virtual void measure_time(uint32_t histogramType, uint64_t time) {
                 // This is not supposed to be called.
                 assert(false);
             }
 
-            virtual void recordInHistogram(uint32_t histogramType, uint64_t time) {
-                // measureTime() is the old and inaccurate function name.
+            virtual void record_in_histogram(uint32_t histogramType, uint64_t time) {
+                // measure_time() is the old and inaccurate function name.
                 // To keep backward compatible. If users implement their own
-                // statistics, which overrides meareTime() but doesn't override
-                // this function. We forward to measureTime().
-                measureTime(histogramType, time);
+                // get_statistics, which overrides meareTime() but doesn't override
+                // this function. We forward to measure_time().
+                measure_time(histogramType, time);
             }
 
             // Resets all ticker and histogram stats
-            virtual status_type Reset() {
-                return status_type::NotSupported("Not implemented");
+            virtual status_type reset() {
+                return status_type::not_supported("Not implemented");
             }
 
             // String representation of the statistic object.
-            virtual std::string ToString() const {
+            virtual std::string to_string() const {
                 // Do nothing by default
-                return std::string("ToString(): not implemented");
+                return std::string("to_string(): not implemented");
             }
 
-            virtual bool getTickerMap(std::map<std::string, uint64_t> *) const {
+            virtual bool get_ticker_map(std::map<std::string, uint64_t> *map) const {
                 // Do nothing by default
                 return false;
             };
 
             // Override this function to disable particular histogram collection
-            virtual bool HistEnabledForType(uint32_t type) const {
+            virtual bool hist_enabled_for_type(uint32_t type) const {
                 return type < HISTOGRAM_ENUM_MAX;
             }
 
-            void set_stats_level(StatsLevel sl) {
+            void set_stats_level(stats_level sl) {
                 stats_level_.store(sl, std::memory_order_relaxed);
             }
 
-            StatsLevel get_stats_level() const {
+            stats_level get_stats_level() const {
                 return stats_level_.load(std::memory_order_relaxed);
             }
 
         private:
-            std::atomic<StatsLevel> stats_level_{kExceptDetailedTimers};
+            std::atomic<stats_level> stats_level_{kExceptDetailedTimers};
         };
 
 // Create a concrete DBStatistics object
-        std::shared_ptr<Statistics> CreateDBStatistics();
+        std::shared_ptr<statistics> create_db_statistics();
 
     }
 } // namespace nil

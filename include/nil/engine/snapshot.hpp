@@ -1,49 +1,44 @@
-//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
-#include <nil/storage/types.hpp>
+#include <nil/engine/types.hpp>
 
 namespace nil {
     namespace dcdb {
 
-        class DB;
+        class database;
 
-// Abstract handle to particular state of a DB.
-// A Snapshot is an immutable object and can therefore be safely
+// Abstract handle to particular state of a database.
+// A get_snapshot is an immutable object and can therefore be safely
 // accessed from multiple threads without any external synchronization.
 //
-// To Create a Snapshot, call DB::GetSnapshot().
-// To Destroy a Snapshot, call DB::ReleaseSnapshot(snapshot).
-        class Snapshot {
+// To Create a get_snapshot, call database::GetSnapshot().
+// To Destroy a snapshot, call database::ReleaseSnapshot(get_snapshot).
+        class snapshot {
         public:
-            // returns Snapshot's sequence number
-            virtual SequenceNumber GetSequenceNumber() const = 0;
+            // returns get_snapshot's sequence number
+            virtual sequence_number get_sequence_number() const = 0;
 
         protected:
-            virtual ~Snapshot();
+            virtual ~snapshot();
         };
 
-// Simple RAII wrapper class for Snapshot.
-// Constructing this object will create a snapshot.  Destructing will
-// release the snapshot.
-        class ManagedSnapshot {
+// Simple RAII wrapper class for get_snapshot.
+// Constructing this object will create a get_snapshot.  Destructing will
+// release the get_snapshot.
+        class managed_snapshot {
         public:
-            explicit ManagedSnapshot(DB *db);
+            explicit managed_snapshot(database *db);
 
-            // Instead of creating a snapshot, take ownership of the input snapshot.
-            ManagedSnapshot(DB *db, const Snapshot *_snapshot);
+            // Instead of creating a get_snapshot, take ownership of the input snapshot.
+            managed_snapshot(database *db, const snapshot *_snapshot);
 
-            ~ManagedSnapshot();
+            ~managed_snapshot();
 
-            const Snapshot *snapshot();
+            const snapshot *get_snapshot();
 
         private:
-            DB *db_;
-            const Snapshot *snapshot_;
+            database *db_;
+            const snapshot *snapshot_;
         };
 
     }

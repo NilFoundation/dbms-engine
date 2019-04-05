@@ -1,11 +1,6 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-//
 // This file defines the structures for exposing run-time status of any
 // rocksdb-related thread.  Such run-time status can be obtained via
-// GetThreadList() API.
+// get_thread_list() API.
 //
 // Note that all thread-status features are still under-development, and
 // thus APIs and class definitions might subject to change at this point.
@@ -20,7 +15,7 @@
 #include <utility>
 #include <vector>
 
-#if !defined(ROCKSDB_LITE) && \
+#if !defined(DCDB_LITE) && \
     !defined(NROCKSDB_THREAD_STATUS) && \
     defined(ROCKSDB_SUPPORT_THREAD_LOCAL)
 #define ROCKSDB_USING_THREAD_STATUS
@@ -39,10 +34,10 @@ namespace nil {
 
 // A structure that describes the current status of a thread.
 // The status of active threads can be fetched using
-// nil::dcdb::GetThreadList().
-        struct ThreadStatus {
+// nil::dcdb::get_thread_list().
+        struct thread_status {
             // The type of a thread.
-            enum ThreadType : int {
+            enum thread_type : int {
                 HIGH_PRIORITY = 0,  // RocksDB BG thread in high-pri thread pool
                 LOW_PRIORITY,  // RocksDB BG thread in low-pri thread pool
                 USER,  // User thread (Non-RocksDB BG thread)
@@ -53,11 +48,11 @@ namespace nil {
             // The type used to refer to a thread operation.
             // A thread operation describes high-level action of a thread.
             // Examples include compaction and flush.
-            enum OperationType : int {
+            enum operation_type : int {
                 OP_UNKNOWN = 0, OP_COMPACTION, OP_FLUSH, NUM_OP_TYPES
             };
 
-            enum OperationStage : int {
+            enum operation_stage_type : int {
                 STAGE_UNKNOWN = 0,
                 STAGE_FLUSH_RUN,
                 STAGE_FLUSH_WRITE_L0,
@@ -72,7 +67,7 @@ namespace nil {
                 NUM_OP_STAGES
             };
 
-            enum CompactionPropertyType : int {
+            enum compaction_property_type : int {
                 COMPACTION_JOB_ID = 0,
                 COMPACTION_INPUT_OUTPUT_LEVEL,
                 COMPACTION_PROP_FLAGS,
@@ -82,7 +77,7 @@ namespace nil {
                 NUM_COMPACTION_PROPERTIES
             };
 
-            enum FlushPropertyType : int {
+            enum flush_property_type : int {
                 FLUSH_JOB_ID = 0, FLUSH_BYTES_MEMTABLES, FLUSH_BYTES_WRITTEN, NUM_FLUSH_PROPERTIES
             };
 
@@ -94,16 +89,17 @@ namespace nil {
             // The type used to refer to a thread state.
             // A state describes lower-level action of a thread
             // such as reading / writing a file or waiting for a mutex.
-            enum StateType : int {
+            enum state_type : int {
                 STATE_UNKNOWN = 0, STATE_MUTEX_WAIT = 1, NUM_STATE_TYPES
             };
 
-            ThreadStatus(const uint64_t _id, const ThreadType _thread_type, const std::string &_db_name,
-                         const std::string &_cf_name, const OperationType _operation_type,
-                         const uint64_t _op_elapsed_micros, const OperationStage _operation_stage,
-                         const uint64_t _op_props[], const StateType _state_type) : thread_id(_id),
-                    thread_type(_thread_type), db_name(_db_name), cf_name(_cf_name), operation_type(_operation_type),
-                    op_elapsed_micros(_op_elapsed_micros), operation_stage(_operation_stage), state_type(_state_type) {
+            thread_status(const uint64_t _id, const thread_type _thread_type, const std::string &_db_name,
+                          const std::string &_cf_name, const operation_type _operation_type,
+                          const uint64_t _op_elapsed_micros, const operation_stage_type _operation_stage,
+                          const uint64_t _op_props[], const state_type _state_type) : thread_id(_id),
+                    thread_type_value(_thread_type), db_name(_db_name), cf_name(_cf_name),
+                    operation_type_value(_operation_type), op_elapsed_micros(_op_elapsed_micros),
+                    operation_stage(_operation_stage), state_type_value(_state_type) {
                 for (int i = 0; i < kNumOperationProperties; ++i) {
                     op_properties[i] = _op_props[i];
                 }
@@ -114,11 +110,11 @@ namespace nil {
 
             // The type of the thread, it could be HIGH_PRIORITY,
             // LOW_PRIORITY, and USER
-            const ThreadType thread_type;
+            const thread_type thread_type_value;
 
-            // The name of the DB instance where the thread is currently
+            // The name of the database instance where the thread is currently
             // involved with.  It would be set to empty string if the thread
-            // does not involve in any DB operation.
+            // does not involve in any database operation.
             const std::string db_name;
 
             // The name of the column family where the thread is currently
@@ -127,14 +123,14 @@ namespace nil {
             const std::string cf_name;
 
             // The operation (high-level action) that the current thread is involved.
-            const OperationType operation_type;
+            const operation_type operation_type_value;
 
             // The elapsed time of the current thread operation in microseconds.
             const uint64_t op_elapsed_micros;
 
             // An integer showing the current stage where the thread is involved
             // in the current operation.
-            const OperationStage operation_stage;
+            const operation_stage_type operation_stage;
 
             // A list of properties that describe some details about the current
             // operation.  Same field in op_properties[] might have different
@@ -142,32 +138,32 @@ namespace nil {
             uint64_t op_properties[kNumOperationProperties];
 
             // The state (lower-level action) that the current thread is involved.
-            const StateType state_type;
+            const state_type state_type_value;
 
             // The followings are a set of utility functions for interpreting
-            // the information of ThreadStatus
+            // the information of thread_status
 
-            static std::string GetThreadTypeName(ThreadType thread_type);
+            static std::string get_thread_type_name(thread_type t_type);
 
             // Obtain the name of an operation given its type.
-            static const std::string &GetOperationName(OperationType op_type);
+            static const std::string &get_operation_name(operation_type op_type);
 
-            static const std::string MicrosToString(uint64_t op_elapsed_time);
+            static const std::string micros_to_string(uint64_t op_elapsed_time);
 
             // Obtain a human-readable string describing the specified operation stage.
-            static const std::string &GetOperationStageName(OperationStage stage);
+            static const std::string &get_operation_stage_name(operation_stage_type stage);
 
             // Obtain the name of the "i"th operation property of the
             // specified operation.
-            static const std::string &GetOperationPropertyName(OperationType op_type, int i);
+            static const std::string &get_operation_property_name(operation_type op_type, int i);
 
             // Translate the "i"th property of the specified operation given
             // a property value.
-            static std::map<std::string, uint64_t> InterpretOperationProperties(OperationType op_type,
-                                                                                const uint64_t *op_properties);
+            static std::map<std::string, uint64_t> interpret_operation_properties(operation_type op_type,
+                                                                                  const uint64_t *op_properties);
 
             // Obtain the name of a state given its type.
-            static const std::string &GetStateName(StateType state_type);
+            static const std::string &get_state_name(state_type st);
         };
 
 

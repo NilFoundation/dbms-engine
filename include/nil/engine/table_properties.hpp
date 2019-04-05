@@ -1,36 +1,33 @@
-// Copyright (c) 2011 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
 #pragma once
 
 #include <cstdint>
 #include <map>
 #include <string>
 
-#include <nil/storage/status.hpp>
-#include <nil/storage/types.hpp>
+#include <nil/engine/status.hpp>
+#include <nil/engine/types.hpp>
 
 namespace nil {
     namespace dcdb {
 
-// -- Table Properties
+// -- Table properties
 // Other than basic table properties, each table may also have the user
 // collected properties.
 // The value of the user-collected properties are encoded as raw bytes --
 // users have to interpret these values by themselves.
-// Note: To do prefix seek/scan in `UserCollectedProperties`, you can do
+// Note: To do prefix seek/scan in `user_properties`, you can do
 // something similar to:
 //
-// UserCollectedProperties props = ...;
+// user_properties props = ...;
 // for (auto pos = props.lower_bound(prefix);
 //      pos != props.end() && pos->first.compare(0, prefix.size(), prefix) == 0;
 //      ++pos) {
 //   ...
 // }
-        typedef std::map<std::string, std::string> UserCollectedProperties;
+        typedef std::map<std::string, std::string> user_collected_properties;
 
 // table properties' human-readable names in the property block.
-        struct TablePropertiesNames {
+        struct table_properties_names {
             static const std::string kDataSize;
             static const std::string kIndexSize;
             static const std::string kIndexPartitions;
@@ -63,67 +60,66 @@ namespace nil {
         extern const std::string kCompressionDictBlock;
         extern const std::string kRangeDelBlock;
 
-// `TablePropertiesCollector` provides the mechanism for users to collect
+// `table_properties_collector` provides the mechanism for users to collect
 // their own properties that they are interested in. This class is essentially
 // a collection of callback functions that will be invoked during table
 // building. It is constructed with table_properties_collector_factory. The methods
 // don't need to be thread-safe, as we will create exactly one
-// TablePropertiesCollector object per table and then call it sequentially
-        class TablePropertiesCollector {
+// table_properties_collector object per table and then call it sequentially
+        class table_properties_collector {
         public:
-            virtual ~TablePropertiesCollector() {
+            virtual ~table_properties_collector() {
             }
 
-            // DEPRECATE User defined collector should implement AddUserKey(), though
+            // DEPRECATE User defined collector should implement add_user_key(), though
             //           this old function still works for backward compatible reason.
-            // Add() will be called when a new key/value pair is inserted into the table.
+            // add() will be called when a new key/value pair is inserted into the table.
             // @params key    the user key that is inserted into the table.
             // @params value  the value that is inserted into the table.
-            virtual status_type Add(const slice & /*key*/, const slice & /*value*/) {
-                return status_type::InvalidArgument("TablePropertiesCollector::Add() deprecated.");
+            virtual status_type add(const slice &key, const slice &value) {
+                return status_type::invalid_argument("table_properties_collector::add() deprecated.");
             }
 
-            // AddUserKey() will be called when a new key/value pair is inserted into the
+            // add_user_key() will be called when a new key/value pair is inserted into the
             // table.
             // @params key    the user key that is inserted into the table.
             // @params value  the value that is inserted into the table.
-            virtual status_type AddUserKey(const slice &key, const slice &value, EntryType /*type*/,
-                                           SequenceNumber /*seq*/, uint64_t /*file_size*/) {
+            virtual status_type add_user_key(const slice &key, const slice &value, entry_type type, sequence_number seq,
+                                             uint64_t file_size) {
                 // For backwards-compatibility.
-                return Add(key, value);
+                return add(key, value);
             }
 
             // Called after each new block is cut
-            virtual void BlockAdd(uint64_t /* blockRawBytes */, uint64_t /* blockCompressedBytesFast */,
-                                  uint64_t /* blockCompressedBytesSlow */) {
+            virtual void block_add(uint64_t blockRawBytes, uint64_t blockCompressedBytesFast,
+                                   uint64_t blockCompressedBytesSlow) {
                 // Nothing to do here. Callback registers can override.
-                return;
             }
 
-            // Finish() will be called when a table has already been built and is ready
+            // finish() will be called when a table has already been built and is ready
             // for writing the properties block.
-            // @params properties  User will add their collected statistics to
+            // @params properties  User will add their collected get_statistics to
             // `properties`.
-            virtual status_type Finish(UserCollectedProperties *properties) = 0;
+            virtual status_type finish(user_collected_properties *properties) = 0;
 
             // Return the human-readable properties, where the key is property name and
             // the value is the human-readable form of value.
-            virtual UserCollectedProperties GetReadableProperties() const = 0;
+            virtual user_collected_properties get_readable_properties() const = 0;
 
             // The name of the properties collector can be used for debugging purpose.
-            virtual const char *Name() const = 0;
+            virtual const char *name() const = 0;
 
             // EXPERIMENTAL Return whether the output file should be further compacted
-            virtual bool NeedCompact() const {
+            virtual bool need_compact() const {
                 return false;
             }
         };
 
-// Constructs TablePropertiesCollector. Internals create a new
-// TablePropertiesCollector for each new table
+// Constructs table_properties_collector. Internals create a new
+// table_properties_collector for each new table
         class table_properties_collector_factory {
         public:
-            struct Context {
+            struct context {
                 uint32_t column_family_id;
                 static const uint32_t kUnknownColumnFamily;
             };
@@ -132,11 +128,11 @@ namespace nil {
             }
 
             // has to be thread-safe
-            virtual TablePropertiesCollector *CreateTablePropertiesCollector(
-                    table_properties_collector_factory::Context context) = 0;
+            virtual table_properties_collector *create_table_properties_collector(
+                    table_properties_collector_factory::context context) = 0;
 
             // The name of the properties collector can be used for debugging purpose.
-            virtual const char *Name() const = 0;
+            virtual const char *name() const = 0;
         };
 
 // table_properties contains a bunch of read-only properties of its associated
@@ -178,14 +174,14 @@ namespace nil {
             uint64_t fixed_key_len = 0;
             // ID of column family for this SST file, corresponding to the CF identified
             // by column_family_name.
-            uint64_t column_family_id = nil::dcdb::table_properties_collector_factory::Context::kUnknownColumnFamily;
+            uint64_t column_family_id = nil::dcdb::table_properties_collector_factory::context::kUnknownColumnFamily;
             // The time when the SST file was created.
             // Since SST files are immutable, this is equivalent to last modified time.
             uint64_t creation_time = 0;
             // Timestamp of the earliest key. 0 means unknown.
             uint64_t oldest_key_time = 0;
 
-            // Name of the column family with which this SST file is associated.
+            // name of the column family with which this SST file is associated.
             // If column family is unknown, `column_family_name` will be an empty string.
             std::string column_family_name;
 
@@ -213,19 +209,19 @@ namespace nil {
             std::string compression_name;
 
             // user collected properties
-            UserCollectedProperties user_collected_properties;
-            UserCollectedProperties readable_properties;
+            user_collected_properties user_properties;
+            user_collected_properties readable_properties;
 
             // The offset of the value of each property in the file.
             std::map<std::string, uint64_t> properties_offsets;
 
             // convert this object to a human readable form
             //   @prop_delim: delimiter for each property.
-            std::string ToString(const std::string &prop_delim = "; ", const std::string &kv_delim = "=") const;
+            std::string to_string(const std::string &prop_delim = "; ", const std::string &kv_delim = "=") const;
 
             // Aggregate the numerical member variables of the specified
             // table_properties.
-            void Add(const table_properties &tp);
+            void add(const table_properties &tp);
         };
 
 // Extra properties
@@ -236,9 +232,9 @@ namespace nil {
 // DEPRECATED: these properties now belong as table_properties members. Please
 // use table_properties::num_deletions and table_properties::num_merge_operands,
 // respectively.
-        extern uint64_t GetDeletedKeys(const UserCollectedProperties &props);
+        extern uint64_t get_deleted_keys(const user_collected_properties &props);
 
-        extern uint64_t GetMergeOperands(const UserCollectedProperties &props, bool *property_present);
+        extern uint64_t get_merge_operands(const user_collected_properties &props, bool *property_present);
 
     }
 } // namespace nil

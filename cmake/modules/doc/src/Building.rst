@@ -43,7 +43,7 @@ So this will build the library named ``boost_filesystem``, however, we need to s
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     )
 
-Using ``PUBLIC`` means this include directory will be used internally to build, and downstream users need this include as well. Next, we need to pull in the dependencies. To do this, we call ``find_package``, and for the sake of the turtorial we assume that the upstream boost libraries have already set this up::
+Using ``PUBLIC`` means this include directory will be used internally to build, and downstream users need this include as well. next, we need to pull in the dependencies. To do this, we call ``find_package``, and for the sake of the turtorial we assume that the upstream boost libraries have already set this up::
 
     find_package(boost_core)
     find_package(boost_static_assert)
@@ -75,7 +75,7 @@ Calling ``find_package`` will find those libraries and provide a target we can u
         boost::config
     )
 
-Now, some of these libraries are header-only, but when we call ``target_link_libraries`` it will add all the flags necessary to use those libraries. Next step is installation, using the ``install`` command::
+Now, some of these libraries are header-only, but when we call ``target_link_libraries`` it will add all the flags necessary to use those libraries. next step is installation, using the ``install`` command::
 
     install(DIRECTORY include/ DESTINATION include)
 
@@ -240,11 +240,11 @@ The boost cmake modules can help reduce the boilerplate needed in writing these 
     project(boost_filesystem)
     find_package(CM)
 
-Next we can setup the version for the project using ``cm_setup_version``::
+next we can setup the version for the project using ``cm_setup_version``::
 
     cm_setup_version(VERSION 1.64)
 
-Next, we add the library and link against the dependencies like always::
+next, we add the library and link against the dependencies like always::
 
     find_package(boost_core)
     find_package(boost_static_assert)

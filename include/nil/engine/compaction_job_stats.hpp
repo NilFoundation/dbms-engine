@@ -1,8 +1,3 @@
-// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under both the GPLv2 (found in the
-//  COPYING file in the root directory) and Apache 2.0 License
-//  (found in the LICENSE.Apache file in the root directory).
-
 #pragma once
 
 #include <stddef.h>
@@ -11,15 +6,15 @@
 
 namespace nil {
     namespace dcdb {
-        struct CompactionJobStats {
-            CompactionJobStats() {
-                Reset();
+        struct compaction_job_stats {
+            compaction_job_stats() {
+                reset();
             }
 
-            void Reset();
+            void reset();
 
-            // Aggregate the CompactionJobStats from another instance with this one
-            void Add(const CompactionJobStats &stats);
+            // Aggregate the compaction_job_stats from another instance with this one
+            void add(const compaction_job_stats &stats);
 
             // the elapsed time of this compaction in microseconds.
             uint64_t elapsed_micros;
@@ -70,9 +65,9 @@ namespace nil {
             uint64_t num_corrupt_keys;
 
             // Following counters are only populated if
-            // options.report_bg_io_stats = true;
+            // opts.report_bg_io_stats = true;
 
-            // Time spent on file's Append() call.
+            // Time spent on file's append() call.
             uint64_t file_write_nanos;
 
             // Time spent on sync file range.
@@ -91,10 +86,10 @@ namespace nil {
             std::string smallest_output_key_prefix;
             std::string largest_output_key_prefix;
 
-            // number of single-deletes which do not meet a put
+            // number of single-deletes which do not meet a insert
             uint64_t num_single_del_fallthru;
 
-            // number of single-deletes which meet something other than a put
+            // number of single-deletes which meet something other than a insert
             uint64_t num_single_del_mismatch;
         };
     }
