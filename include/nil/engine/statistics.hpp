@@ -432,7 +432,7 @@ namespace nil {
             double percentile99;
             double average;
             double standard_deviation;
-            // zero-initialize new members since old statistics::histogram_data()
+            // zero-initialize new members since old statistics::get_histogram_data()
             // implementations won't write them.
             double max = 0.0;
             uint64_t count = 0;
@@ -461,7 +461,7 @@ namespace nil {
 
             virtual uint64_t get_ticker_count(uint32_t tickerType) const = 0;
 
-            virtual void histogram_data(uint32_t type, histogram_data *const data) const = 0;
+            virtual void get_histogram_data(uint32_t type, histogram_data *const data) const = 0;
 
             virtual std::string get_histogram_string(uint32_t type) const {
                 return "";

@@ -142,27 +142,27 @@ namespace nil {
             // The followings are a set of utility functions for interpreting
             // the information of thread_status
 
-            static std::string get_thread_type_name(thread_type thread_type);
+            static std::string get_thread_type_name(enum thread_type thread_type);
 
             // Obtain the name of an operation given its type.
-            static const std::string &get_operation_name(operation_type op_type);
+            static const std::string &get_operation_name(enum operation_type op_type);
 
             static const std::string micros_to_string(uint64_t op_elapsed_time);
 
             // Obtain a human-readable string describing the specified operation stage.
-            static const std::string &get_operation_stage_name(operation_stage stage);
+            static const std::string &get_operation_stage_name(enum operation_stage stage);
 
             // Obtain the name of the "i"th operation property of the
             // specified operation.
-            static const std::string &get_operation_property_name(operation_type op_type, int i);
+            static const std::string &get_operation_property_name(enum operation_type op_type, int i);
 
             // Translate the "i"th property of the specified operation given
             // a property value.
-            static std::map<std::string, uint64_t> interpret_operation_properties(operation_type op_type,
+            static std::map<std::string, uint64_t> interpret_operation_properties(enum operation_type op_type,
                                                                                   const uint64_t *op_properties);
 
             // Obtain the name of a state given its type.
-            static const std::string &get_state_name(state_type state_type);
+            static const std::string &get_state_name(enum state_type state_type);
         };
 
 

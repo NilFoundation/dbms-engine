@@ -91,7 +91,7 @@ namespace nil {
 
             status_type(const status_type &s, severity sev);
 
-            severity severity() const {
+            severity get_severity() const {
                 return sev_;
             }
 
