@@ -1055,13 +1055,13 @@ namespace nil {
 // An implementation of environment_type that forwards all calls to another environment_type.
 // May be useful to clients who wish to override just part of the
 // functionality of another environment_type.
-        class EnvWrapper : public environment_type {
+        class env_wrapper : public environment_type {
         public:
-            // Initialize an EnvWrapper that delegates all calls to *t
-            explicit EnvWrapper(environment_type *t) : target_(t) {
+            // Initialize an env_wrapper that delegates all calls to *t
+            explicit env_wrapper(environment_type *t) : target_(t) {
             }
 
-            ~EnvWrapper() override;
+            ~env_wrapper() override;
 
             // Return the target to which this environment_type forwards all calls
             environment_type *target() const {
