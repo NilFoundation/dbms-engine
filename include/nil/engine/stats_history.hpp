@@ -10,7 +10,7 @@
 namespace nil {
     namespace dcdb {
 
-        class DBImpl;
+        class database_impl;
 
         class stats_history_iterator {
         public:

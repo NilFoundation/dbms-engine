@@ -458,7 +458,7 @@ namespace nil {
             //     and cache the table object returned.
             // (2) SstFileDumper (for SST dump) opens the table and dump the table
             //     contents using the iterator of the table.
-            // (3) DBImpl::ingest_external_file() calls this function to read the contents
+            // (3) database_impl::ingest_external_file() calls this function to read the contents
             //     of the sst file it's attempting to add
             //
             // table_reader_options is a table_reader_options which contain all the
@@ -475,11 +475,11 @@ namespace nil {
             //
             // It is called in several places:
             // (1) When flushing memtable to a level-0 output file, it creates a table
-            //     builder (In DBImpl::WriteLevel0Table(), by calling build_table())
+            //     builder (In database_impl::WriteLevel0Table(), by calling build_table())
             // (2) During compaction, it gets the builder for writing compaction output
-            //     files in DBImpl::OpenCompactionOutputFile().
+            //     files in database_impl::OpenCompactionOutputFile().
             // (3) When recovering from transaction logs, it creates a table builder to
-            //     write to a level-0 output file (In DBImpl::WriteLevel0TableForRecovery,
+            //     write to a level-0 output file (In database_impl::WriteLevel0TableForRecovery,
             //     by calling build_table())
             // (4) When running Repairer, it creates a table builder to convert logs to
             //     SST files (In Repairer::ConvertLogToTable() by calling build_table())
