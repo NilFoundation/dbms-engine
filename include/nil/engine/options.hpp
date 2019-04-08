@@ -360,7 +360,7 @@ namespace nil {
             // spend lots of memory for memtables.
             db_options *optimize_for_small_db();
 
-#ifndef DCDB_LITE
+
 
             // By default, RocksDB uses only one background thread for flush and
             // compaction. Calling this function will set it up such that total of
@@ -369,7 +369,7 @@ namespace nil {
             // bottlenecked by RocksDB.
             db_options *increase_parallelism(int total_threads = 16);
 
-#endif  // DCDB_LITE
+
 
             // If true, the database will be created if it is missing.
             // default_environment: false
@@ -930,14 +930,14 @@ namespace nil {
             // Not supported in DCDB_LITE mode!
             std::shared_ptr<cache> row_cache = nullptr;
 
-#ifndef DCDB_LITE
+
             // A filter object supplied to be invoked while processing write-ahead-logs
             // (WALs) during recovery. The filter provides a way to inspect log
             // records, ignoring a particular record or skipping replay.
             // The filter is invoked at startup and is invoked from a single-thread
             // currently.
             wal_filter *wal_filter = nullptr;
-#endif  // DCDB_LITE
+
 
             // If true, then database::open / create_column_family / drop_column_family
             // / set_options will fail if opts file is not detected or properly

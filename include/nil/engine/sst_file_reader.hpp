@@ -1,6 +1,6 @@
 #pragma once
 
-#ifndef DCDB_LITE
+
 
 #include <nil/engine/iterator.hpp>
 #include <nil/engine/options.hpp>

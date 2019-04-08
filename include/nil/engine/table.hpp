@@ -278,7 +278,7 @@ namespace nil {
         extern table_factory *new_block_based_table_factory(
                 const block_based_table_options &table_options = block_based_table_options());
 
-#ifndef DCDB_LITE
+
 
         enum encoding_type : char {
             // Always write full keys without any special encoding.
@@ -430,7 +430,7 @@ namespace nil {
         extern table_factory *new_cuckoo_table_factory(
                 const cuckoo_table_options &table_options = cuckoo_table_options());
 
-#endif  // DCDB_LITE
+
 
         class random_access_file_reader;
 
@@ -531,7 +531,7 @@ namespace nil {
             }
         };
 
-#ifndef DCDB_LITE
+
 
 // Create a special table factory that can open either of the supported
 // table formats, based on setting inside the SST files. It should be used to
@@ -547,7 +547,7 @@ namespace nil {
                 std::shared_ptr<table_factory> plain_table_factory = nullptr,
                 std::shared_ptr<table_factory> cuckoo_table_factory = nullptr);
 
-#endif  // DCDB_LITE
+
 
     }
 } // namespace nil

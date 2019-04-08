@@ -431,7 +431,7 @@ namespace nil {
             // use "get_snapshot" after this call.
             virtual void release_snapshot(const snapshot *snapshot) = 0;
 
-#ifndef DCDB_LITE
+
             // contains all valid property arguments for get_property().
             //
             // NOTE: Property names cannot end in numbers since those are interpreted as
@@ -955,7 +955,7 @@ namespace nil {
             // updated, false if user attempted to call if with seqnum <= current value.
             virtual bool set_preserve_deletes_sequence_number(sequence_number seqnum) = 0;
 
-#ifndef DCDB_LITE
+
 
             // Prevent file deletions. Compactions will continue to occur,
             // but no obsolete files will be deleted. Calling this multiple
@@ -1175,7 +1175,7 @@ namespace nil {
                 return ingest_external_file(default_column_family(), {file_info->file_path}, ifo);
             }
 
-#endif  // DCDB_LITE
+
 
             // Sets the globally unique ID created at database creation time by invoking
             // environment_type::generate_unique_id(), in identity. Returns status_type::is_ok if identity could
@@ -1185,7 +1185,7 @@ namespace nil {
             // Returns default column family handle
             virtual column_family_handle *default_column_family() const = 0;
 
-#ifndef DCDB_LITE
+
 
             virtual status_type get_properties_of_all_tables(column_family_handle *column_family,
                                                              table_properties_collection *props) = 0;
@@ -1217,7 +1217,7 @@ namespace nil {
                 return status_type::not_supported("end_trace() is not implemented.");
             }
 
-#endif  // DCDB_LITE
+
 
             // Needed for StackableDB
             virtual database *get_root_db() {
@@ -1244,7 +1244,7 @@ namespace nil {
                                const std::vector<column_family_descriptor> &column_families = std::vector<
                                        column_family_descriptor>());
 
-#ifndef DCDB_LITE
+
 
 // If a database cannot be opened, you may attempt to call this method to
 // resurrect as much of the contents of the database as possible.

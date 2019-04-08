@@ -11,7 +11,7 @@
 namespace nil {
     namespace dcdb {
 
-#ifndef DCDB_LITE
+
 // The following set of functions provide a way to construct RocksDB opts
 // from a string or a string-to-string map.  Here're the general rule of
 // setting option values from strings by type.  Some RocksDB types are also
@@ -327,7 +327,7 @@ namespace nil {
         status_type verify_sst_file_checksum(const options &options, const environment_options &env_options,
                                              const std::string &file_path);
 
-#endif  // DCDB_LITE
+
 
     }
 } // namespace nil

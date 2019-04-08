@@ -1,6 +1,6 @@
 #pragma once
 
-#ifndef DCDB_LITE
+
 
 #include <memory>
 #include <string>

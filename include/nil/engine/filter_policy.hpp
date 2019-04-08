@@ -45,7 +45,7 @@ namespace nil {
 #endif
 
             virtual int calculate_num_entry(const uint32_t space) {
-#ifndef DCDB_LITE
+
                 throw std::runtime_error("calculate_num_entry not Implemented");
 #else
                 abort();
