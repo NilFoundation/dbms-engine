@@ -31,7 +31,7 @@ macro(define_storage_test name)
 endmacro()
 
 set(TESTS_NAMES
-    "storage"
+    "engine"
     )
 
 foreach(TEST_NAME ${TESTS_NAMES})
