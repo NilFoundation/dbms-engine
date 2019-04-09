@@ -24,9 +24,9 @@
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
-#define ROCKSDB_DEPRECATED_FUNC __attribute__((__deprecated__))
+#define DCDB_DEPRECATED_FUNC __attribute__((__deprecated__))
 #elif _WIN32
-#define ROCKSDB_DEPRECATED_FUNC __declspec(deprecated)
+#define DCDB_DEPRECATED_FUNC __declspec(deprecated)
 #endif
 
 namespace nil {
@@ -753,7 +753,7 @@ namespace nil {
             }
 
             // Deprecated versions of get_approximate_sizes
-            ROCKSDB_DEPRECATED_FUNC virtual void get_approximate_sizes(const range *range, int n, uint64_t *sizes,
+            DCDB_DEPRECATED_FUNC virtual void get_approximate_sizes(const range *range, int n, uint64_t *sizes,
                                                                        bool include_memtable) {
                 uint8_t include_flags = size_approximation_flags::INCLUDE_FILES;
                 if (include_memtable) {
@@ -762,7 +762,7 @@ namespace nil {
                 get_approximate_sizes(default_column_family(), range, n, sizes, include_flags);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual void get_approximate_sizes(column_family_handle *column_family,
+            DCDB_DEPRECATED_FUNC virtual void get_approximate_sizes(column_family_handle *column_family,
                                                                        const range *range, int n, uint64_t *sizes,
                                                                        bool include_memtable) {
                 uint8_t include_flags = size_approximation_flags::INCLUDE_FILES;
@@ -797,7 +797,7 @@ namespace nil {
                 return compact_range(options, default_column_family(), begin, end);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual status_type compact_range(column_family_handle *column_family,
+            DCDB_DEPRECATED_FUNC virtual status_type compact_range(column_family_handle *column_family,
                                                                       const slice *begin, const slice *end,
                                                                       bool change_level = false, int target_level = -1,
                                                                       uint32_t target_path_id = 0) {
@@ -808,7 +808,7 @@ namespace nil {
                 return compact_range(options, column_family, begin, end);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual status_type compact_range(const slice *begin, const slice *end,
+            DCDB_DEPRECATED_FUNC virtual status_type compact_range(const slice *begin, const slice *end,
                                                                       bool change_level = false, int target_level = -1,
                                                                       uint32_t target_path_id = 0) {
                 compact_range_options options;
@@ -1077,7 +1077,7 @@ namespace nil {
             virtual status_type verify_checksum() = 0;
 
             // add_file() is deprecated, please use ingest_external_file()
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
                                                                  const std::vector<std::string> &file_path_list,
                                                                  bool move_file = false,
                                                                  bool skip_snapshot_check = false) {
@@ -1089,7 +1089,7 @@ namespace nil {
                 return ingest_external_file(column_family, file_path_list, ifo);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(const std::vector<std::string> &file_path_list,
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(const std::vector<std::string> &file_path_list,
                                                                  bool move_file = false,
                                                                  bool skip_snapshot_check = false) {
                 ingest_external_file_options ifo;
@@ -1101,7 +1101,7 @@ namespace nil {
             }
 
             // add_file() is deprecated, please use ingest_external_file()
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
                                                                  const std::string &file_path, bool move_file = false,
                                                                  bool skip_snapshot_check = false) {
                 ingest_external_file_options ifo;
@@ -1112,7 +1112,7 @@ namespace nil {
                 return ingest_external_file(column_family, {file_path}, ifo);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(const std::string &file_path, bool move_file = false,
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(const std::string &file_path, bool move_file = false,
                                                                  bool skip_snapshot_check = false) {
                 ingest_external_file_options ifo;
                 ifo.move_files = move_file;
@@ -1123,7 +1123,7 @@ namespace nil {
             }
 
             // Load table file with information "file_info" into "column_family"
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family, const std::vector<
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family, const std::vector<
                     external_sst_file_info> &file_info_list, bool move_file = false, bool skip_snapshot_check = false) {
                 std::vector<std::string> external_files;
                 for (const external_sst_file_info &file_info : file_info_list) {
@@ -1137,7 +1137,7 @@ namespace nil {
                 return ingest_external_file(column_family, external_files, ifo);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(
                     const std::vector<external_sst_file_info> &file_info_list, bool move_file = false,
                     bool skip_snapshot_check = false) {
                 std::vector<std::string> external_files;
@@ -1152,7 +1152,7 @@ namespace nil {
                 return ingest_external_file(default_column_family(), external_files, ifo);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
                                                                  const external_sst_file_info *file_info,
                                                                  bool move_file = false,
                                                                  bool skip_snapshot_check = false) {
@@ -1164,7 +1164,7 @@ namespace nil {
                 return ingest_external_file(column_family, {file_info->file_path}, ifo);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(const external_sst_file_info *file_info,
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(const external_sst_file_info *file_info,
                                                                  bool move_file = false,
                                                                  bool skip_snapshot_check = false) {
                 ingest_external_file_options ifo;

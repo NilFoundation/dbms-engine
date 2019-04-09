@@ -11,9 +11,9 @@
 #include <nil/engine/types.hpp>
 
 #if defined(__GNUC__) || defined(__clang__)
-#define ROCKSDB_DEPRECATED_FUNC __attribute__((__deprecated__))
+#define DCDB_DEPRECATED_FUNC __attribute__((__deprecated__))
 #elif _WIN32
-#define ROCKSDB_DEPRECATED_FUNC __declspec(deprecated)
+#define DCDB_DEPRECATED_FUNC __declspec(deprecated)
 #endif
 
 namespace nil {
@@ -80,7 +80,7 @@ namespace nil {
 
             // add a insert key with value to currently opened file (deprecated)
             // REQUIRES: key is after any previously added key according to comparator.
-            ROCKSDB_DEPRECATED_FUNC status_type add(const slice &user_key, const slice &value);
+            DCDB_DEPRECATED_FUNC status_type add(const slice &user_key, const slice &value);
 
             // add a insert key with value to currently opened file
             // REQUIRES: key is after any previously added key according to comparator.
