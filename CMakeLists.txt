@@ -29,7 +29,7 @@ cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
-cm_project(${CMAKE_WORKSPACE_NAME} storage)
+cm_project(${CMAKE_WORKSPACE_NAME} engine)
 
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
