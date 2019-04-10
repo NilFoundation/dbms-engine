@@ -39,4 +39,4 @@ namespace nil {
     }
 } // namespace nil
 
-#endif  // !DCDB_LITE
+

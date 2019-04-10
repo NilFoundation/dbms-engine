@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 #include <memory>
 #include <string>
 
@@ -115,4 +113,4 @@ namespace nil {
     }
 } // namespace nil
 
-#endif  // !DCDB_LITE
+

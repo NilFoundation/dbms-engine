@@ -47,10 +47,6 @@ namespace nil {
             virtual int calculate_num_entry(const uint32_t space) {
 
                 throw std::runtime_error("calculate_num_entry not Implemented");
-#else
-                abort();
-#endif
-                return 0;
             }
 
 #if defined(_MSC_VER)
