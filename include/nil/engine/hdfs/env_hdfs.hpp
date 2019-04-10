@@ -49,7 +49,7 @@ namespace nil {
 
         public:
             explicit HdfsEnv(const std::string &fsname) : fsname_(fsname) {
-                posixEnv = environment_type::Default();
+                posixEnv = environment_type::default_environment();
                 fileSys_ = connectToPath(fsname_);
             }
 
@@ -322,11 +322,11 @@ namespace nil {
                 return notsup;
             }
 
-            virtual void schedule(void (*function)(void *arg), void *arg, Priority pri = LOW, void *tag = nullptr,
+            virtual void schedule(void (*function)(void *arg), void *arg, priority_type pri = LOW, void *tag = nullptr,
                                   void (*unschedFunction)(void *arg) = nullptr) override {
             }
 
-            virtual int unschedule(void *tag, Priority pri) override {
+            virtual int unschedule(void *tag, priority_type pri) override {
                 return 0;
             }
 
@@ -336,7 +336,7 @@ namespace nil {
             virtual void wait_for_join() override {
             }
 
-            virtual unsigned int get_thread_pool_queue_len(Priority pri = LOW) const override {
+            virtual unsigned int get_thread_pool_queue_len(priority_type pri = LOW) const override {
                 return 0;
             }
 
@@ -363,14 +363,14 @@ namespace nil {
                 return notsup;
             }
 
-            virtual void set_background_threads(int number, Priority pri = LOW) override {
+            virtual void set_background_threads(int number, priority_type pri = LOW) override {
             }
 
-            virtual int get_background_threads(Priority pri = LOW) override {
+            virtual int get_background_threads(priority_type pri = LOW) override {
                 return 0;
             }
 
-            virtual void inc_background_threads_if_needed(int number, Priority pri) override {
+            virtual void inc_background_threads_if_needed(int number, priority_type pri) override {
             }
 
             virtual std::string time_to_string(uint64_t number) override {
