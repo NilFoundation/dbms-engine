@@ -443,13 +443,5 @@ namespace nil {
             virtual ~event_listener() {
             }
         };
-
-#else
-
-        class event_listener {
-        };
-
-
-
     }
 } // namespace nil
