@@ -4,12 +4,6 @@ if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
     cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 endif()
 
-if(Boost_FOUND AND BUILD_SHARED_LIBS)
-    set(Boost_USE_STATIC_LIBS FALSE)
-else()
-    set(Boost_USE_STATIC_LIBS TRUE)
-endif()
-
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${Boost_LIBRARIES})
