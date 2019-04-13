@@ -12,9 +12,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
 include(CMConfig)
 include(CMSetupVersion)
 
-include(CheckCSourceCompiles)
-include(CheckCSourceRuns)
-
 cm_workspace(nil)
 
 macro(cm_find_package NAME)
