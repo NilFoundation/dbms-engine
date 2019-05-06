@@ -14,7 +14,7 @@ namespace nil {
 // sst_file_writer.
         class sst_file_reader {
         public:
-            sst_file_reader(const options &opts);
+            sst_file_reader(const database_options &opts);
 
             ~sst_file_reader();
 

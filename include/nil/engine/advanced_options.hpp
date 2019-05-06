@@ -18,7 +18,7 @@ namespace nil {
 
         class table_factory;
 
-        struct options;
+        struct database_options;
 
         enum compaction_style : char {
             // level based compaction style
@@ -637,7 +637,7 @@ namespace nil {
             advanced_column_family_options();
 
             // Create column_family_options from opts
-            explicit advanced_column_family_options(const options &options);
+            explicit advanced_column_family_options(const database_options &options);
 
             // ---------------- OPTIONS NOT SUPPORTED ANYMORE ----------------
 

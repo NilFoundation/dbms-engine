@@ -43,7 +43,7 @@ namespace nil {
         class writable_file_writer;
 
         struct environment_options;
-        struct options;
+        struct database_options;
 
         using std::unique_ptr;
 

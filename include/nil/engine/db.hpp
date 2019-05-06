@@ -27,7 +27,7 @@
 namespace nil {
     namespace dcdb {
 
-        struct options;
+        struct database_options;
         struct db_options;
         struct read_options;
         struct write_options;
@@ -139,7 +139,7 @@ namespace nil {
             // is_ok on success.
             // Stores nullptr in *dbptr and returns a non-is_ok status on error.
             // Caller should delete *dbptr when it is no longer needed.
-            static status_type open(const options &options, const std::string &name, database **dbptr);
+            static status_type open(const database_options &options, const std::string &name, database **dbptr);
 
             // open the database for read only. All database interfaces
             // that modify data, like insert/delete, will return error.
@@ -148,7 +148,7 @@ namespace nil {
             //
             // Not supported in DCDB_LITE, in which case the function will
             // return status_type::not_supported.
-            static status_type open_for_read_only(const options &options, const std::string &name, database **dbptr,
+            static status_type open_for_read_only(const database_options &options, const std::string &name, database **dbptr,
                                                   bool error_if_log_file_exist = false);
 
             // open the database for read only with column families. When opening database with
@@ -899,9 +899,9 @@ namespace nil {
             // column family, the opts provided when calling database::open() or
             // database::create_column_family() will have been "sanitized" and transformed
             // in an implementation-defined manner.
-            virtual options get_options(column_family_handle *column_family) const = 0;
+            virtual database_options get_options(column_family_handle *column_family) const = 0;
 
-            virtual options get_options() const {
+            virtual database_options get_options() const {
                 return get_options(default_column_family());
             }
 
@@ -1230,7 +1230,7 @@ namespace nil {
 
 // Destroy the contents of the specified database.
 // Be very careful using this method.
-        status_type destroy_db(const std::string &name, const options &options,
+        status_type destroy_db(const std::string &name, const database_options &options,
                                const std::vector<column_family_descriptor> &column_families = std::vector<
                                        column_family_descriptor>());
 
@@ -1255,7 +1255,7 @@ namespace nil {
 
 // @param opts These opts will be used for the database and for ALL column
 //                families encountered during the repair
-        status_type repair_db(const std::string &dbname, const options &options);
+        status_type repair_db(const std::string &dbname, const database_options &options);
 
 
     }
