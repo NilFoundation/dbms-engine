@@ -35,7 +35,7 @@ namespace nil {
 // In Level-based compaction, it Determines which file from a level to be
 // picked to merge to the next level. We suggest people try
 // kMinOverlappingRatio first when you tune your database.
-        enum compaction_pri : char {
+        enum compaction_priority : char {
             // Slightly prioritize larger files by size compensated by #deletes
                     kByCompensatedSize = 0x0, // First compact files whose data's latest update time is oldest.
             // Try this if you only update some hot keys in small ranges.
@@ -512,7 +512,7 @@ namespace nil {
             // If level compaction_style = kCompactionStyleLevel, for each level,
             // which files are prioritized to be picked to compact.
             // default_environment: kMinOverlappingRatio
-            compaction_pri compaction_pri = kMinOverlappingRatio;
+            compaction_priority compaction_pri = kMinOverlappingRatio;
 
             // The opts needed to support Universal Style compactions
             //
