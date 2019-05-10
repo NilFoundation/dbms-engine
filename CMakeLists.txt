@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.11)
 
 cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0028 NEW)
+cmake_policy(SET CMP0048 OLD)
 cmake_policy(SET CMP0057 NEW)
 cmake_policy(SET CMP0079 OLD)
 
@@ -10,9 +11,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
 
 include(CMConfig)
 include(CMSetupVersion)
-
-include(CheckCSourceCompiles)
-include(CheckCSourceRuns)
 
 cm_workspace(nil)
 
@@ -28,7 +26,7 @@ cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
-cm_project(${CMAKE_WORKSPACE_NAME} storage)
+cm_project(${CMAKE_WORKSPACE_NAME} engine)
 
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 

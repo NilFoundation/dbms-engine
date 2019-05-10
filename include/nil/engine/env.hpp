@@ -314,11 +314,11 @@ namespace nil {
             virtual status_type unlock_file(FileLock *lock) = 0;
 
             // priority for scheduling job in thread pool
-            enum Priority {
+            enum priority_type {
                 BOTTOM, LOW, HIGH, USER, TOTAL
             };
 
-            static std::string priority_to_string(Priority priority);
+            static std::string priority_to_string(priority_type priority);
 
             // priority for requesting bytes in rate limiter scheduler
             enum io_priority {
@@ -335,12 +335,12 @@ namespace nil {
             // serialized.
             // When the unschedule function is called, the unschedFunction
             // registered at the time of schedule is invoked with arg as a parameter.
-            virtual void schedule(void (*function)(void *arg), void *arg, Priority pri = LOW, void *tag = nullptr,
+            virtual void schedule(void (*function)(void *arg), void *arg, priority_type pri = LOW, void *tag = nullptr,
                                   void (*unschedFunction)(void *arg) = nullptr) = 0;
 
             // Arrange to remove jobs for given arg from the queue_ if they are not
             // already scheduled. Caller is expected to have exclusive lock on arg.
-            virtual int unschedule(void *arg, Priority pri) {
+            virtual int unschedule(void *arg, priority_type pri) {
                 return 0;
             }
 
@@ -353,7 +353,7 @@ namespace nil {
             }
 
             // get thread pool queue length for specific thread pool.
-            virtual unsigned int get_thread_pool_queue_len(Priority pri = LOW) const {
+            virtual unsigned int get_thread_pool_queue_len(priority_type pri = LOW) const {
                 return 0;
             }
 
@@ -401,9 +401,9 @@ namespace nil {
             // The number of background worker threads of a specific thread pool
             // for this environment. 'LOW' is the default pool.
             // default number: 1
-            virtual void set_background_threads(int number, Priority pri = LOW) = 0;
+            virtual void set_background_threads(int number, priority_type pri = LOW) = 0;
 
-            virtual int get_background_threads(Priority pri = LOW) = 0;
+            virtual int get_background_threads(priority_type pri = LOW) = 0;
 
             virtual status_type set_allow_non_owner_access(bool allow_non_owner_access) {
                 return status_type::not_supported("Not supported.");
@@ -412,14 +412,14 @@ namespace nil {
             // Enlarge number of background worker threads of a specific thread pool
             // for this environment if it is smaller than specified. 'LOW' is the default
             // pool.
-            virtual void inc_background_threads_if_needed(int number, Priority pri) = 0;
+            virtual void inc_background_threads_if_needed(int number, priority_type pri) = 0;
 
             // Lower IO priority for threads from the specified pool.
-            virtual void lower_thread_pool_io_priority(Priority pool = LOW) {
+            virtual void lower_thread_pool_io_priority(priority_type pool = LOW) {
             }
 
             // Lower CPU priority for threads from the specified pool.
-            virtual void lower_thread_pool_cpu_priority(Priority pool = LOW) {
+            virtual void lower_thread_pool_cpu_priority(priority_type pool = LOW) {
             }
 
             // Converts seconds-since-Jan-01-1970 to a printable string
@@ -1055,13 +1055,13 @@ namespace nil {
 // An implementation of environment_type that forwards all calls to another environment_type.
 // May be useful to clients who wish to override just part of the
 // functionality of another environment_type.
-        class EnvWrapper : public environment_type {
+        class environment_wrapper : public environment_type {
         public:
-            // Initialize an EnvWrapper that delegates all calls to *t
-            explicit EnvWrapper(environment_type *t) : target_(t) {
+            // Initialize an environment_wrapper that delegates all calls to *t
+            explicit environment_wrapper(environment_type *t) : target_(t) {
             }
 
-            ~EnvWrapper() override;
+            ~environment_wrapper() override;
 
             // Return the target to which this environment_type forwards all calls
             environment_type *target() const {
@@ -1165,12 +1165,12 @@ namespace nil {
                 return target_->unlock_file(l);
             }
 
-            void schedule(void (*f)(void *arg), void *a, Priority pri, void *tag = nullptr,
+            void schedule(void (*f)(void *arg), void *a, priority_type pri, void *tag = nullptr,
                           void (*u)(void *arg) = nullptr) override {
                 return target_->schedule(f, a, pri, tag, u);
             }
 
-            int unschedule(void *tag, Priority pri) override {
+            int unschedule(void *tag, priority_type pri) override {
                 return target_->unschedule(tag, pri);
             }
 
@@ -1182,7 +1182,7 @@ namespace nil {
                 return target_->wait_for_join();
             }
 
-            unsigned int get_thread_pool_queue_len(Priority pri = LOW) const override {
+            unsigned int get_thread_pool_queue_len(priority_type pri = LOW) const override {
                 return target_->get_thread_pool_queue_len(pri);
             }
 
@@ -1218,11 +1218,11 @@ namespace nil {
                 return target_->get_absolute_path(db_path, output_path);
             }
 
-            void set_background_threads(int num, Priority pri) override {
+            void set_background_threads(int num, priority_type pri) override {
                 return target_->set_background_threads(num, pri);
             }
 
-            int get_background_threads(Priority pri) override {
+            int get_background_threads(priority_type pri) override {
                 return target_->get_background_threads(pri);
             }
 
@@ -1230,15 +1230,15 @@ namespace nil {
                 return target_->set_allow_non_owner_access(allow_non_owner_access);
             }
 
-            void inc_background_threads_if_needed(int num, Priority pri) override {
+            void inc_background_threads_if_needed(int num, priority_type pri) override {
                 return target_->inc_background_threads_if_needed(num, pri);
             }
 
-            void lower_thread_pool_io_priority(Priority pool = LOW) override {
+            void lower_thread_pool_io_priority(priority_type pool = LOW) override {
                 target_->lower_thread_pool_io_priority(pool);
             }
 
-            void lower_thread_pool_cpu_priority(Priority pool = LOW) override {
+            void lower_thread_pool_cpu_priority(priority_type pool = LOW) override {
                 target_->lower_thread_pool_cpu_priority(pool);
             }
 

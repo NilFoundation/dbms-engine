@@ -69,7 +69,7 @@ namespace nil {
 
             // return true if two keys with different byte sequences can be regarded
             // as equal by this comparator.
-            // The major use case is to determine if DataBlockHashIndex is compatible
+            // The major use case is to determine if data_block_hash_index is compatible
             // with the customized comparator.
             virtual bool can_keys_with_different_byte_contents_be_equal() const {
                 return true;

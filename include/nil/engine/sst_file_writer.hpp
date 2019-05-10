@@ -1,7 +1,5 @@
 #pragma once
 
-#ifndef DCDB_LITE
-
 #include <memory>
 #include <string>
 
@@ -11,9 +9,9 @@
 #include <nil/engine/types.hpp>
 
 #if defined(__GNUC__) || defined(__clang__)
-#define ROCKSDB_DEPRECATED_FUNC __attribute__((__deprecated__))
+#define DCDB_DEPRECATED_FUNC __attribute__((__deprecated__))
 #elif _WIN32
-#define ROCKSDB_DEPRECATED_FUNC __declspec(deprecated)
+#define DCDB_DEPRECATED_FUNC __declspec(deprecated)
 #endif
 
 namespace nil {
@@ -59,7 +57,7 @@ namespace nil {
             // If invalidate_page_cache is set to true, sst_file_writer will give the OS a
             // hint that this file pages is not needed every time we write 1MB to the file.
             // To use the rate limiter an io_priority smaller than IO_TOTAL can be passed.
-            sst_file_writer(const environment_options &env_options, const options &options,
+            sst_file_writer(const environment_options &env_options, const database_options &options,
                           column_family_handle *column_family = nullptr, bool invalidate_page_cache = true,
                           environment_type::io_priority io_priority = environment_type::io_priority::IO_TOTAL,
                           bool skip_filters = false) : sst_file_writer(env_options, options, options.comparator,
@@ -67,7 +65,7 @@ namespace nil {
             }
 
             // Deprecated API
-            sst_file_writer(const environment_options &env_options, const options &options,
+            sst_file_writer(const environment_options &env_options, const database_options &options,
                           const comparator *user_comparator, column_family_handle *column_family = nullptr,
                           bool invalidate_page_cache = true,
                           environment_type::io_priority io_priority = environment_type::io_priority::IO_TOTAL,
@@ -80,7 +78,7 @@ namespace nil {
 
             // add a insert key with value to currently opened file (deprecated)
             // REQUIRES: key is after any previously added key according to comparator.
-            ROCKSDB_DEPRECATED_FUNC status_type add(const slice &user_key, const slice &value);
+            DCDB_DEPRECATED_FUNC status_type add(const slice &user_key, const slice &value);
 
             // add a insert key with value to currently opened file
             // REQUIRES: key is after any previously added key according to comparator.
@@ -115,4 +113,4 @@ namespace nil {
     }
 } // namespace nil
 
-#endif  // !DCDB_LITE
+

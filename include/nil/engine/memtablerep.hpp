@@ -323,7 +323,7 @@ namespace nil {
             const size_t lookahead_;
         };
 
-#ifndef DCDB_LITE
+
 
 // This creates MemTableReps that are backed by an std::vector. On iteration,
 // the vector is sorted. This is useful for workloads where iteration is very
@@ -382,6 +382,6 @@ namespace nil {
                                                                      bool if_log_bucket_dist_when_flash = true,
                                                                      uint32_t threshold_use_skiplist = 256);
 
-#endif  // DCDB_LITE
+
     }
 } // namespace nil

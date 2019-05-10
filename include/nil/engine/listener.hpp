@@ -110,7 +110,7 @@ namespace nil {
             } condition;
         };
 
-#ifndef DCDB_LITE
+
 
         struct table_file_deletion_info {
             // The name of the database where the file was deleted.
@@ -443,13 +443,5 @@ namespace nil {
             virtual ~event_listener() {
             }
         };
-
-#else
-
-        class event_listener {
-        };
-
-#endif  // DCDB_LITE
-
     }
 } // namespace nil

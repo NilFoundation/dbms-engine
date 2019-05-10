@@ -85,7 +85,7 @@ namespace nil {
                     kDisableCompressionOption = 0xff,
         };
 
-        struct options;
+        struct database_options;
         struct db_path;
 
         struct column_family_options : public advanced_column_family_options {
@@ -313,7 +313,7 @@ namespace nil {
             column_family_options();
 
             // Create column_family_options from opts
-            explicit column_family_options(const options &options);
+            explicit column_family_options(const database_options &options);
 
             void dump(Logger *log) const;
         };
@@ -360,7 +360,7 @@ namespace nil {
             // spend lots of memory for memtables.
             db_options *optimize_for_small_db();
 
-#ifndef DCDB_LITE
+
 
             // By default, RocksDB uses only one background thread for flush and
             // compaction. Calling this function will set it up such that total of
@@ -369,7 +369,7 @@ namespace nil {
             // bottlenecked by RocksDB.
             db_options *increase_parallelism(int total_threads = 16);
 
-#endif  // DCDB_LITE
+
 
             // If true, the database will be created if it is missing.
             // default_environment: false
@@ -800,7 +800,7 @@ namespace nil {
             db_options();
 
             // Create db_options from opts
-            explicit db_options(const options &options);
+            explicit db_options(const database_options &options);
 
             void dump(Logger *log) const;
 
@@ -930,14 +930,14 @@ namespace nil {
             // Not supported in DCDB_LITE mode!
             std::shared_ptr<cache> row_cache = nullptr;
 
-#ifndef DCDB_LITE
+
             // A filter object supplied to be invoked while processing write-ahead-logs
             // (WALs) during recovery. The filter provides a way to inspect log
             // records, ignoring a particular record or skipping replay.
             // The filter is invoked at startup and is invoked from a single-thread
             // currently.
             wal_filter *wal_filter = nullptr;
-#endif  // DCDB_LITE
+
 
             // If true, then database::open / create_column_family / drop_column_family
             // / set_options will fail if opts file is not detected or properly
@@ -1021,17 +1021,17 @@ namespace nil {
         };
 
 // opts to control the behavior of a database (passed to database::open)
-        struct options : public db_options, public column_family_options {
+        struct database_options : public db_options, public column_family_options {
             // Create an opts object with default values for all fields.
-            options() : db_options(), column_family_options() {
+            database_options() : db_options(), column_family_options() {
             }
 
-            options(const db_options &input_db_options, const column_family_options &input_column_family_options)
+            database_options(const db_options &input_db_options, const column_family_options &input_column_family_options)
                     : db_options(input_db_options), column_family_options(input_column_family_options) {
             }
 
             // The function recovers opts to the option as in version 4.6.
-            options *old_defaults(int rocksdb_major_version = 4, int rocksdb_minor_version = 6);
+            database_options *old_defaults(int rocksdb_major_version = 4, int rocksdb_minor_version = 6);
 
             void dump(Logger *log) const;
 
@@ -1047,11 +1047,11 @@ namespace nil {
             // All data will be in level 0 without any automatic compaction.
             // It's recommended to manually call compact_range(NULL, NULL) before reading
             // from the database, because otherwise the read can be very slow.
-            options *prepare_for_bulk_load();
+            database_options *prepare_for_bulk_load();
 
             // Use this if your database is very small (like under 1GB) and you don't want to
             // spend lots of memory for memtables.
-            options *optimize_for_small_db();
+            database_options *optimize_for_small_db();
         };
 
 //

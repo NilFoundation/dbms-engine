@@ -18,21 +18,16 @@
 #include <nil/engine/transaction_log.hpp>
 #include <nil/engine/types.hpp>
 
-#ifdef _WIN32
-// Windows API macro interference
-#undef DeleteFile
-#endif
-
 #if defined(__GNUC__) || defined(__clang__)
-#define ROCKSDB_DEPRECATED_FUNC __attribute__((__deprecated__))
+#define DCDB_DEPRECATED_FUNC __attribute__((__deprecated__))
 #elif _WIN32
-#define ROCKSDB_DEPRECATED_FUNC __declspec(deprecated)
+#define DCDB_DEPRECATED_FUNC __declspec(deprecated)
 #endif
 
 namespace nil {
     namespace dcdb {
 
-        struct options;
+        struct database_options;
         struct db_options;
         struct read_options;
         struct write_options;
@@ -144,7 +139,7 @@ namespace nil {
             // is_ok on success.
             // Stores nullptr in *dbptr and returns a non-is_ok status on error.
             // Caller should delete *dbptr when it is no longer needed.
-            static status_type open(const options &options, const std::string &name, database **dbptr);
+            static status_type open(const database_options &options, const std::string &name, database **dbptr);
 
             // open the database for read only. All database interfaces
             // that modify data, like insert/delete, will return error.
@@ -153,7 +148,7 @@ namespace nil {
             //
             // Not supported in DCDB_LITE, in which case the function will
             // return status_type::not_supported.
-            static status_type open_for_read_only(const options &options, const std::string &name, database **dbptr,
+            static status_type open_for_read_only(const database_options &options, const std::string &name, database **dbptr,
                                                   bool error_if_log_file_exist = false);
 
             // open the database for read only with column families. When opening database with
@@ -431,7 +426,7 @@ namespace nil {
             // use "get_snapshot" after this call.
             virtual void release_snapshot(const snapshot *snapshot) = 0;
 
-#ifndef DCDB_LITE
+
             // contains all valid property arguments for get_property().
             //
             // NOTE: Property names cannot end in numbers since those are interpreted as
@@ -643,7 +638,7 @@ namespace nil {
                 //      of opts.get_statistics
                 static const std::string kOptionsStatistics;
             };
-#endif /* DCDB_LITE */
+
 
             // database implementations can export properties about their state via this method.
             // If "property" is a valid property understood by this database implementation (see
@@ -753,8 +748,8 @@ namespace nil {
             }
 
             // Deprecated versions of get_approximate_sizes
-            ROCKSDB_DEPRECATED_FUNC virtual void get_approximate_sizes(const range *range, int n, uint64_t *sizes,
-                                                                       bool include_memtable) {
+            DCDB_DEPRECATED_FUNC virtual void get_approximate_sizes(const range *range, int n, uint64_t *sizes,
+                                                                    bool include_memtable) {
                 uint8_t include_flags = size_approximation_flags::INCLUDE_FILES;
                 if (include_memtable) {
                     include_flags |= size_approximation_flags::INCLUDE_MEMTABLES;
@@ -762,9 +757,9 @@ namespace nil {
                 get_approximate_sizes(default_column_family(), range, n, sizes, include_flags);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual void get_approximate_sizes(column_family_handle *column_family,
-                                                                       const range *range, int n, uint64_t *sizes,
-                                                                       bool include_memtable) {
+            DCDB_DEPRECATED_FUNC virtual void get_approximate_sizes(column_family_handle *column_family,
+                                                                    const range *range, int n, uint64_t *sizes,
+                                                                    bool include_memtable) {
                 uint8_t include_flags = size_approximation_flags::INCLUDE_FILES;
                 if (include_memtable) {
                     include_flags |= size_approximation_flags::INCLUDE_MEMTABLES;
@@ -797,10 +792,10 @@ namespace nil {
                 return compact_range(options, default_column_family(), begin, end);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual status_type compact_range(column_family_handle *column_family,
-                                                                      const slice *begin, const slice *end,
-                                                                      bool change_level = false, int target_level = -1,
-                                                                      uint32_t target_path_id = 0) {
+            DCDB_DEPRECATED_FUNC virtual status_type compact_range(column_family_handle *column_family,
+                                                                   const slice *begin, const slice *end,
+                                                                   bool change_level = false, int target_level = -1,
+                                                                   uint32_t target_path_id = 0) {
                 compact_range_options options;
                 options.change_level = change_level;
                 options.target_level = target_level;
@@ -808,9 +803,9 @@ namespace nil {
                 return compact_range(options, column_family, begin, end);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual status_type compact_range(const slice *begin, const slice *end,
-                                                                      bool change_level = false, int target_level = -1,
-                                                                      uint32_t target_path_id = 0) {
+            DCDB_DEPRECATED_FUNC virtual status_type compact_range(const slice *begin, const slice *end,
+                                                                   bool change_level = false, int target_level = -1,
+                                                                   uint32_t target_path_id = 0) {
                 compact_range_options options;
                 options.change_level = change_level;
                 options.target_level = target_level;
@@ -904,9 +899,9 @@ namespace nil {
             // column family, the opts provided when calling database::open() or
             // database::create_column_family() will have been "sanitized" and transformed
             // in an implementation-defined manner.
-            virtual options get_options(column_family_handle *column_family) const = 0;
+            virtual database_options get_options(column_family_handle *column_family) const = 0;
 
-            virtual options get_options() const {
+            virtual database_options get_options() const {
                 return get_options(default_column_family());
             }
 
@@ -955,7 +950,6 @@ namespace nil {
             // updated, false if user attempted to call if with seqnum <= current value.
             virtual bool set_preserve_deletes_sequence_number(sequence_number seqnum) = 0;
 
-#ifndef DCDB_LITE
 
             // Prevent file deletions. Compactions will continue to occur,
             // but no obsolete files will be deleted. Calling this multiple
@@ -1007,9 +1001,6 @@ namespace nil {
             virtual status_type get_updates_since(sequence_number seq_number,
                                                   std::unique_ptr<transaction_log_iterator> *iter,
                                                   const transaction_log_iterator::read_options &read_options = transaction_log_iterator::read_options()) = 0;
-
-// Windows API macro interference
-#undef DeleteFile
 
             // remove the file name from the db directory and update the internal state to
             // reflect that. Supports deletion of sst and log files only. 'name' must be
@@ -1077,10 +1068,10 @@ namespace nil {
             virtual status_type verify_checksum() = 0;
 
             // add_file() is deprecated, please use ingest_external_file()
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
-                                                                 const std::vector<std::string> &file_path_list,
-                                                                 bool move_file = false,
-                                                                 bool skip_snapshot_check = false) {
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
+                                                              const std::vector<std::string> &file_path_list,
+                                                              bool move_file = false,
+                                                              bool skip_snapshot_check = false) {
                 ingest_external_file_options ifo;
                 ifo.move_files = move_file;
                 ifo.snapshot_consistency = !skip_snapshot_check;
@@ -1089,9 +1080,9 @@ namespace nil {
                 return ingest_external_file(column_family, file_path_list, ifo);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(const std::vector<std::string> &file_path_list,
-                                                                 bool move_file = false,
-                                                                 bool skip_snapshot_check = false) {
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(const std::vector<std::string> &file_path_list,
+                                                              bool move_file = false,
+                                                              bool skip_snapshot_check = false) {
                 ingest_external_file_options ifo;
                 ifo.move_files = move_file;
                 ifo.snapshot_consistency = !skip_snapshot_check;
@@ -1101,9 +1092,9 @@ namespace nil {
             }
 
             // add_file() is deprecated, please use ingest_external_file()
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
-                                                                 const std::string &file_path, bool move_file = false,
-                                                                 bool skip_snapshot_check = false) {
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
+                                                              const std::string &file_path, bool move_file = false,
+                                                              bool skip_snapshot_check = false) {
                 ingest_external_file_options ifo;
                 ifo.move_files = move_file;
                 ifo.snapshot_consistency = !skip_snapshot_check;
@@ -1112,8 +1103,8 @@ namespace nil {
                 return ingest_external_file(column_family, {file_path}, ifo);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(const std::string &file_path, bool move_file = false,
-                                                                 bool skip_snapshot_check = false) {
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(const std::string &file_path, bool move_file = false,
+                                                              bool skip_snapshot_check = false) {
                 ingest_external_file_options ifo;
                 ifo.move_files = move_file;
                 ifo.snapshot_consistency = !skip_snapshot_check;
@@ -1123,8 +1114,10 @@ namespace nil {
             }
 
             // Load table file with information "file_info" into "column_family"
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family, const std::vector<
-                    external_sst_file_info> &file_info_list, bool move_file = false, bool skip_snapshot_check = false) {
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
+                                                              const std::vector<external_sst_file_info> &file_info_list,
+                                                              bool move_file = false,
+                                                              bool skip_snapshot_check = false) {
                 std::vector<std::string> external_files;
                 for (const external_sst_file_info &file_info : file_info_list) {
                     external_files.push_back(file_info.file_path);
@@ -1137,9 +1130,9 @@ namespace nil {
                 return ingest_external_file(column_family, external_files, ifo);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(
-                    const std::vector<external_sst_file_info> &file_info_list, bool move_file = false,
-                    bool skip_snapshot_check = false) {
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(const std::vector<external_sst_file_info> &file_info_list,
+                                                              bool move_file = false,
+                                                              bool skip_snapshot_check = false) {
                 std::vector<std::string> external_files;
                 for (const external_sst_file_info &file_info : file_info_list) {
                     external_files.push_back(file_info.file_path);
@@ -1152,10 +1145,10 @@ namespace nil {
                 return ingest_external_file(default_column_family(), external_files, ifo);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
-                                                                 const external_sst_file_info *file_info,
-                                                                 bool move_file = false,
-                                                                 bool skip_snapshot_check = false) {
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
+                                                              const external_sst_file_info *file_info,
+                                                              bool move_file = false,
+                                                              bool skip_snapshot_check = false) {
                 ingest_external_file_options ifo;
                 ifo.move_files = move_file;
                 ifo.snapshot_consistency = !skip_snapshot_check;
@@ -1164,9 +1157,9 @@ namespace nil {
                 return ingest_external_file(column_family, {file_info->file_path}, ifo);
             }
 
-            ROCKSDB_DEPRECATED_FUNC virtual status_type add_file(const external_sst_file_info *file_info,
-                                                                 bool move_file = false,
-                                                                 bool skip_snapshot_check = false) {
+            DCDB_DEPRECATED_FUNC virtual status_type add_file(const external_sst_file_info *file_info,
+                                                              bool move_file = false,
+                                                              bool skip_snapshot_check = false) {
                 ingest_external_file_options ifo;
                 ifo.move_files = move_file;
                 ifo.snapshot_consistency = !skip_snapshot_check;
@@ -1175,7 +1168,6 @@ namespace nil {
                 return ingest_external_file(default_column_family(), {file_info->file_path}, ifo);
             }
 
-#endif  // DCDB_LITE
 
             // Sets the globally unique ID created at database creation time by invoking
             // environment_type::generate_unique_id(), in identity. Returns status_type::is_ok if identity could
@@ -1185,7 +1177,6 @@ namespace nil {
             // Returns default column family handle
             virtual column_family_handle *default_column_family() const = 0;
 
-#ifndef DCDB_LITE
 
             virtual status_type get_properties_of_all_tables(column_family_handle *column_family,
                                                              table_properties_collection *props) = 0;
@@ -1217,7 +1208,6 @@ namespace nil {
                 return status_type::not_supported("end_trace() is not implemented.");
             }
 
-#endif  // DCDB_LITE
 
             // Needed for StackableDB
             virtual database *get_root_db() {
@@ -1240,11 +1230,10 @@ namespace nil {
 
 // Destroy the contents of the specified database.
 // Be very careful using this method.
-        status_type destroy_db(const std::string &name, const options &options,
+        status_type destroy_db(const std::string &name, const database_options &options,
                                const std::vector<column_family_descriptor> &column_families = std::vector<
                                        column_family_descriptor>());
 
-#ifndef DCDB_LITE
 
 // If a database cannot be opened, you may attempt to call this method to
 // resurrect as much of the contents of the database as possible.
@@ -1266,9 +1255,8 @@ namespace nil {
 
 // @param opts These opts will be used for the database and for ALL column
 //                families encountered during the repair
-        status_type repair_db(const std::string &dbname, const options &options);
+        status_type repair_db(const std::string &dbname, const database_options &options);
 
-#endif
 
     }
 } // namespace nil

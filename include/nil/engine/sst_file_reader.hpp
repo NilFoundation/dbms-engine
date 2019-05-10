@@ -1,6 +1,6 @@
 #pragma once
 
-#ifndef DCDB_LITE
+
 
 #include <nil/engine/iterator.hpp>
 #include <nil/engine/options.hpp>
@@ -14,7 +14,7 @@ namespace nil {
 // sst_file_writer.
         class sst_file_reader {
         public:
-            sst_file_reader(const options &opts);
+            sst_file_reader(const database_options &opts);
 
             ~sst_file_reader();
 
@@ -39,4 +39,4 @@ namespace nil {
     }
 } // namespace nil
 
-#endif  // !DCDB_LITE
+

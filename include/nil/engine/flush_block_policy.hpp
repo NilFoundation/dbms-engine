@@ -11,7 +11,7 @@ namespace nil {
 
         class block_builder;
 
-        struct options;
+        struct database_options;
 
 // flush_block_policy provides a configurable way to determine when to flush a
 // block in the block based tables,

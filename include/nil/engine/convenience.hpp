@@ -11,7 +11,7 @@
 namespace nil {
     namespace dcdb {
 
-#ifndef DCDB_LITE
+
 // The following set of functions provide a way to construct RocksDB opts
 // from a string or a string-to-string map.  Here're the general rule of
 // setting option values from strings by type.  Some RocksDB types are also
@@ -301,8 +301,8 @@ namespace nil {
         status_type get_mem_table_rep_factory_from_string(const std::string &opts_str,
                                                           std::unique_ptr<mem_table_rep_factory> *new_mem_factory);
 
-        status_type get_options_from_string(const options &base_options, const std::string &opts_str,
-                                            options *new_options);
+        status_type get_options_from_string(const database_options &base_options, const std::string &opts_str,
+                                            database_options *new_options);
 
         status_type string_to_map(const std::string &opts_str, std::unordered_map<std::string, std::string> *opts_map);
 
@@ -324,10 +324,10 @@ namespace nil {
                                            size_t n, bool include_end = true);
 
 // Verify the checksum of file
-        status_type verify_sst_file_checksum(const options &options, const environment_options &env_options,
+        status_type verify_sst_file_checksum(const database_options &options, const environment_options &env_options,
                                              const std::string &file_path);
 
-#endif  // DCDB_LITE
+
 
     }
 } // namespace nil

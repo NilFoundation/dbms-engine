@@ -17,8 +17,8 @@
 
 #if !defined(DCDB_LITE) && \
     !defined(NROCKSDB_THREAD_STATUS) && \
-    defined(ROCKSDB_SUPPORT_THREAD_LOCAL)
-#define ROCKSDB_USING_THREAD_STATUS
+    defined(DCDB_SUPPORT_THREAD_LOCAL)
+#define DCDB_USING_THREAD_STATUS
 #endif
 
 namespace nil {
