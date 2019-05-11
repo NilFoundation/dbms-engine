@@ -954,7 +954,7 @@ namespace nil {
             }
 
             // flush to the OS buffers
-            virtual void Flush() {
+            virtual void flush() {
             }
 
             virtual info_log_level GetInfoLogLevel() const {
