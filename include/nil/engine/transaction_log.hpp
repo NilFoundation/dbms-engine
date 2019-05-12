@@ -97,11 +97,11 @@ namespace nil {
             // An iterator is either positioned at a write_batch or not valid.
             // This method returns true if the iterator is valid.
             // Can read data from a valid iterator.
-            virtual bool Valid() = 0;
+            virtual bool valid() = 0;
 
             // Moves the iterator to the next write_batch.
             // REQUIRES: valid() to be true.
-            virtual void Next() = 0;
+            virtual void next() = 0;
 
             // Returns is_ok if the iterator is valid.
             // Returns the Error when something has gone wrong.
