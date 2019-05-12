@@ -78,7 +78,7 @@ namespace nil {
 
             virtual status_type CreateDir(const std::string &name);
 
-            virtual status_type CreateDirIfMissing(const std::string &name);
+            virtual status_type create_dir_if_missing(const std::string &name);
 
             virtual status_type DeleteDir(const std::string &name);
 
