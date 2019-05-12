@@ -68,13 +68,13 @@ namespace nil {
             virtual status_type NewWritableFile(const std::string &fname, std::unique_ptr<writable_file> *result,
                                                 const environment_options &opts);
 
-            virtual status_type NewDirectory(const std::string &name, std::unique_ptr<Directory> *result);
+            virtual status_type NewDirectory(const std::string &name, std::unique_ptr<directory> *result);
 
             virtual status_type FileExists(const std::string &fname);
 
-            virtual status_type GetChildren(const std::string &path, std::vector<std::string> *result);
+            virtual status_type get_children(const std::string &path, std::vector<std::string> *result);
 
-            virtual status_type DeleteFile(const std::string &fname);
+            virtual status_type delete_file(const std::string &fname);
 
             virtual status_type CreateDir(const std::string &name);
 
@@ -89,7 +89,7 @@ namespace nil {
             virtual status_type RenameFile(const std::string &src, const std::string &target);
 
             virtual status_type LinkFile(const std::string &src, const std::string &target) {
-                return status_type::NotSupported(); // not supported
+                return status_type::not_supported(); // not supported
             }
 
             virtual status_type LockFile(const std::string &fname, FileLock **lock);
