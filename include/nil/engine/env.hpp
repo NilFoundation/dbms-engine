@@ -929,7 +929,7 @@ namespace nil {
             // close the log file. Must be called before destructor. If the return
             // status is not_supported(), it means the implementation does cleanup in
             // the destructor
-            virtual status_type Close();
+            virtual status_type close();
 
             // write a header to the log file with the specified format
             // It is recommended that you log all header information at the start of the
