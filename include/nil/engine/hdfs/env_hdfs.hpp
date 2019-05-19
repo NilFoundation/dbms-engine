@@ -127,8 +127,8 @@ namespace nil {
                 return posixEnv->NowMicros();
             }
 
-            virtual void SleepForMicroseconds(int micros) {
-                posixEnv->SleepForMicroseconds(micros);
+            virtual void sleep_for_microseconds(int micros) {
+                posixEnv->sleep_for_microseconds(micros);
             }
 
             virtual status_type GetHostName(char *name, uint64_t len) {
@@ -143,8 +143,8 @@ namespace nil {
                 return posixEnv->GetAbsolutePath(db_path, output_path);
             }
 
-            virtual void SetBackgroundThreads(int number, priority pri = LOW) {
-                posixEnv->SetBackgroundThreads(number, pri);
+            virtual void set_background_threads(int number, priority pri = LOW) {
+                posixEnv->set_background_threads(number, pri);
             }
 
             virtual int GetBackgroundThreads(priority pri = LOW) {
