@@ -6,7 +6,7 @@
 #include <iostream>
 
 #include "nil/dcdb/port/sys_time.hpp"
-#include <nil/engine/env.hpp>
+#include <nil/engine/environment.hpp>
 #include <nil/engine/status.hpp>
 
 #ifdef USE_HDFS
@@ -96,7 +96,7 @@ namespace nil {
 
             virtual status_type UnlockFile(FileLock *lock);
 
-            virtual status_type NewLogger(const std::string &fname, std::shared_ptr<Logger> *result);
+            virtual status_type NewLogger(const std::string &fname, std::shared_ptr<boost::log::sources::severity_logger_mt<info_log_level>> *result);
 
             virtual void Schedule(void (*function)(void *arg), void *arg, priority pri = LOW, void *tag = nullptr,
                                   void (*unschedFunction)(void *arg) = 0) {
@@ -318,7 +318,7 @@ namespace nil {
                 return notsup;
             }
 
-            virtual status_type new_logger(const std::string &fname, std::shared_ptr<Logger> *result) override {
+            virtual status_type new_logger(const std::string &fname, std::shared_ptr<boost::log::sources::severity_logger_mt<info_log_level>> *result) override {
                 return notsup;
             }
 

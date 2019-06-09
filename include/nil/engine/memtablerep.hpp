@@ -265,11 +265,13 @@ namespace nil {
             }
 
             virtual mem_table_rep *create_mem_table_rep(const mem_table_rep::key_comparator &key_cmp, allocator *a,
-                                                        const slice_transform *st, Logger *l) = 0;
+                                                        const slice_transform *st,
+                                                        boost::log::sources::severity_logger_mt <info_log_level> *l) = 0;
 
             virtual mem_table_rep *create_mem_table_rep(const mem_table_rep::key_comparator &key_cmp,
                                                         allocator *allocator, const slice_transform *slice_transform,
-                                                        Logger *logger, uint32_t column_family_id) {
+                                                        boost::log::sources::severity_logger_mt <info_log_level> *logger,
+                                                        uint32_t column_family_id) {
                 return create_mem_table_rep(key_cmp, allocator, slice_transform, logger);
             }
 
@@ -305,7 +307,8 @@ namespace nil {
             using mem_table_rep_factory::create_mem_table_rep;
 
             virtual mem_table_rep *create_mem_table_rep(const mem_table_rep::key_comparator &key_cmp, allocator *a,
-                                                        const slice_transform *st, Logger *l) override;
+                                                        const slice_transform *st,
+                                                        boost::log::sources::severity_logger_mt <info_log_level> *l) override;
 
             virtual const char *name() const override {
                 return "skip_list_factory";
@@ -322,7 +325,6 @@ namespace nil {
         private:
             const size_t lookahead_;
         };
-
 
 
 // This creates MemTableReps that are backed by an std::vector. On iteration,
@@ -343,7 +345,7 @@ namespace nil {
             using mem_table_rep_factory::create_mem_table_rep;
 
             virtual mem_table_rep *create_mem_table_rep(const mem_table_rep::key_comparator &key_cmp, allocator *a,
-                                                        const slice_transform *st, Logger *l) override;
+                                                        const slice_transform *st, boost::log::sources::severity_logger_mt<info_log_level> *l) override;
 
             virtual const char *name() const override {
                 return "vector_rep_factory";

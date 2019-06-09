@@ -97,7 +97,7 @@ namespace nil {
 //    during creating the missing trash_dir or deleting existing files in trash.
 // @param max_trash_db_ratio: If the trash size constitutes for more than this
 //    fraction of the total database size we will start deleting new files passed to
-//    DeleteScheduler immediately
+//    delete_scheduler immediately
 // @param bytes_max_delete_chunk: if a file to delete is larger than delete
 //    chunk, ftruncate the file by this size each time, rather than dropping the
 //    whole file. 0 means to always delete the whole file. If the file has more
@@ -105,7 +105,7 @@ namespace nil {
 //    `rate_bytes_per_sec` will be appreciated. NOTE that with this option,
 //    files already renamed as a trash may be partial, so users should not
 //    directly recover them without checking.
-        extern sst_file_manager *new_sst_file_manager(environment_type *env, std::shared_ptr<Logger> info_log = nullptr,
+        extern sst_file_manager *new_sst_file_manager(environment_type *env, std::shared_ptr<boost::log::sources::severity_logger_mt<info_log_level>> info_log = nullptr,
                                                       std::string trash_dir = "", int64_t rate_bytes_per_sec = 0,
                                                       bool delete_existing_trash = true, status_type *status = nullptr,
                                                       double max_trash_db_ratio = 0.25,

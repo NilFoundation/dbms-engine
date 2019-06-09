@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-#include <nil/engine/env.hpp>
+#include <nil/engine/environment.hpp>
 #include <nil/engine/slice.hpp>
 #include <nil/engine/statistics.hpp>
 #include <nil/engine/status.hpp>
@@ -53,7 +53,7 @@ namespace nil {
 
 // Factor method to create a new persistent cache
         status_type new_persistent_cache(environment_type *const env, const std::string &path, const uint64_t size,
-                                         const std::shared_ptr<Logger> &log, const bool optimized_for_nvm,
+                                         const std::shared_ptr<boost::log::sources::severity_logger_mt<info_log_level>> &log, const bool optimized_for_nvm,
                                          std::shared_ptr<persistent_cache> *cache);
     }
 } // namespace nil

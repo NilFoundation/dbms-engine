@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <nil/engine/db.hpp>
+#include <nil/engine/database.hpp>
 #include <nil/engine/options.hpp>
 #include <nil/engine/table.hpp>
 

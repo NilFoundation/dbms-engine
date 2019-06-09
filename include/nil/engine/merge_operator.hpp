@@ -5,14 +5,13 @@
 #include <string>
 #include <vector>
 
+#include <nil/engine/logging.hpp>
 #include <nil/engine/slice.hpp>
 
 namespace nil {
     namespace dcdb {
 
         class slice;
-
-        class Logger;
 
 // The merge Operator
 //
@@ -65,7 +64,7 @@ namespace nil {
             // Also make use of the *logger for error messages.
             virtual bool full_merge(const slice &key, const slice *existing_value,
                                     const std::deque<std::string> &operand_list, std::string *new_value,
-                                    Logger *logger) const {
+                                    boost::log::sources::severity_logger_mt<info_log_level> *logger) const {
                 // deprecated, please use full_merge_v2()
                 assert(false);
                 return false;
@@ -73,8 +72,9 @@ namespace nil {
 
             struct merge_operation_input {
                 explicit merge_operation_input(const slice &_key, const slice *_existing_value,
-                                               const std::vector<slice> &_operand_list, Logger *_logger) : key(_key),
-                        existing_value(_existing_value), operand_list(_operand_list), logger(_logger) {
+                                               const std::vector<slice> &_operand_list,
+                                               boost::log::sources::severity_logger_mt<info_log_level> *_logger) : key(
+                        _key), existing_value(_existing_value), operand_list(_operand_list), logger(_logger) {
                 }
 
                 // The key associated with the merge operation.
@@ -86,7 +86,7 @@ namespace nil {
                 const std::vector<slice> &operand_list;
                 // Logger could be used by client to log any errors that happen during
                 // the merge operation.
-                Logger *logger;
+                boost::log::sources::severity_logger_mt<info_log_level> *logger;
             };
 
             struct merge_operation_output {
@@ -153,7 +153,8 @@ namespace nil {
             // and return false there.  The default implementation of partial_merge will
             // always return false.
             virtual bool partial_merge(const slice &key, const slice &left_operand, const slice &right_operand,
-                                       std::string *new_value, Logger *logger) const {
+                                       std::string *new_value,
+                                       boost::log::sources::severity_logger_mt<info_log_level> *logger) const {
                 return false;
             }
 
@@ -179,7 +180,8 @@ namespace nil {
             // should either implement partial_merge_multi, or implement partial_merge which
             // is served as the helper function of the default partial_merge_multi.
             virtual bool partial_merge_multi(const slice &key, const std::deque<slice> &operand_list,
-                                             std::string *new_value, Logger *logger) const;
+                                             std::string *new_value,
+                                             boost::log::sources::severity_logger_mt<info_log_level> *logger) const;
 
             // The name of the merge_operator. Used to check for merge_operator
             // mismatches (i.e., a database created with one merge_operator is
@@ -233,7 +235,8 @@ namespace nil {
             // internal corruption. The client should assume that this will be treated
             // as an error by the library.
             virtual bool merge(const slice &key, const slice *existing_value, const slice &value,
-                               std::string *new_value, Logger *logger) const = 0;
+                               std::string *new_value,
+                               boost::log::sources::severity_logger_mt<info_log_level> *logger) const = 0;
 
 
         private:
@@ -241,7 +244,8 @@ namespace nil {
             bool full_merge_v2(const merge_operation_input &merge_in, merge_operation_output *merge_out) const override;
 
             bool partial_merge(const slice &key, const slice &left_operand, const slice &right_operand,
-                               std::string *new_value, Logger *logger) const override;
+                               std::string *new_value,
+                               boost::log::sources::severity_logger_mt<info_log_level> *logger) const override;
         };
 
     }

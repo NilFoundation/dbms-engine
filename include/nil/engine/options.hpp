@@ -8,9 +8,12 @@
 #include <limits>
 #include <unordered_map>
 
+#include <boost/log/sources/severity_feature.hpp>
+#include <boost/log/sources/severity_logger.hpp>
+
 #include <nil/engine/advanced_options.hpp>
 #include <nil/engine/comparator.hpp>
-#include <nil/engine/env.hpp>
+#include <nil/engine/environment.hpp>
 #include <nil/engine/listener.hpp>
 #include <nil/engine/universal_compaction.hpp>
 #include <nil/engine/write_buffer_manager.hpp>
@@ -89,9 +92,6 @@ namespace nil {
         struct db_path;
 
         struct column_family_options : public advanced_column_family_options {
-            // The function recovers opts to a previous version. Only 4.6 or later
-            // versions are supported.
-            column_family_options *old_defaults(int rocksdb_major_version = 4, int rocksdb_minor_version = 6);
 
             // Some functions that make it easier to optimize RocksDB
             // Use this if your database is very small (like under 1GB) and you don't want to
@@ -315,7 +315,7 @@ namespace nil {
             // Create column_family_options from opts
             explicit column_family_options(const database_options &options);
 
-            void dump(Logger *log) const;
+            void dump(boost::log::sources::severity_logger_mt<info_log_level> *log) const;
         };
 
         enum class wal_recovery_mode : char {
@@ -349,10 +349,7 @@ namespace nil {
             }
         };
 
-
         struct db_options {
-            // The function recovers opts to the option as in version 4.6.
-            db_options *old_defaults(int rocksdb_major_version = 4, int rocksdb_minor_version = 6);
 
             // Some functions that make it easier to optimize RocksDB
 
@@ -361,14 +358,12 @@ namespace nil {
             db_options *optimize_for_small_db();
 
 
-
             // By default, RocksDB uses only one background thread for flush and
             // compaction. Calling this function will set it up such that total of
             // `total_threads` is used. Good value for `total_threads` is the number of
             // cores. You almost definitely want to call this function if your system is
             // bottlenecked by RocksDB.
             db_options *increase_parallelism(int total_threads = 16);
-
 
 
             // If true, the database will be created if it is missing.
@@ -422,12 +417,12 @@ namespace nil {
             // be written to info_log if it is non-nullptr, or to a file stored
             // in the same directory as the database contents if info_log is nullptr.
             // default_environment: nullptr
-            std::shared_ptr<Logger> info_log = nullptr;
+            std::shared_ptr<LoggerType> info_log = nullptr;
 
 #ifdef NDEBUG
-            info_log_level info_log_level = INFO_LEVEL;
+            log_level log_level = INFO_LEVEL;
 #else
-            info_log_level info_log_level = DEBUG_LEVEL;
+            info_log_level log_level = DEBUG_LEVEL;
 #endif  // NDEBUG
 
             // Number of open files that can be used by the database.  You may need to
@@ -802,7 +797,7 @@ namespace nil {
             // Create db_options from opts
             explicit db_options(const database_options &options);
 
-            void dump(Logger *log) const;
+            void dump(boost::log::sources::severity_logger_mt<info_log_level> *log) const;
 
             // Allows OS to incrementally sync files to disk while they are being
             // written, asynchronously, in the background. This operation can be used
@@ -987,7 +982,7 @@ namespace nil {
             // Clients are responsible to periodically call this method to advance
             // the cutoff time. If this method is never called and preserve_deletes
             // is set to true NO deletes will ever be processed.
-            // At the moment this only keeps normal deletes, SingleDeletes will
+            // At the moment this only keeps normal deletes, single_removes will
             // not be preserved.
             // DEFAULT: false
             // Immutable (TODO: make it dynamically changeable)
@@ -1026,16 +1021,14 @@ namespace nil {
             database_options() : db_options(), column_family_options() {
             }
 
-            database_options(const db_options &input_db_options, const column_family_options &input_column_family_options)
-                    : db_options(input_db_options), column_family_options(input_column_family_options) {
+            database_options(const db_options &input_db_options,
+                             const column_family_options &input_column_family_options) : db_options(input_db_options),
+                    column_family_options(input_column_family_options) {
             }
 
-            // The function recovers opts to the option as in version 4.6.
-            database_options *old_defaults(int rocksdb_major_version = 4, int rocksdb_minor_version = 6);
+            void dump(boost::log::sources::severity_logger_mt<info_log_level> *log) const;
 
-            void dump(Logger *log) const;
-
-            void dump_cf_options(Logger *log) const;
+            void dump_cf_options(boost::log::sources::severity_logger_mt<info_log_level> *log) const;
 
             // Some functions that make it easier to optimize RocksDB
 
@@ -1248,8 +1241,8 @@ namespace nil {
             // default_environment: false
             bool low_pri;
 
-            write_options() : sync(false), disable_wal(false), ignore_missing_column_families(false), no_slowdown(false),
-                    low_pri(false) {
+            write_options() : sync(false), disable_wal(false), ignore_missing_column_families(false),
+                    no_slowdown(false), low_pri(false) {
             }
         };
 
@@ -1271,7 +1264,8 @@ namespace nil {
 
 // Create a Logger from provided db_options
         extern status_type create_logger_from_options(const std::string &dbname, const db_options &options,
-                                                      std::shared_ptr<Logger> *logger);
+                                                      std::shared_ptr<boost::log::sources::severity_logger_mt<
+                                                              info_log_level>> *logger);
 
 // compaction_options are used in compact_files() call.
         struct compaction_options {

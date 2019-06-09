@@ -18,7 +18,7 @@
 #include <unordered_map>
 
 #include <nil/engine/cache.hpp>
-#include <nil/engine/env.hpp>
+#include <nil/engine/environment.hpp>
 #include <nil/engine/iterator.hpp>
 #include <nil/engine/options.hpp>
 #include <nil/engine/status.hpp>

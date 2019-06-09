@@ -111,7 +111,6 @@ namespace nil {
         };
 
 
-
         struct table_file_deletion_info {
             // The name of the database where the file was deleted.
             std::string db_name;

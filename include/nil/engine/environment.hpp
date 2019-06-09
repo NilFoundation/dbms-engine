@@ -17,6 +17,7 @@
 #include <vector>
 
 #include <nil/engine/status.hpp>
+#include <nil/engine/logging.hpp>
 #include <nil/engine/thread_status.hpp>
 
 #ifdef _WIN32
@@ -47,6 +48,7 @@ namespace nil {
         class directory;
 
         struct db_options;
+
         struct immutable_db_options;
 
         class rate_limiter;
@@ -474,9 +476,6 @@ namespace nil {
 
             // Returns the ID of the current thread.
             virtual uint64_t get_thread_id() const;
-
-// This seems to clash with a macro on Windows, so #undef it here
-#undef GetFreeSpace
 
             // get the amount of free disk space
             virtual status_type get_free_space(const std::string &path, uint64_t *diskfree) {
@@ -911,10 +910,6 @@ namespace nil {
             }
         };
 
-        enum info_log_level : unsigned char {
-            DEBUG_LEVEL = 0, INFO_LEVEL, WARN_LEVEL, ERROR_LEVEL, FATAL_LEVEL, HEADER_LEVEL, NUM_INFO_LOG_LEVELS,
-        };
-
 // An interface for writing log messages.
         class Logger {
         public:
@@ -1000,20 +995,7 @@ namespace nil {
         extern void Log(const info_log_level log_level, const std::shared_ptr<Logger> &info_log, const char *format,
                         ...);
 
-// a set of log functions with different log levels.
-        extern void Header(const std::shared_ptr<Logger> &info_log, const char *format, ...);
-
-        extern void Debug(const std::shared_ptr<Logger> &info_log, const char *format, ...);
-
-        extern void Info(const std::shared_ptr<Logger> &info_log, const char *format, ...);
-
-        extern void Warn(const std::shared_ptr<Logger> &info_log, const char *format, ...);
-
-        extern void Error(const std::shared_ptr<Logger> &info_log, const char *format, ...);
-
-        extern void Fatal(const std::shared_ptr<Logger> &info_log, const char *format, ...);
-
-// Log the specified data to *info_log if info_log is non-nullptr.
+        // Log the specified data to *info_log if info_log is non-nullptr.
 // The default info log level is info_log_level::INFO_LEVEL.
         extern void Log(const std::shared_ptr<Logger> &info_log, const char *format, ...)
 #   if defined(__GNUC__) || defined(__clang__)
@@ -1021,31 +1003,18 @@ namespace nil {
 #   endif
         ;
 
-        extern void LogFlush(Logger *info_log);
+        extern void LogFlush(boost::log::sources::severity_logger_mt<info_log_level> *info_log);
 
-        extern void Log(const info_log_level log_level, Logger *info_log, const char *format, ...);
+        extern void Log(const info_log_level log_level, boost::log::sources::severity_logger_mt<info_log_level> *info_log, const char *format, ...);
 
 // The default info log level is info_log_level::INFO_LEVEL.
-        extern void Log(Logger *info_log, const char *format, ...)
+        extern void Log(boost::log::sources::severity_logger_mt<info_log_level> *info_log, const char *format, ...)
 #   if defined(__GNUC__) || defined(__clang__)
         __attribute__((__format__ (__printf__, 2, 3)))
 #   endif
         ;
 
-// a set of log functions with different log levels.
-        extern void Header(Logger *info_log, const char *format, ...);
-
-        extern void Debug(Logger *info_log, const char *format, ...);
-
-        extern void Info(Logger *info_log, const char *format, ...);
-
-        extern void Warn(Logger *info_log, const char *format, ...);
-
-        extern void Error(Logger *info_log, const char *format, ...);
-
-        extern void Fatal(Logger *info_log, const char *format, ...);
-
-// A utility routine: write "data" to the named file.
+        // A utility routine: write "data" to the named file.
         extern status_type WriteStringToFile(environment_type *env, const slice &data, const std::string &fname,
                                              bool should_sync = false);
 

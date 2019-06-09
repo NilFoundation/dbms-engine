@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nil/engine/db.hpp>
+#include <nil/engine/database.hpp>
 #include <nil/engine/status.hpp>
 
 namespace nil {

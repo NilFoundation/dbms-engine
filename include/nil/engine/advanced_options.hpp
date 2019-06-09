@@ -638,31 +638,6 @@ namespace nil {
 
             // Create column_family_options from opts
             explicit advanced_column_family_options(const database_options &options);
-
-            // ---------------- OPTIONS NOT SUPPORTED ANYMORE ----------------
-
-            // NOT SUPPORTED ANYMORE
-            // This does not do anything anymore.
-            int max_mem_compaction_level;
-
-            // NOT SUPPORTED ANYMORE -- this opts is no longer used
-            // Puts are delayed to opts.delayed_write_rate when any level has a
-            // compaction score that exceeds soft_rate_limit. This is ignored when == 0.0.
-            //
-            // default_environment: 0 (disabled)
-            //
-            // Dynamically changeable through set_options() API
-            double soft_rate_limit = 0.0;
-
-            // NOT SUPPORTED ANYMORE -- this opts is no longer used
-            double hard_rate_limit = 0.0;
-
-            // NOT SUPPORTED ANYMORE -- this opts is no longer used
-            unsigned int rate_limit_delay_max_milliseconds = 100;
-
-            // NOT SUPPORTED ANYMORE
-            // Does not have any effect.
-            bool purge_redundant_kvs_while_flush = true;
         };
     }
 } // namespace nil

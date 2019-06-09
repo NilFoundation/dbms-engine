@@ -148,8 +148,8 @@ namespace nil {
             //
             // Not supported in DCDB_LITE, in which case the function will
             // return status_type::not_supported.
-            static status_type open_for_read_only(const database_options &options, const std::string &name, database **dbptr,
-                                                  bool error_if_log_file_exist = false);
+            static status_type open_for_read_only(const database_options &options, const std::string &name,
+                                                  database **dbptr, bool error_if_log_file_exist = false);
 
             // open the database for read only with column families. When opening database with
             // read only, you can specify only a subset of column families in the
@@ -833,9 +833,9 @@ namespace nil {
             // @see get_column_family_meta_data
             virtual status_type compact_files(const compaction_options &compact_opts,
                                               column_family_handle *column_family,
-                                              const std::vector<std::string> &input_file_names, const int output_level,
-                                              const int output_path_id = -1,
-                                              std::vector<std::string> *const output_file_names = nullptr,
+                                              const std::vector<std::string> &input_file_names, int output_level,
+                                              int output_path_id = -1,
+                                              std::vector<std::string> *output_file_names = nullptr,
                                               compaction_job_info *compaction_job_inf = nullptr) = 0;
 
             virtual status_type compact_files(const compaction_options &compact_options,
@@ -1067,108 +1067,6 @@ namespace nil {
 
             virtual status_type verify_checksum() = 0;
 
-            // add_file() is deprecated, please use ingest_external_file()
-            DCDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
-                                                              const std::vector<std::string> &file_path_list,
-                                                              bool move_file = false,
-                                                              bool skip_snapshot_check = false) {
-                ingest_external_file_options ifo;
-                ifo.move_files = move_file;
-                ifo.snapshot_consistency = !skip_snapshot_check;
-                ifo.allow_global_seqno = false;
-                ifo.allow_blocking_flush = false;
-                return ingest_external_file(column_family, file_path_list, ifo);
-            }
-
-            DCDB_DEPRECATED_FUNC virtual status_type add_file(const std::vector<std::string> &file_path_list,
-                                                              bool move_file = false,
-                                                              bool skip_snapshot_check = false) {
-                ingest_external_file_options ifo;
-                ifo.move_files = move_file;
-                ifo.snapshot_consistency = !skip_snapshot_check;
-                ifo.allow_global_seqno = false;
-                ifo.allow_blocking_flush = false;
-                return ingest_external_file(default_column_family(), file_path_list, ifo);
-            }
-
-            // add_file() is deprecated, please use ingest_external_file()
-            DCDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
-                                                              const std::string &file_path, bool move_file = false,
-                                                              bool skip_snapshot_check = false) {
-                ingest_external_file_options ifo;
-                ifo.move_files = move_file;
-                ifo.snapshot_consistency = !skip_snapshot_check;
-                ifo.allow_global_seqno = false;
-                ifo.allow_blocking_flush = false;
-                return ingest_external_file(column_family, {file_path}, ifo);
-            }
-
-            DCDB_DEPRECATED_FUNC virtual status_type add_file(const std::string &file_path, bool move_file = false,
-                                                              bool skip_snapshot_check = false) {
-                ingest_external_file_options ifo;
-                ifo.move_files = move_file;
-                ifo.snapshot_consistency = !skip_snapshot_check;
-                ifo.allow_global_seqno = false;
-                ifo.allow_blocking_flush = false;
-                return ingest_external_file(default_column_family(), {file_path}, ifo);
-            }
-
-            // Load table file with information "file_info" into "column_family"
-            DCDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
-                                                              const std::vector<external_sst_file_info> &file_info_list,
-                                                              bool move_file = false,
-                                                              bool skip_snapshot_check = false) {
-                std::vector<std::string> external_files;
-                for (const external_sst_file_info &file_info : file_info_list) {
-                    external_files.push_back(file_info.file_path);
-                }
-                ingest_external_file_options ifo;
-                ifo.move_files = move_file;
-                ifo.snapshot_consistency = !skip_snapshot_check;
-                ifo.allow_global_seqno = false;
-                ifo.allow_blocking_flush = false;
-                return ingest_external_file(column_family, external_files, ifo);
-            }
-
-            DCDB_DEPRECATED_FUNC virtual status_type add_file(const std::vector<external_sst_file_info> &file_info_list,
-                                                              bool move_file = false,
-                                                              bool skip_snapshot_check = false) {
-                std::vector<std::string> external_files;
-                for (const external_sst_file_info &file_info : file_info_list) {
-                    external_files.push_back(file_info.file_path);
-                }
-                ingest_external_file_options ifo;
-                ifo.move_files = move_file;
-                ifo.snapshot_consistency = !skip_snapshot_check;
-                ifo.allow_global_seqno = false;
-                ifo.allow_blocking_flush = false;
-                return ingest_external_file(default_column_family(), external_files, ifo);
-            }
-
-            DCDB_DEPRECATED_FUNC virtual status_type add_file(column_family_handle *column_family,
-                                                              const external_sst_file_info *file_info,
-                                                              bool move_file = false,
-                                                              bool skip_snapshot_check = false) {
-                ingest_external_file_options ifo;
-                ifo.move_files = move_file;
-                ifo.snapshot_consistency = !skip_snapshot_check;
-                ifo.allow_global_seqno = false;
-                ifo.allow_blocking_flush = false;
-                return ingest_external_file(column_family, {file_info->file_path}, ifo);
-            }
-
-            DCDB_DEPRECATED_FUNC virtual status_type add_file(const external_sst_file_info *file_info,
-                                                              bool move_file = false,
-                                                              bool skip_snapshot_check = false) {
-                ingest_external_file_options ifo;
-                ifo.move_files = move_file;
-                ifo.snapshot_consistency = !skip_snapshot_check;
-                ifo.allow_global_seqno = false;
-                ifo.allow_blocking_flush = false;
-                return ingest_external_file(default_column_family(), {file_info->file_path}, ifo);
-            }
-
-
             // Sets the globally unique ID created at database creation time by invoking
             // environment_type::generate_unique_id(), in identity. Returns status_type::is_ok if identity could
             // be set properly
@@ -1209,7 +1107,7 @@ namespace nil {
             }
 
 
-            // Needed for StackableDB
+            // Needed for stackable_db
             virtual database *get_root_db() {
                 return this;
             }
