@@ -32,8 +32,8 @@ function(cm_setup_version)
     elseif(PARSE_PARSE_HEADER)
         foreach(level MAJOR MINOR PATCH)
             file(STRINGS ${PARSE_PARSE_HEADER}
-                         _define_${level}
-                         REGEX "#define ${PREFIX}_VERSION_${level}")
+                 _define_${level}
+                 REGEX "#define ${PREFIX}_VERSION_${level}")
             string(REGEX MATCH "([0-9]+)" _version_${level} "${_define_${level}}")
             # TODO: Check if it is empty
             cm_set_parent(${PROJECT_NAME}_VERSION_${level} ${_version_${level}})

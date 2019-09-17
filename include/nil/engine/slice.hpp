@@ -1,3 +1,12 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+
 // Slice is a simple structure containing a pointer into some external
 // engine and a size.  The user of a slice must ensure that the slice
 // is not used after the corresponding external engine has been
@@ -10,17 +19,15 @@
 
 #pragma once
 
-#include <assert.h>
+#include <cassert>
 #include <cstdio>
-#include <stddef.h>
-#include <string.h>
+#include <cstddef>
+#include <cstring>
 #include <string>
 
 #ifdef __cpp_lib_string_view
 #include <string_view>
 #endif
-
-#include <nil/engine/cleanable.hpp>
 
 namespace nil {
     namespace dcdb {
@@ -43,7 +50,8 @@ namespace nil {
 #ifdef __cpp_lib_string_view
             // Create a slice that refers to the same contents as "sv"
             /* implicit */
-            slice(std::string_view sv) : data_(sv.data()), size_(sv.size()) {}
+            slice(std::string_view sv) : data_(sv.data()), size_(sv.size()) {
+            }
 #endif
 
             // Create a slice that refers to s[0,strlen(s)-1]
@@ -103,7 +111,7 @@ namespace nil {
 #ifdef __cpp_lib_string_view
             // Return a string_view that references the same data as this slice.
             std::string_view to_string_view() const {
-              return std::string_view(data_, size_);
+                return std::string_view(data_, size_);
             }
 #endif
 
@@ -139,98 +147,8 @@ namespace nil {
             // Intentionally copyable
         };
 
-/**
- * A Slice that can be pinned with some cleanup tasks, which will be run upon
- * ::Reset() or object destruction, whichever is invoked first. This can be used
- * to avoid memcpy by having the PinnableSlice object referring to the data
- * that is locked in the memory and release them after the data is consumed.
- */
-        class pinnable_slice : public slice, public cleanable {
-        public:
-            pinnable_slice() {
-                buf_ = &self_space_;
-            }
-
-            explicit pinnable_slice(std::string *buf) {
-                buf_ = buf;
-            }
-
-            // No copy constructor and copy assignment allowed.
-            pinnable_slice(pinnable_slice &) = delete;
-
-            pinnable_slice &operator=(pinnable_slice &) = delete;
-
-            inline void pin_slice(const slice &s, cleanup_function f, void *arg1, void *arg2) {
-                assert(!pinned_);
-                pinned_ = true;
-                data_ = s.data();
-                size_ = s.size();
-                register_cleanup(f, arg1, arg2);
-                assert(pinned_);
-            }
-
-            inline void pin_slice(const slice &s, cleanable *cleanable) {
-                assert(!pinned_);
-                pinned_ = true;
-                data_ = s.data();
-                size_ = s.size();
-                cleanable->delegate_cleanups_to(this);
-                assert(pinned_);
-            }
-
-            inline void pin_self(const slice &slice) {
-                assert(!pinned_);
-                buf_->assign(slice.data(), slice.size());
-                data_ = buf_->data();
-                size_ = buf_->size();
-                assert(!pinned_);
-            }
-
-            inline void pin_self() {
-                assert(!pinned_);
-                data_ = buf_->data();
-                size_ = buf_->size();
-                assert(!pinned_);
-            }
-
-            void remove_suffix(size_t n) {
-                assert(n <= size());
-                if (pinned_) {
-                    size_ -= n;
-                } else {
-                    buf_->erase(size() - n, n);
-                    pin_self();
-                }
-            }
-
-            void remove_prefix(size_t n) {
-                assert(0);  // Not implemented
-            }
-
-            void reset() {
-                cleanable::reset();
-                pinned_ = false;
-                size_ = 0;
-            }
-
-            inline std::string *get_self() {
-                return buf_;
-            }
-
-            inline bool is_pinned() {
-                return pinned_;
-            }
-
-        private:
-            friend class pinnable_slice4_test;
-
-            std::string self_space_;
-            std::string *buf_;
-            bool pinned_ = false;
-        };
-
-// A set of Slices that are virtually concatenated together.  'parts' points
-// to an array of Slices.  The number of elements in the array is 'num_parts'.
+        // A set of Slices that are virtually concatenated together.  'parts' points
+        // to an array of Slices.  The number of elements in the array is 'num_parts'.
         struct slice_parts {
             slice_parts(const slice *_parts, int _num_parts) : parts(_parts), num_parts(_num_parts) {
             }
@@ -274,5 +192,5 @@ namespace nil {
             }
             return off;
         }
-    }
-} // namespace nil
+    }    // namespace dcdb
+}    // namespace nil

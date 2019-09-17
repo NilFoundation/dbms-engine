@@ -2,19 +2,19 @@
 include(GNUInstallDirs)
 
 define_property(TARGET PROPERTY "INTERFACE_DESCRIPTION"
-  BRIEF_DOCS "Description of the target"
-  FULL_DOCS "Description of the target"
-)
+                BRIEF_DOCS "Description of the target"
+                FULL_DOCS "Description of the target"
+                )
 
 define_property(TARGET PROPERTY "INTERFACE_URL"
-  BRIEF_DOCS "An URL where people can get more information about and download the package."
-  FULL_DOCS "An URL where people can get more information about and download the package."
-)
+                BRIEF_DOCS "An URL where people can get more information about and download the package."
+                FULL_DOCS "An URL where people can get more information about and download the package."
+                )
 
 define_property(TARGET PROPERTY "INTERFACE_PKG_CONFIG_REQUIRES"
-  BRIEF_DOCS "A list of packages required by this package. The versions of these packages may be specified using the comparison operators =, <, >, <= or >=."
-  FULL_DOCS "A list of packages required by this package. The versions of these packages may be specified using the comparison operators =, <, >, <= or >=."
-)
+                BRIEF_DOCS "A list of packages required by this package. The versions of these packages may be specified using the comparison operators =, <, >, <= or >=."
+                FULL_DOCS "A list of packages required by this package. The versions of these packages may be specified using the comparison operators =, <, >, <= or >=."
+                )
 
 function(cm_generate_pkgconfig_file)
     set(options)
@@ -56,7 +56,7 @@ function(cm_generate_pkgconfig_file)
     endif()
 
     file(WRITE ${PKGCONFIG_FILENAME}
-"
+         "
 prefix=${CMAKE_INSTALL_PREFIX}
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/${LIB_DIR}
@@ -68,7 +68,7 @@ Cflags: -I\${includedir} ${PARSE_CFLAGS}
 ${LIBS}
 Requires: ${PARSE_REQUIRES}
 "
-  )
+         )
 
 endfunction()
 
@@ -126,7 +126,7 @@ function(cm_auto_pkgconfig_each)
     if(TARGET_REQUIRES)
         list(APPEND REQUIRES ${TARGET_REQUIRES})
     endif()
-    
+
     cm_preprocess_pkgconfig_property(LINK_LIBS ${TARGET} INTERFACE_LINK_LIBRARIES)
     foreach(LIB ${LINK_LIBS})
         if(TARGET ${LIB})
@@ -186,7 +186,7 @@ function(cm_auto_pkgconfig_each)
     endif()
 
     file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME_LOWER}.pc CONTENT
-"
+         "
 prefix=${CMAKE_INSTALL_PREFIX}
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/${CMAKE_INSTALL_LIBDIR}
@@ -196,7 +196,7 @@ Description: ${DESCRIPTION}
 Version: ${PROJECT_VERSION}
 ${CONTENT}
 "
-  )
+         )
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME_LOWER}.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
     set_property(TARGET ${TARGET} PROPERTY INTERFACE_PKG_CONFIG_NAME ${PACKAGE_NAME_LOWER})
 endfunction()
@@ -236,13 +236,13 @@ function(cm_auto_pkgconfig)
 
         if(GENERATE_PROJECT_PC)
             file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME_LOWER}.pc CONTENT
-"
+                 "
 Name: ${PACKAGE_NAME_LOWER}
 Description: ${DESCRIPTION}
 Version: ${PROJECT_VERSION}
 Requires: ${REQUIRES}
 "
-            )
+                 )
         endif()
     endif()
 

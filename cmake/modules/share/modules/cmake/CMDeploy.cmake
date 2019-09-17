@@ -13,7 +13,7 @@ function(cm_deploy)
     if(PARSE_SKIP_HEADER_INSTALL)
         cm_install_targets(TARGETS ${PARSE_TARGETS} INCLUDE ${PARSE_INCLUDE} SKIP_HEADER_INSTALL)
     else()
-        cm_install_targets(TARGETS ${PARSE_TARGETS} INCLUDE ${PARSE_INCLUDE} )
+        cm_install_targets(TARGETS ${PARSE_TARGETS} INCLUDE ${PARSE_INCLUDE})
     endif()
 
     cm_auto_pkgconfig(TARGET ${PARSE_TARGETS})

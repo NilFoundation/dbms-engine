@@ -1,3 +1,12 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+
 // A status_type encapsulates the result of an operation.  It may indicate success,
 // or it may indicate an error with an associated error message.
 //
@@ -32,15 +41,15 @@ namespace nil {
 
             status_type(status_type &&s)
 #if !(defined _MSC_VER) || ((defined _MSC_VER) && (_MSC_VER >= 1900))
-            noexcept
+                noexcept
 #endif
-            ;
+                ;
 
             status_type &operator=(status_type &&s)
 #if !(defined _MSC_VER) || ((defined _MSC_VER) && (_MSC_VER >= 1900))
-            noexcept
+                noexcept
 #endif
-            ;
+                ;
 
             bool operator==(const status_type &rhs) const;
 
@@ -86,7 +95,12 @@ namespace nil {
             }
 
             enum severity : unsigned char {
-                kNoError = 0, kSoftError = 1, kHardError = 2, kFatalError = 3, kUnrecoverableError = 4, kMaxSeverity
+                kNoError = 0,
+                kSoftError = 1,
+                kHardError = 2,
+                kFatalError = 3,
+                kUnrecoverableError = 4,
+                kMaxSeverity
             };
 
             status_type(const status_type &s, severity sev);
@@ -358,8 +372,8 @@ namespace nil {
             severity sev_;
             const char *state_;
 
-            explicit status_type(code _code, sub_code _subcode = kNone) : code_(_code), subcode_(_subcode),
-                    sev_(kNoError), state_(nullptr) {
+            explicit status_type(code _code, sub_code _subcode = kNone) :
+                code_(_code), subcode_(_subcode), sev_(kNoError), state_(nullptr) {
             }
 
             status_type(code _code, sub_code _subcode, const slice &msg, const slice &msg2);
@@ -374,8 +388,8 @@ namespace nil {
             state_ = (s.state_ == nullptr) ? nullptr : copy_state(s.state_);
         }
 
-        inline status_type::status_type(const status_type &s, severity sev) : code_(s.code_), subcode_(s.subcode_),
-                sev_(sev) {
+        inline status_type::status_type(const status_type &s, severity sev) :
+            code_(s.code_), subcode_(s.subcode_), sev_(sev) {
             state_ = (s.state_ == nullptr) ? nullptr : copy_state(s.state_);
         }
 
@@ -394,15 +408,16 @@ namespace nil {
 
         inline status_type::status_type(status_type &&s)
 #if !(defined _MSC_VER) || ((defined _MSC_VER) && (_MSC_VER >= 1900))
-        noexcept
+            noexcept
 #endif
-                : status_type() {
+            :
+            status_type() {
             *this = std::move(s);
         }
 
         inline status_type &status_type::operator=(status_type &&s)
 #if !(defined _MSC_VER) || ((defined _MSC_VER) && (_MSC_VER >= 1900))
-        noexcept
+            noexcept
 #endif
         {
             if (this != &s) {
@@ -426,5 +441,5 @@ namespace nil {
         inline bool status_type::operator!=(const status_type &rhs) const {
             return !(*this == rhs);
         }
-    }
-} // namespace nil
+    }    // namespace dcdb
+}    // namespace nil
