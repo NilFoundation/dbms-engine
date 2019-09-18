@@ -29,7 +29,8 @@ include(CMSetupVersion)
 cm_project(engine WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-
+     include/nil/engine/slice.hpp
+     include/nil/engine/status.hpp
      )
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES

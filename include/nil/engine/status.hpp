@@ -22,7 +22,7 @@
 #include <nil/engine/slice.hpp>
 
 namespace nil {
-    namespace dcdb {
+    namespace engine {
 
         class status_type {
         public:

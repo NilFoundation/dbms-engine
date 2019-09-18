@@ -30,7 +30,7 @@
 #endif
 
 namespace nil {
-    namespace dcdb {
+    namespace engine {
 
         class slice {
         public:
@@ -192,5 +192,5 @@ namespace nil {
             }
             return off;
         }
-    }    // namespace dcdb
+    }    // namespace engine
 }    // namespace nil
