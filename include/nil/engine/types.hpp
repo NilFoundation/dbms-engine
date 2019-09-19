@@ -34,13 +34,13 @@ namespace nil {
 
         // <user key, sequence number, and entry type> tuple.
         struct full_key {
-            slice user_key;
+            engine::slice user_key;
             sequence_number sequence;
             entry_type type;
 
             full_key() : sequence(0) {
             }    // Intentionally left uninitialized (for speed)
-            full_key(const slice &u, const sequence_number &seq, entry_type t) : user_key(u), sequence(seq), type(t) {
+            full_key(const engine::slice &u, const sequence_number &seq, entry_type t) : user_key(u), sequence(seq), type(t) {
             }
 
             std::string debug_string(bool hex = false) const;
@@ -52,10 +52,10 @@ namespace nil {
             }
         };
 
-        // Parse slice representing internal key to full_key
+        // Parse engine::slice representing internal key to full_key
         // Parsed full_key is valid for as long as the memory pointed to by
         // internal_key is alive.
-        bool parse_full_key(const slice &internal_key, full_key *result);
+        bool parse_full_key(const engine::slice &internal_key, full_key *result);
 
     }    // namespace dcdb
 }    // namespace nil

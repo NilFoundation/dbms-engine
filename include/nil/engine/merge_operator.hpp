@@ -20,7 +20,7 @@
 namespace nil {
     namespace dcdb {
 
-        class slice;
+        class engine::slice;
 
         // The merge Operator
         //
@@ -71,7 +71,7 @@ namespace nil {
             // internal corruption. This will be treated as an error by the library.
             //
             // Also make use of the *logger for error messages.
-            virtual bool full_merge(const slice &key, const slice *existing_value,
+            virtual bool full_merge(const engine::slice &key, const engine::slice *existing_value,
                                     const std::deque<std::string> &operand_list, std::string *new_value,
                                     boost::log::sources::severity_logger_mt<info_log_level> *logger) const {
                 // deprecated, please use full_merge_v2()
@@ -80,27 +80,27 @@ namespace nil {
             }
 
             struct merge_operation_input {
-                explicit merge_operation_input(const slice &_key, const slice *_existing_value,
-                                               const std::vector<slice> &_operand_list,
+                explicit merge_operation_input(const engine::slice &_key, const engine::slice *_existing_value,
+                                               const std::vector<engine::slice> &_operand_list,
                                                boost::log::sources::severity_logger_mt<info_log_level> *_logger) :
                     key(_key),
                     existing_value(_existing_value), operand_list(_operand_list), logger(_logger) {
                 }
 
                 // The key associated with the merge operation.
-                const slice &key;
+                const engine::slice &key;
                 // The existing value of the current key, nullptr means that the
                 // value doesn't exist.
-                const slice *existing_value;
+                const engine::slice *existing_value;
                 // A list of operands to apply.
-                const std::vector<slice> &operand_list;
+                const std::vector<engine::slice> &operand_list;
                 // Logger could be used by client to log any errors that happen during
                 // the merge operation.
                 boost::log::sources::severity_logger_mt<info_log_level> *logger;
             };
 
             struct merge_operation_output {
-                explicit merge_operation_output(std::string &_new_value, slice &_existing_operand) :
+                explicit merge_operation_output(std::string &_new_value, engine::slice &_existing_operand) :
                     new_value(_new_value), existing_operand(_existing_operand) {
                 }
 
@@ -109,7 +109,7 @@ namespace nil {
                 // If the merge result is one of the existing operands (or existing_value),
                 // client can set this field to the operand (or existing_value) instead of
                 // using new_value.
-                slice &existing_operand;
+                engine::slice &existing_operand;
             };
 
             // This function applies a stack of merge operands in chrionological order
@@ -162,7 +162,7 @@ namespace nil {
             // If there is corruption in the data, handle it in the full_merge_v2() function
             // and return false there.  The default implementation of partial_merge will
             // always return false.
-            virtual bool partial_merge(const slice &key, const slice &left_operand, const slice &right_operand,
+            virtual bool partial_merge(const engine::slice &key, const engine::slice &left_operand, const engine::slice &right_operand,
                                        std::string *new_value,
                                        boost::log::sources::severity_logger_mt<info_log_level> *logger) const {
                 return false;
@@ -189,7 +189,7 @@ namespace nil {
             // multiple times, where each time it only merges two operands.  Developers
             // should either implement partial_merge_multi, or implement partial_merge which
             // is served as the helper function of the default partial_merge_multi.
-            virtual bool partial_merge_multi(const slice &key, const std::deque<slice> &operand_list,
+            virtual bool partial_merge_multi(const engine::slice &key, const std::deque<engine::slice> &operand_list,
                                              std::string *new_value,
                                              boost::log::sources::severity_logger_mt<info_log_level> *logger) const;
 
@@ -220,7 +220,7 @@ namespace nil {
             // relative to how they were merged (passed to full_merge or full_merge_v2)
             // for performance reasons, see also:
             // https://github.com/facebook/rocksdb/issues/3865
-            virtual bool should_merge(const std::vector<slice> &operands) const {
+            virtual bool should_merge(const std::vector<engine::slice> &operands) const {
                 return false;
             }
         };
@@ -244,7 +244,7 @@ namespace nil {
             // returns false, it is because client specified bad data or there was
             // internal corruption. The client should assume that this will be treated
             // as an error by the library.
-            virtual bool merge(const slice &key, const slice *existing_value, const slice &value,
+            virtual bool merge(const engine::slice &key, const engine::slice *existing_value, const engine::slice &value,
                                std::string *new_value,
                                boost::log::sources::severity_logger_mt<info_log_level> *logger) const = 0;
 
@@ -252,7 +252,7 @@ namespace nil {
             // default_environment implementations of the merge_operator functions
             bool full_merge_v2(const merge_operation_input &merge_in, merge_operation_output *merge_out) const override;
 
-            bool partial_merge(const slice &key, const slice &left_operand, const slice &right_operand,
+            bool partial_merge(const engine::slice &key, const engine::slice &left_operand, const engine::slice &right_operand,
                                std::string *new_value,
                                boost::log::sources::severity_logger_mt<info_log_level> *logger) const override;
         };

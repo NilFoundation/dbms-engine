@@ -120,7 +120,7 @@ namespace nil {
             }
 
             // Return error status of an appropriate type.
-            static status_type not_found(const slice &msg, const slice &msg2 = slice()) {
+            static status_type not_found(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kNotFound, msg, msg2);
             }
 
@@ -129,7 +129,7 @@ namespace nil {
                 return status_type(kNotFound, msg);
             }
 
-            static status_type corruption(const slice &msg, const slice &msg2 = slice()) {
+            static status_type corruption(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kCorruption, msg, msg2);
             }
 
@@ -137,7 +137,7 @@ namespace nil {
                 return status_type(kCorruption, msg);
             }
 
-            static status_type not_supported(const slice &msg, const slice &msg2 = slice()) {
+            static status_type not_supported(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kNotSupported, msg, msg2);
             }
 
@@ -145,7 +145,7 @@ namespace nil {
                 return status_type(kNotSupported, msg);
             }
 
-            static status_type invalid_argument(const slice &msg, const slice &msg2 = slice()) {
+            static status_type invalid_argument(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kInvalidArgument, msg, msg2);
             }
 
@@ -153,7 +153,7 @@ namespace nil {
                 return status_type(kInvalidArgument, msg);
             }
 
-            static status_type io_error(const slice &msg, const slice &msg2 = slice()) {
+            static status_type io_error(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kIOError, msg, msg2);
             }
 
@@ -161,7 +161,7 @@ namespace nil {
                 return status_type(kIOError, msg);
             }
 
-            static status_type merge_in_progress(const slice &msg, const slice &msg2 = slice()) {
+            static status_type merge_in_progress(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kMergeInProgress, msg, msg2);
             }
 
@@ -169,7 +169,7 @@ namespace nil {
                 return status_type(kMergeInProgress, msg);
             }
 
-            static status_type incomplete(const slice &msg, const slice &msg2 = slice()) {
+            static status_type incomplete(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kIncomplete, msg, msg2);
             }
 
@@ -181,7 +181,7 @@ namespace nil {
                 return status_type(kShutdownInProgress, msg);
             }
 
-            static status_type shutdown_in_progress(const slice &msg, const slice &msg2 = slice()) {
+            static status_type shutdown_in_progress(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kShutdownInProgress, msg, msg2);
             }
 
@@ -189,7 +189,7 @@ namespace nil {
                 return status_type(kAborted, msg);
             }
 
-            static status_type aborted(const slice &msg, const slice &msg2 = slice()) {
+            static status_type aborted(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kAborted, msg, msg2);
             }
 
@@ -197,7 +197,7 @@ namespace nil {
                 return status_type(kBusy, msg);
             }
 
-            static status_type busy(const slice &msg, const slice &msg2 = slice()) {
+            static status_type busy(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kBusy, msg, msg2);
             }
 
@@ -205,7 +205,7 @@ namespace nil {
                 return status_type(kTimedOut, msg);
             }
 
-            static status_type timed_out(const slice &msg, const slice &msg2 = slice()) {
+            static status_type timed_out(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kTimedOut, msg, msg2);
             }
 
@@ -213,7 +213,7 @@ namespace nil {
                 return status_type(kExpired, msg);
             }
 
-            static status_type expired(const slice &msg, const slice &msg2 = slice()) {
+            static status_type expired(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kExpired, msg, msg2);
             }
 
@@ -221,7 +221,7 @@ namespace nil {
                 return status_type(kTryAgain, msg);
             }
 
-            static status_type try_again(const slice &msg, const slice &msg2 = slice()) {
+            static status_type try_again(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kTryAgain, msg, msg2);
             }
 
@@ -229,7 +229,7 @@ namespace nil {
                 return status_type(kCompactionTooLarge, msg);
             }
 
-            static status_type compaction_too_large(const slice &msg, const slice &msg2 = slice()) {
+            static status_type compaction_too_large(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kCompactionTooLarge, msg, msg2);
             }
 
@@ -237,7 +237,7 @@ namespace nil {
                 return status_type(kIOError, kNoSpace);
             }
 
-            static status_type no_space(const slice &msg, const slice &msg2 = slice()) {
+            static status_type no_space(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kIOError, kNoSpace, msg, msg2);
             }
 
@@ -245,7 +245,7 @@ namespace nil {
                 return status_type(kAborted, kMemoryLimit);
             }
 
-            static status_type memory_limit(const slice &msg, const slice &msg2 = slice()) {
+            static status_type memory_limit(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kAborted, kMemoryLimit, msg, msg2);
             }
 
@@ -253,7 +253,7 @@ namespace nil {
                 return status_type(kIOError, kSpaceLimit);
             }
 
-            static status_type space_limit(const slice &msg, const slice &msg2 = slice()) {
+            static status_type space_limit(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
                 return status_type(kIOError, kSpaceLimit, msg, msg2);
             }
 
@@ -376,9 +376,9 @@ namespace nil {
                 code_(_code), subcode_(_subcode), sev_(kNoError), state_(nullptr) {
             }
 
-            status_type(code _code, sub_code _subcode, const slice &msg, const slice &msg2);
+            status_type(code _code, sub_code _subcode, const engine::slice &msg, const engine::slice &msg2);
 
-            status_type(code _code, const slice &msg, const slice &msg2) : status_type(_code, kNone, msg, msg2) {
+            status_type(code _code, const engine::slice &msg, const engine::slice &msg2) : status_type(_code, kNone, msg, msg2) {
             }
 
             static const char *copy_state(const char *state);

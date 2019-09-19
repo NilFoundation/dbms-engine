@@ -8,7 +8,7 @@
 //---------------------------------------------------------------------------//
 
 // Class for specifying user-defined functions which perform a
-// transformation on a slice.  It is not required that every slice
+// transformation on a engine::slice.  It is not required that every engine::slice
 // belong to the domain and/or range of a function.  Subclasses should
 // define in_domain and in_range to determine which slices are in either
 // of these sets respectively.
@@ -20,7 +20,7 @@
 namespace nil {
     namespace dcdb {
 
-        class slice;
+        class engine::slice;
 
         /*
          * A slice_transform is a generic pluggable way of transforming one string
@@ -36,9 +36,9 @@ namespace nil {
             virtual const char *name() const = 0;
 
             // Extract a prefix from a specified key. This method is called when
-            // a key is inserted into the db, and the returned slice is used to
+            // a key is inserted into the db, and the returned engine::slice is used to
             // create a bloom filter.
-            virtual slice transform(const slice &key) const = 0;
+            virtual engine::slice transform(const engine::slice &key) const = 0;
 
             // Determine whether the specified key is compatible with the logic
             // specified in the transform method. This method is invoked for every
@@ -56,10 +56,10 @@ namespace nil {
             // Wiki documentation here:
             // https://github.com/facebook/rocksdb/wiki/Prefix-Seek-API-Changes
             //
-            virtual bool in_domain(const slice &key) const = 0;
+            virtual bool in_domain(const engine::slice &key) const = 0;
 
             // This is currently not used and remains here for backward compatibility.
-            virtual bool in_range(const slice &dst) const {
+            virtual bool in_range(const engine::slice &dst) const {
                 return false;
             }
 
@@ -81,7 +81,7 @@ namespace nil {
             // using the bloom filter. Otherwise, user needs to skip the bloom filter
             // by setting read_options.total_order_seek = true.
             //
-            // Here is an example: Suppose we implement a slice transform that returns
+            // Here is an example: Suppose we implement a engine::slice transform that returns
             // the first part of the string after splitting it using delimiter ",":
             // 1. same_result_when_appended("abc,") should return true. If applying prefix
             //    bloom filter using it, all slices matching "abc:.*" will be extracted
@@ -93,7 +93,7 @@ namespace nil {
             //    "abcd,e", the file can be filtered out and the key will be invisible.
             //
             // i.e., an implementation always returning false is safe.
-            virtual bool same_result_when_appended(const slice &prefix) const {
+            virtual bool same_result_when_appended(const engine::slice &prefix) const {
                 return false;
             }
         };
