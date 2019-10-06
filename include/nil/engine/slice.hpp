@@ -31,8 +31,48 @@
 
 namespace nil {
     namespace engine {
+        class slice;
+
+        // A set of Slices that are virtually concatenated together.  'parts' points
+        // to an array of Slices.  The number of elements in the array is 'num_parts'.
+        struct slice_parts {
+            slice_parts(const slice *_parts, int _num_parts) : parts(_parts), num_parts(_num_parts) {
+            }
+
+            slice_parts() : parts(nullptr), num_parts(0) {
+            }
+
+            const slice *parts;
+            int num_parts;
+        };
 
         class slice {
+            // 2 small internal utility functions, for efficient hex conversions
+            // and no need for snprintf, toupper etc...
+            // Originally from wdt/system/EncryptionUtils.cpp - for to_string(true)/decode_hex:
+            inline static char toHex(unsigned char v) {
+                if (v <= 9) {
+                    return '0' + v;
+                }
+                return 'A' + v - 10;
+            }
+
+            // most of the get_code is for validation/error check
+            inline static int fromHex(char c) {
+                // toupper:
+                if (c >= 'a' && c <= 'f') {
+                    c -= ('a' - 'A');    // aka 0x20
+                }
+                // validation
+                if (c < '0' || (c > '9' && (c < 'A' || c > 'F'))) {
+                    return -1;    // invalid not 0-9A-F hex char
+                }
+                if (c <= '9') {
+                    return c - '0';
+                }
+                return c - 'A' + 10;
+            }
+
         public:
             // Create an empty slice.
             slice() : data_(""), size_(0) {
@@ -62,7 +102,19 @@ namespace nil {
 
             // Create a single slice from slice_parts using buf as engine.
             // buf must exist as long as the returned slice exists.
-            slice(const struct slice_parts &parts, std::string *buf);
+            slice(const struct slice_parts &parts, std::string *buf) {
+                size_t length = 0;
+                for (int i = 0; i < parts.num_parts; ++i) {
+                    length += parts.parts[i].size();
+                }
+                buf->reserve(length);
+
+                for (int i = 0; i < parts.num_parts; ++i) {
+                    buf->append(parts.parts[i].data(), parts.parts[i].size());
+                }
+                data_ = buf->data();
+                size_ = buf->size();
+            }
 
             // Return a pointer to the beginning of the referenced data
             const char *data() const {
@@ -106,7 +158,21 @@ namespace nil {
 
             // Return a string that contains the copy of the referenced data.
             // when hex is true, returns a string of twice the length hex encoded (0-9A-F)
-            std::string to_string(bool hex = false) const;
+            std::string to_string(bool hex = false) const {
+                std::string result;    // RVO/NRVO/move
+                if (hex) {
+                    result.reserve(2 * size_);
+                    for (size_t i = 0; i < size_; ++i) {
+                        unsigned char c = data_[i];
+                        result.push_back(toHex(c >> 4U));
+                        result.push_back(toHex(c & 0xfU));
+                    }
+                    return result;
+                } else {
+                    result.assign(data_, size_);
+                    return result;
+                }
+            }
 
 #ifdef __cpp_lib_string_view
             // Return a string_view that references the same data as this slice.
@@ -120,13 +186,49 @@ namespace nil {
             // (e.g not coming from slice::to_string(true)) decode_hex returns false.
             // This slice is expected to have an even number of 0-9A-F characters
             // also accepts lowercase (a-f)
-            bool decode_hex(std::string *result) const;
+            bool decode_hex(std::string *result) const {
+                std::string::size_type len = size_;
+                if (len % 2) {
+                    // Hex string must be even number of hex digits to get complete bytes back
+                    return false;
+                }
+                if (!result) {
+                    return false;
+                }
+                result->clear();
+                result->reserve(len / 2);
+
+                for (size_t i = 0; i < len;) {
+                    int h1 = fromHex(data_[i++]);
+                    if (h1 < 0) {
+                        return false;
+                    }
+                    int h2 = fromHex(data_[i++]);
+                    if (h2 < 0) {
+                        return false;
+                    }
+                    result->push_back(static_cast<char>((h1 << 4U) | h2));
+                }
+                return true;
+            }
 
             // Three-way comparison.  Returns value:
             //   <  0 iff "*this" <  "b",
             //   == 0 iff "*this" == "b",
             //   >  0 iff "*this" >  "b"
-            int compare(const slice &b) const;
+            int compare(const slice &b) const {
+                assert(data_ != nullptr && b.data_ != nullptr);
+                const size_t min_len = (size_ < b.size_) ? size_ : b.size_;
+                int r = memcmp(data_, b.data_, min_len);
+                if (r == 0) {
+                    if (size_ < b.size_) {
+                        r = -1;
+                    } else if (size_ > b.size_) {
+                        r = +1;
+                    }
+                }
+                return r;
+            }
 
             // Return true iff "x" is a prefix of "*this"
             bool starts_with(const slice &x) const {
@@ -138,7 +240,16 @@ namespace nil {
             }
 
             // compare two slices and returns the first byte where they differ
-            size_t difference_offset(const slice &b) const;
+            size_t difference_offset(const slice &b) const {
+                size_t off = 0;
+                const size_t len = (size_ < b.size_) ? size_ : b.size_;
+                for (; off < len; off++) {
+                    if (data_[off] != b.data_[off]) {
+                        break;
+                    }
+                }
+                return off;
+            }
 
             // private: make these public for rocksdbjni access
             const char *data_;
@@ -147,50 +258,12 @@ namespace nil {
             // Intentionally copyable
         };
 
-        // A set of Slices that are virtually concatenated together.  'parts' points
-        // to an array of Slices.  The number of elements in the array is 'num_parts'.
-        struct slice_parts {
-            slice_parts(const slice *_parts, int _num_parts) : parts(_parts), num_parts(_num_parts) {
-            }
-
-            slice_parts() : parts(nullptr), num_parts(0) {
-            }
-
-            const slice *parts;
-            int num_parts;
-        };
-
         inline bool operator==(const slice &x, const slice &y) {
             return ((x.size() == y.size()) && (memcmp(x.data(), y.data(), x.size()) == 0));
         }
 
         inline bool operator!=(const slice &x, const slice &y) {
             return !(x == y);
-        }
-
-        inline int slice::compare(const slice &b) const {
-            assert(data_ != nullptr && b.data_ != nullptr);
-            const size_t min_len = (size_ < b.size_) ? size_ : b.size_;
-            int r = memcmp(data_, b.data_, min_len);
-            if (r == 0) {
-                if (size_ < b.size_) {
-                    r = -1;
-                } else if (size_ > b.size_) {
-                    r = +1;
-                }
-            }
-            return r;
-        }
-
-        inline size_t slice::difference_offset(const slice &b) const {
-            size_t off = 0;
-            const size_t len = (size_ < b.size_) ? size_ : b.size_;
-            for (; off < len; off++) {
-                if (data_[off] != b.data_[off]) {
-                    break;
-                }
-            }
-            return off;
         }
     }    // namespace engine
 }    // namespace nil

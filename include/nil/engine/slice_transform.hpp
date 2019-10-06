@@ -18,9 +18,9 @@
 #include <string>
 
 namespace nil {
-    namespace dcdb {
+    namespace engine {
 
-        class engine::slice;
+        class slice;
 
         /*
          * A slice_transform is a generic pluggable way of transforming one string
@@ -97,12 +97,6 @@ namespace nil {
                 return false;
             }
         };
-
-        extern const slice_transform *new_fixed_prefix_transform(size_t prefix_len);
-
-        extern const slice_transform *new_capped_prefix_transform(size_t cap_len);
-
-        extern const slice_transform *new_noop_transform();
 
     }    // namespace dcdb
 }

@@ -18,9 +18,9 @@
 #include <nil/engine/slice.hpp>
 
 namespace nil {
-    namespace dcdb {
+    namespace engine {
 
-        class engine::slice;
+        class slice;
 
         // The merge Operator
         //
@@ -162,8 +162,8 @@ namespace nil {
             // If there is corruption in the data, handle it in the full_merge_v2() function
             // and return false there.  The default implementation of partial_merge will
             // always return false.
-            virtual bool partial_merge(const engine::slice &key, const engine::slice &left_operand, const engine::slice &right_operand,
-                                       std::string *new_value,
+            virtual bool partial_merge(const engine::slice &key, const engine::slice &left_operand,
+                                       const engine::slice &right_operand, std::string *new_value,
                                        boost::log::sources::severity_logger_mt<info_log_level> *logger) const {
                 return false;
             }
@@ -244,17 +244,17 @@ namespace nil {
             // returns false, it is because client specified bad data or there was
             // internal corruption. The client should assume that this will be treated
             // as an error by the library.
-            virtual bool merge(const engine::slice &key, const engine::slice *existing_value, const engine::slice &value,
-                               std::string *new_value,
+            virtual bool merge(const engine::slice &key, const engine::slice *existing_value,
+                               const engine::slice &value, std::string *new_value,
                                boost::log::sources::severity_logger_mt<info_log_level> *logger) const = 0;
 
         private:
             // default_environment implementations of the merge_operator functions
             bool full_merge_v2(const merge_operation_input &merge_in, merge_operation_output *merge_out) const override;
 
-            bool partial_merge(const engine::slice &key, const engine::slice &left_operand, const engine::slice &right_operand,
-                               std::string *new_value,
+            bool partial_merge(const engine::slice &key, const engine::slice &left_operand,
+                               const engine::slice &right_operand, std::string *new_value,
                                boost::log::sources::severity_logger_mt<info_log_level> *logger) const override;
         };
-    }    // namespace dcdb
+    }    // namespace engine
 }    // namespace nil

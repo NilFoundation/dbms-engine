@@ -55,7 +55,16 @@ namespace nil {
         // Parse engine::slice representing internal key to full_key
         // Parsed full_key is valid for as long as the memory pointed to by
         // internal_key is alive.
-        bool parse_full_key(const engine::slice &internal_key, full_key *result);
+        bool parse_full_key(const engine::slice &internal_key, engine::full_key *fkey) {
+            ParsedInternalKey ikey;
+            if (!ParseInternalKey(internal_key, &ikey)) {
+                return false;
+            }
+            fkey->user_key = ikey.user_key;
+            fkey->sequence = ikey.sequence;
+            fkey->type = GetEntryType(ikey.type);
+            return true;
+        }
 
     }    // namespace dcdb
 }    // namespace nil
