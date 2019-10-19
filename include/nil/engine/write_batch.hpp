@@ -22,7 +22,7 @@ namespace nil {
         class column_family_handle;
 
         // Abstract base class that defines the basic interface for a write batch.
-        // See write_batch for a basic implementation and WriteBatchWithIndex for an
+        // See write_batch for a basic implementation and write_batch_with_index for an
         // indexed implementation.
         class write_batch {
         public:
