@@ -29,13 +29,32 @@ include(CMSetupVersion)
 cm_project(engine WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-     include/nil/engine/engine::slice.hpp
-     include/nil/engine/status.hpp
-     )
+     include/nil/storage/engine/column_family/column_family_descriptor.hpp
+     include/nil/storage/engine/column_family/column_family_handle.hpp
+     include/nil/storage/engine/column_family/column_family_options.hpp
+
+     include/nil/storage/engine/slice/slice.hpp
+     include/nil/storage/engine/slice/slice_transform.hpp
+
+     include/nil/storage/engine/transaction/transaction.hpp
+     include/nil/storage/engine/transaction/transaction_db_mutex.hpp
+
+     include/nil/storage/engine/write_batch/write_batch.hpp
+     include/nil/storage/engine/write_batch/write_batch_with_index.hpp
+
+     include/nil/storage/engine/write_batch
+     include/nil/storage/engine/compaction_filter.hpp
+     include/nil/storage/engine/comparator.hpp
+     include/nil/storage/engine/database.hpp
+     include/nil/storage/engine/filter_policy.hpp
+     include/nil/storage/engine/iterator.hpp
+     include/nil/storage/engine/logging.hpp
+     include/nil/storage/engine/merge_operator.hpp
+     include/nil/storage/engine/status.hpp
+     include/nil/storage/engine/types.hpp)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES
-     src/environment.cpp
-     )
+     src/environment.cpp)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
      ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS}
@@ -51,8 +70,7 @@ cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_
 add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
 
 set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                      EXPORT_NAME ${CURRENT_PROJECT_NAME}
-                      )
+                      EXPORT_NAME ${CURRENT_PROJECT_NAME})
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
 
