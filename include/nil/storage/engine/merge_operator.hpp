@@ -15,7 +15,7 @@
 #include <vector>
 
 #include <nil/storage/engine/logging.hpp>
-#include <nil/storage/engine/slice.hpp>
+#include <nil/storage/engine/slice/slice.hpp>
 
 namespace nil {
     namespace engine {

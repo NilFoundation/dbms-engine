@@ -14,7 +14,7 @@
 
 #include <nil/storage/engine/comparator.hpp>
 #include <nil/storage/engine/iterator.hpp>
-#include <nil/storage/engine/slice.hpp>
+#include <nil/storage/engine/slice/slice.hpp>
 #include <nil/storage/engine/status.hpp>
 #include <nil/storage/engine/write_batch/write_batch.hpp>
 
