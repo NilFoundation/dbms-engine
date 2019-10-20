@@ -1,3 +1,12 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+
 #pragma once
 
 #include <memory>
@@ -29,10 +38,10 @@ namespace nil {
             //         timed_out if timed out,
             //         or other engine::status_type on failure.
             // If returned status is is_ok, transaction_db will eventually call unlock().
-            virtual engine::status_type TryLockFor(int64_t timeout_time) = 0;
+            virtual engine::status_type try_lock_for(int64_t timeout_time) = 0;
 
             // Unlock Mutex that was successfully locked by lock() or TryLockUntil()
-            virtual void un_lock() = 0;
+            virtual void unlock() = 0;
         };
 
         class transaction_db_cond_var {
@@ -45,7 +54,7 @@ namespace nil {
             // Returns is_ok if notified.
             // Returns non-is_ok if transaction_db should stop waiting and fail the operation.
             // May return is_ok spuriously even if not notified.
-            virtual engine::status_type Wait(std::shared_ptr<transaction_db_mutex> mutex) = 0;
+            virtual engine::status_type wait(std::shared_ptr<transaction_db_mutex> mutex) = 0;
 
             // Block current thread until condition variable is notified by a call to
             // Notify() or NotifyAll(), or if the timeout is reached.
@@ -61,7 +70,8 @@ namespace nil {
             // Returns other status if transaction_db should otherwis stop waiting and
             //  fail the operation.
             // May return is_ok spuriously even if not notified.
-            virtual engine::status_type WaitFor(std::shared_ptr<transaction_db_mutex> mutex, int64_t timeout_time) = 0;
+            virtual engine::status_type wait_for(std::shared_ptr<transaction_db_mutex> mutex, int64_t timeout_time)
+            = 0;
 
             // If any threads are waiting on *this, unblock at least one of the
             // waiting threads.

@@ -1,6 +1,12 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 //
-// A write_batch_with_index with a binary searchable index built for all the keys
-// inserted.
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+
 #pragma once
 
 #include <memory>
@@ -10,7 +16,7 @@
 #include <nil/storage/engine/iterator.hpp>
 #include <nil/storage/engine/slice.hpp>
 #include <nil/storage/engine/status.hpp>
-#include <nil/storage/engine/write_batch.hpp>
+#include <nil/storage/engine/write_batch/write_batch.hpp>
 
 namespace nil {
     namespace engine {
