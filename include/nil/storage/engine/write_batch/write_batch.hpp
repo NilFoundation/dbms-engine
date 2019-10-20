@@ -174,6 +174,5 @@ namespace nil {
             // Sets the maximum size of the write batch in bytes. 0 means no limit.
             virtual void set_max_bytes(size_t max_bytes) = 0;
         };
-
     }    // namespace engine
 }    // namespace nil

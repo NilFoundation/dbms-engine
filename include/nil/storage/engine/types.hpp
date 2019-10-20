@@ -11,7 +11,7 @@
 
 #include <cstdint>
 
-#include <nil/storage/engine/slice.hpp>
+#include <nil/storage/engine/slice/slice.hpp>
 
 namespace nil {
     namespace engine {
