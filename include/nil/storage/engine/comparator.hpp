@@ -11,10 +11,10 @@
 
 #include <string>
 
-namespace nil {
-    namespace dcdb {
+#include <nil/storage/engine/slice/slice.hpp>
 
-        class engine::slice;
+namespace nil {
+    namespace engine {
 
         // A comparator object provides a total order across slices that are
         // used as keys in an sstable or a database.  A comparator implementation
@@ -84,15 +84,5 @@ namespace nil {
                 return true;
             }
         };
-
-        // Return a builtin comparator that uses lexicographic byte-wise
-        // ordering.  The result remains the property of this module and
-        // must not be deleted.
-        extern const comparator *bytewise_comparator();
-
-        // Return a builtin comparator that uses reverse lexicographic byte-wise
-        // ordering.
-        extern const comparator *reverse_bytewise_comparator();
-
-    }    // namespace dcdb
+    }    // namespace engine
 }    // namespace nil
