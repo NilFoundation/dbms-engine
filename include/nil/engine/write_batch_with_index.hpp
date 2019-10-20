@@ -127,7 +127,7 @@ namespace nil {
 
             virtual write_batch *get_write_batch() = 0;
 
-            // Create an iterator of a column family. User can call iterator.seek() to
+            // create an iterator of a column family. User can call iterator.seek() to
             // search to the next entry of or after a key. Keys will be iterated in the
             // order given by index_comparator. For multiple updates on the same key,
             // each update will be returned as a separate entry, in the order of update
@@ -136,7 +136,7 @@ namespace nil {
             // The returned iterator should be deleted by the caller.
             virtual write_batch_with_index_iterator *new_iterator(column_family_handle *column_family) = 0;
 
-            // Create an iterator of the default column family.
+            // create an iterator of the default column family.
             virtual write_batch_with_index_iterator *new_iterator() = 0;
 
             // Will create a new iterator that will use write_batch_with_index_iterator as a delta and

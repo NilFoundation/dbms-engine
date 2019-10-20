@@ -74,33 +74,33 @@ namespace nil {
             }
 
         public:
-            // Create an empty slice.
+            // create an empty slice.
             slice() : data_(""), size_(0) {
             }
 
-            // Create a slice that refers to d[0,n-1].
+            // create a slice that refers to d[0,n-1].
             slice(const char *d, size_t n) : data_(d), size_(n) {
             }
 
-            // Create a slice that refers to the contents of "s"
+            // create a slice that refers to the contents of "s"
             /* implicit */
             slice(const std::string &s) : data_(s.data()), size_(s.size()) {
             }
 
 #ifdef __cpp_lib_string_view
-            // Create a slice that refers to the same contents as "sv"
+            // create a slice that refers to the same contents as "sv"
             /* implicit */
             slice(std::string_view sv) : data_(sv.data()), size_(sv.size()) {
             }
 #endif
 
-            // Create a slice that refers to s[0,strlen(s)-1]
+            // create a slice that refers to s[0,strlen(s)-1]
             /* implicit */
             slice(const char *s) : data_(s) {
                 size_ = (s == nullptr) ? 0 : strlen(s);
             }
 
-            // Create a single slice from slice_parts using buf as engine.
+            // create a single slice from slice_parts using buf as engine.
             // buf must exist as long as the returned slice exists.
             slice(const struct slice_parts &parts, std::string *buf) {
                 size_t length = 0;

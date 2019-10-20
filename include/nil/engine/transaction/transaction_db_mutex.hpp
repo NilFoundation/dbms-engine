@@ -20,7 +20,7 @@ namespace nil {
             }
 
             // Attempt to acquire lock.  Return is_ok on success, or other engine::status_type on failure.
-            // If returned status is is_ok, transaction_db will eventually call un_lock().
+            // If returned status is is_ok, transaction_db will eventually call unlock().
             virtual engine::status_type lock() = 0;
 
             // Attempt to acquire lock.  If timeout is non-negative, operation may be
@@ -28,7 +28,7 @@ namespace nil {
             // Returns is_ok on success,
             //         timed_out if timed out,
             //         or other engine::status_type on failure.
-            // If returned status is is_ok, transaction_db will eventually call un_lock().
+            // If returned status is is_ok, transaction_db will eventually call unlock().
             virtual engine::status_type TryLockFor(int64_t timeout_time) = 0;
 
             // Unlock Mutex that was successfully locked by lock() or TryLockUntil()
@@ -74,10 +74,10 @@ namespace nil {
         // Factory class that can allocate mutexes and condition variables.
         class transaction_db_mutex_factory {
         public:
-            // Create a transaction_db_mutex object.
+            // create a transaction_db_mutex object.
             virtual std::shared_ptr<transaction_db_mutex> allocate_mutex() = 0;
 
-            // Create a transaction_db_cond_var object.
+            // create a transaction_db_cond_var object.
             virtual std::shared_ptr<transaction_db_cond_var> allocate_cond_var() = 0;
 
             virtual ~transaction_db_mutex_factory() {

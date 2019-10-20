@@ -26,7 +26,7 @@ namespace nil {
 
         class status_type {
         public:
-            // Create a success status.
+            // create a success status.
             status_type() : code_(kOk), subcode_(kNone), sev_(kNoError), state_(nullptr) {
             }
 
