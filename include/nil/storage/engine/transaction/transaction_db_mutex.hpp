@@ -50,14 +50,14 @@ namespace nil {
             }
 
             // Block current thread until condition variable is notified by a call to
-            // Notify() or NotifyAll().  Wait() will be called with mutex locked.
+            // notify() or notify_all().  Wait() will be called with mutex locked.
             // Returns is_ok if notified.
             // Returns non-is_ok if transaction_db should stop waiting and fail the operation.
             // May return is_ok spuriously even if not notified.
             virtual engine::status_type wait(std::shared_ptr<transaction_db_mutex> mutex) = 0;
 
             // Block current thread until condition variable is notified by a call to
-            // Notify() or NotifyAll(), or if the timeout is reached.
+            // notify() or notify_all(), or if the timeout is reached.
             // Wait() will be called with mutex locked.
             //
             // If timeout is non-negative, operation should be failed after this many
@@ -70,15 +70,14 @@ namespace nil {
             // Returns other status if transaction_db should otherwis stop waiting and
             //  fail the operation.
             // May return is_ok spuriously even if not notified.
-            virtual engine::status_type wait_for(std::shared_ptr<transaction_db_mutex> mutex, int64_t timeout_time)
-            = 0;
+            virtual engine::status_type wait_for(std::shared_ptr<transaction_db_mutex> mutex, int64_t timeout_time) = 0;
 
             // If any threads are waiting on *this, unblock at least one of the
             // waiting threads.
-            virtual void Notify() = 0;
+            virtual void notify() = 0;
 
             // Unblocks all threads waiting on *this.
-            virtual void NotifyAll() = 0;
+            virtual void notify_all() = 0;
         };
 
         // Factory class that can allocate mutexes and condition variables.
@@ -93,5 +92,5 @@ namespace nil {
             virtual ~transaction_db_mutex_factory() {
             }
         };
-    }    // namespace dcdb
+    }    // namespace engine
 }    // namespace nil
