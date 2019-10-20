@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#include <nil/engine/comparator.hpp>
-#include <nil/engine/status.hpp>
+#include <nil/storage/engine/comparator.hpp>
+#include <nil/storage/engine/status.hpp>
 
 namespace nil {
     namespace engine {

@@ -6,11 +6,11 @@
 #include <memory>
 #include <string>
 
-#include <nil/engine/comparator.hpp>
-#include <nil/engine/iterator.hpp>
-#include <nil/engine/slice.hpp>
-#include <nil/engine/status.hpp>
-#include <nil/engine/write_batch.hpp>
+#include <nil/storage/engine/comparator.hpp>
+#include <nil/storage/engine/iterator.hpp>
+#include <nil/storage/engine/slice.hpp>
+#include <nil/storage/engine/status.hpp>
+#include <nil/storage/engine/write_batch.hpp>
 
 namespace nil {
     namespace engine {

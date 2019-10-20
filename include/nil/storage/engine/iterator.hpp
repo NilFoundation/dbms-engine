@@ -21,8 +21,8 @@
 
 #include <string>
 
-#include <nil/engine/slice.hpp>
-#include <nil/engine/status.hpp>
+#include <nil/storage/engine/slice.hpp>
+#include <nil/storage/engine/status.hpp>
 
 namespace nil {
     namespace engine {

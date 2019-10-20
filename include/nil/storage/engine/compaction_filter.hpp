@@ -14,8 +14,8 @@
 #include <string>
 #include <vector>
 
-#include <nil/engine/slice.hpp>
-#include <nil/engine/slice_transform.hpp>
+#include <nil/storage/engine/slice.hpp>
+#include <nil/storage/engine/slice_transform.hpp>
 
 namespace nil {
     namespace engine {
