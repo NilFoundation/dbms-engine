@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include <nil/storage/engine/slice/slice.hpp>
+#include <nil/storage/engine/slice.hpp>
 
 namespace nil {
     namespace engine {
