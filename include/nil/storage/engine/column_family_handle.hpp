@@ -10,6 +10,8 @@
 #ifndef DCDB_COLUMN_FAMILY_HANDLE_HPP
 #define DCDB_COLUMN_FAMILY_HANDLE_HPP
 
+#include <nil/storage/engine/column_family_descriptor.hpp>
+
 namespace nil {
     namespace engine {
         class column_family_handle {
@@ -28,8 +30,6 @@ namespace nil {
             // information, this call might internally lock and release database mutex to
             // access the up-to-date CF opts.  In addition, all the pointer-typed
             // opts cannot be referenced any longer than the original opts exist.
-            //
-            // Note that this function is not supported in RocksDBLite.
             virtual status_type get_descriptor(column_family_descriptor *desc) = 0;
 
             // Returns the comparator of the column family associated with the
