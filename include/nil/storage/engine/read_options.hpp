@@ -7,13 +7,15 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef STORAGE_ENGINE_COLUMN_FAMILY_HPP
-#define STORAGE_ENGINE_COLUMN_FAMILY_HPP
+#ifndef STORAGE_ENGINE_READ_OPTIONS_HPP
+#define STORAGE_ENGINE_READ_OPTIONS_HPP
 
 namespace nil {
     namespace engine {
-        class column_family {};
-    }    // namespace engine
-}    // namespace nil
+        struct read_options {
 
-#endif    // DCDB_COLUMN_FAMILY_HPP
+        };
+    }
+}
+
+#endif    // DCDB_READ_OPTIONS_HPP

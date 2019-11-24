@@ -26,10 +26,10 @@
 #include <string>
 #include <vector>
 
-namespace nil {
-    namespace dcdb {
+#include <nil/storage/engine/slice.hpp>
 
-        class engine::slice;
+namespace nil {
+    namespace engine {
 
         // A class that takes a bunch of keys, then generates filter
         class filter_bits_builder {
@@ -40,12 +40,12 @@ namespace nil {
             // add Key to filter, you could use any way to store the key.
             // Such as: storing hashes or original keys
             // Keys are in sorted order and duplicated keys are possible.
-            virtual void add_key(const engine::slice &key) = 0;
+            virtual void add_key(const slice &key) = 0;
 
             // Generate the filter using the keys that are added
             // The return value of this function would be the filter bits,
             // The ownership of actual data is set to buf
-            virtual engine::slice finish(std::unique_ptr<const char[]> *buf) = 0;
+            virtual slice finish(std::unique_ptr<const char[]> *buf) = 0;
 
             // Calculate num of entries fit into a space.
 #if defined(_MSC_VER)
@@ -71,7 +71,7 @@ namespace nil {
             }
 
             // Check if the entry match the bits in filter
-            virtual bool may_match(const engine::slice &entry) = 0;
+            virtual bool may_match(const slice &entry) = 0;
         };
 
         // We add a new format of filter block called full filter block
@@ -104,14 +104,14 @@ namespace nil {
             //
             // Warning: do not change the initial contents of *dst.  Instead,
             // append the newly constructed filter to *dst.
-            virtual void create_filter(const engine::slice *keys, int n, std::string *dst) const = 0;
+            virtual void create_filter(const slice *keys, int n, std::string *dst) const = 0;
 
             // "filter" contains the data appended by a preceding call to
             // create_filter() on this class.  This method must return true if
             // the key was in the list of keys passed to create_filter().
             // This method may return true or false if the key was not on the
             // list, but it should aim to return false with a high probability.
-            virtual bool key_may_match(const engine::slice &key, const engine::slice &filter) const = 0;
+            virtual bool key_may_match(const slice &key, const slice &filter) const = 0;
 
             // get the filter_bits_builder, which is ONLY used for full filter block
             // It contains interface to take individual key, then generate filter
@@ -122,7 +122,7 @@ namespace nil {
             // get the filter_bits_reader, which is ONLY used for full filter block
             // It contains interface to tell if key can be in filter
             // The input engine::slice should NOT be deleted by filter_policy
-            virtual filter_bits_reader *get_filter_bits_reader(const engine::slice &contents) const {
+            virtual filter_bits_reader *get_filter_bits_reader(const slice &contents) const {
                 return nullptr;
             }
         };

@@ -98,5 +98,5 @@ namespace nil {
             virtual const char *name() const = 0;
         };
 
-    }    // namespace dcdb
+    }    // namespace engine
 }    // namespace nil

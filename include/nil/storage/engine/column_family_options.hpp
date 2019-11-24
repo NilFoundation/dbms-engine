@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef DCDB_COLUMN_FAMILY_OPTIONS_HPP
-#define DCDB_COLUMN_FAMILY_OPTIONS_HPP
+#ifndef STORAGE_ENGINE_COLUMN_FAMILY_OPTIONS_HPP
+#define STORAGE_ENGINE_COLUMN_FAMILY_OPTIONS_HPP
 
 namespace nil {
     namespace engine {

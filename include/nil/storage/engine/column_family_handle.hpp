@@ -7,13 +7,14 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef DCDB_COLUMN_FAMILY_HANDLE_HPP
-#define DCDB_COLUMN_FAMILY_HANDLE_HPP
+#ifndef STORAGE_ENGINE_COLUMN_FAMILY_HANDLE_HPP
+#define STORAGE_ENGINE_COLUMN_FAMILY_HANDLE_HPP
 
 #include <nil/storage/engine/column_family_descriptor.hpp>
 
 namespace nil {
     namespace engine {
+
         class column_family_handle {
         public:
             virtual ~column_family_handle() {
@@ -36,7 +37,7 @@ namespace nil {
             // current handle.
             virtual const comparator *get_comparator() const = 0;
         };
-    }
-}
+    }    // namespace engine
+}    // namespace nil
 
 #endif    // DCDB_COLUMN_FAMILY_HANDLE_HPP

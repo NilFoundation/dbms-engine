@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include <nil/storage/engine/slice/slice.hpp>
+#include <nil/storage/engine/slice.hpp>
 #include <nil/storage/engine/status.hpp>
 
 namespace nil {
@@ -75,24 +75,24 @@ namespace nil {
             // the returned engine::slice is valid only until the next modification of
             // the iterator.
             // REQUIRES: valid()
-            virtual engine::slice key() const = 0;
+            virtual slice key() const = 0;
 
             // Return the value for the current entry.  The underlying engine for
             // the returned engine::slice is valid only until the next modification of
             // the iterator.
             // REQUIRES: valid()
-            virtual engine::slice value() const = 0;
+            virtual slice value() const = 0;
 
             // If an error has occurred, return it.  Else return an is_ok status.
             // If non-blocking IO is requested and this operation cannot be
             // satisfied without doing some IO, then this returns engine::status_type::incomplete().
-            virtual engine::status_type status() const = 0;
+            virtual status_type status() const = 0;
 
             // If supported, renew the iterator to represent the latest state. The
             // iterator will be invalidated after the call. Not supported if
             // read_options.get_snapshot is given when creating the iterator.
-            virtual engine::status_type refresh() {
-                return engine::status_type::not_supported("refresh() is not supported");
+            virtual status_type refresh() {
+                return status_type::not_supported("refresh() is not supported");
             }
 
             // Property "rocksdb.iterator.is-key-pinned":
@@ -108,15 +108,15 @@ namespace nil {
             // Property "rocksdb.iterator.internal-key":
             //   get the user-key portion of the internal key at which the iteration
             //   stopped.
-            virtual engine::status_type get_property(const std::string &prop_name, std::string *prop) {
+            virtual status_type get_property(const std::string &prop_name, std::string *prop) {
                 if (prop == nullptr) {
-                    return engine::status_type::invalid_argument("prop is nullptr");
+                    return status_type::invalid_argument("prop is nullptr");
                 }
                 if (prop_name == "rocksdb.iterator.is-key-pinned") {
                     *prop = "0";
-                    return engine::status_type();
+                    return status_type();
                 }
-                return engine::status_type::invalid_argument("Unidentified property.");
+                return status_type::invalid_argument("Unidentified property.");
             }
 
         private:

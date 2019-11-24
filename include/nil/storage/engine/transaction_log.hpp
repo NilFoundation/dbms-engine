@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <nil/storage/engine/write_batch/write_batch.hpp>
+#include <nil/storage/engine/write_batch.hpp>
 #include <nil/storage/engine/status.hpp>
 #include <nil/storage/engine/types.hpp>
 
@@ -113,7 +113,7 @@ namespace nil {
 
             // Returns is_ok if the iterator is valid.
             // Returns the Error when something has gone wrong.
-            virtual engine::status_type status() = 0;
+            virtual status_type status() = 0;
 
             // If valid return's the current write_batch and the sequence number of the
             // earliest transaction contained in the batch.

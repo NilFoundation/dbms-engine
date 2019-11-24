@@ -17,10 +17,10 @@
 
 #include <string>
 
+#include <nil/storage/engine/slice.hpp>
+
 namespace nil {
     namespace engine {
-
-        class slice;
 
         /*
          * A slice_transform is a generic pluggable way of transforming one string
@@ -38,7 +38,7 @@ namespace nil {
             // Extract a prefix from a specified key. This method is called when
             // a key is inserted into the db, and the returned engine::slice is used to
             // create a bloom filter.
-            virtual engine::slice transform(const engine::slice &key) const = 0;
+            virtual slice transform(const slice &key) const = 0;
 
             // Determine whether the specified key is compatible with the logic
             // specified in the transform method. This method is invoked for every
@@ -56,10 +56,10 @@ namespace nil {
             // Wiki documentation here:
             // https://github.com/facebook/rocksdb/wiki/Prefix-Seek-API-Changes
             //
-            virtual bool in_domain(const engine::slice &key) const = 0;
+            virtual bool in_domain(const slice &key) const = 0;
 
             // This is currently not used and remains here for backward compatibility.
-            virtual bool in_range(const engine::slice &dst) const {
+            virtual bool in_range(const slice &dst) const {
                 return false;
             }
 
@@ -93,7 +93,7 @@ namespace nil {
             //    "abcd,e", the file can be filtered out and the key will be invisible.
             //
             // i.e., an implementation always returning false is safe.
-            virtual bool same_result_when_appended(const engine::slice &prefix) const {
+            virtual bool same_result_when_appended(const slice &prefix) const {
                 return false;
             }
         };

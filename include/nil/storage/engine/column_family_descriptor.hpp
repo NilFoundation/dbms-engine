@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef DCDB_COLUMN_FAMILY_DESCRIPTOR_HPP
-#define DCDB_COLUMN_FAMILY_DESCRIPTOR_HPP
+#ifndef STORAGE_ENGINE_COLUMN_FAMILY_DESCRIPTOR_HPP
+#define STORAGE_ENGINE_COLUMN_FAMILY_DESCRIPTOR_HPP
 
 #include <string>
 
@@ -19,15 +19,17 @@ namespace nil {
         extern const std::string kDefaultColumnFamilyName;
 
         struct column_family_descriptor {
-            std::string name;
-            column_family_options options;
+            typedef column_family_options options_type;
 
-            column_family_descriptor() : name(kDefaultColumnFamilyName), options(column_family_options()) {
+            column_family_descriptor() : name(kDefaultColumnFamilyName), options(options_type()) {
             }
 
-            column_family_descriptor(const std::string &_name, const column_family_options &_options) :
+            column_family_descriptor(const std::string &_name, const options_type &_options) :
                 name(_name), options(_options) {
             }
+
+            std::string name;
+            options_type options;
         };
     }    // namespace engine
 }    // namespace nil

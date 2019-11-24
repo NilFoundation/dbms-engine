@@ -14,16 +14,14 @@
 
 #include <nil/storage/engine/comparator.hpp>
 #include <nil/storage/engine/iterator.hpp>
-#include <nil/storage/engine/slice/slice.hpp>
+#include <nil/storage/engine/slice.hpp>
 #include <nil/storage/engine/status.hpp>
-#include <nil/storage/engine/write_batch/write_batch.hpp>
+#include <nil/storage/engine/write_batch.hpp>
 
 namespace nil {
     namespace engine {
 
         class column_family_handle;
-
-        class comparator;
 
         class database;
 
@@ -46,8 +44,8 @@ namespace nil {
         // Used in write_batch_with_index_iterator.
         struct write_entry {
             write_type type;
-            engine::slice key;
-            engine::slice value;
+            slice key;
+            slice value;
         };
 
         // iterator of one column family out of a write_batch_with_index.
@@ -84,50 +82,47 @@ namespace nil {
         // By calling get_write_batch(), a user will get the write_batch for the data
         // they inserted, which can be used for database::write().
         // A user can call new_iterator() to create an iterator.
-        class write_batch_with_index : public engine::write_batch {
+        class write_batch_with_index : public write_batch {
         public:
-            using engine::write_batch::insert;
+            using write_batch::insert;
 
-            virtual engine::status_type insert(column_family_handle *column_family, const engine::slice &key,
-                                               const engine::slice &value) override = 0;
+            virtual status_type insert(column_family_handle *column_family, const engine::slice &key,
+                                       const slice &value) override = 0;
 
-            virtual engine::status_type insert(const engine::slice &key, const engine::slice &value) override = 0;
+            virtual status_type insert(const slice &key, const slice &value) override = 0;
 
-            using engine::write_batch::merge;
+            using write_batch::merge;
 
-            virtual engine::status_type merge(column_family_handle *column_family, const engine::slice &key,
-                                              const engine::slice &value) override = 0;
+            virtual status_type merge(column_family_handle *column_family, const engine::slice &key,
+                                      const slice &value) override = 0;
 
-            virtual engine::status_type merge(const engine::slice &key, const engine::slice &value) override = 0;
+            virtual status_type merge(const slice &key, const slice &value) override = 0;
 
-            using engine::write_batch::remove;
+            using write_batch::remove;
 
-            virtual engine::status_type remove(column_family_handle *column_family,
-                                               const engine::slice &key) override = 0;
+            virtual status_type remove(column_family_handle *column_family, const slice &key) override = 0;
 
-            virtual engine::status_type remove(const engine::slice &key) override = 0;
+            virtual status_type remove(const slice &key) override = 0;
 
-            using engine::write_batch::single_remove;
+            using write_batch::single_remove;
 
-            virtual engine::status_type single_remove(column_family_handle *column_family,
-                                                      const engine::slice &key) override = 0;
+            virtual status_type single_remove(column_family_handle *column_family, const slice &key) override = 0;
 
-            virtual engine::status_type single_remove(const engine::slice &key) override = 0;
+            virtual status_type single_remove(const slice &key) override = 0;
 
-            using engine::write_batch::remove_range;
+            using write_batch::remove_range;
 
-            virtual engine::status_type remove_range(column_family_handle *column_family,
-                                                     const engine::slice &begin_key,
-                                                     const engine::slice &end_key) override = 0;
+            virtual status_type remove_range(column_family_handle *column_family,
+                                             const slice &begin_key,
+                                             const slice &end_key) override = 0;
 
-            virtual engine::status_type remove_range(const engine::slice &begin_key,
-                                                     const engine::slice &end_key) override = 0;
+            virtual status_type remove_range(const slice &begin_key, const slice &end_key) override = 0;
 
-            using engine::write_batch::put_log_data;
+            using write_batch::put_log_data;
 
-            virtual engine::status_type put_log_data(const engine::slice &blob) override = 0;
+            virtual status_type put_log_data(const slice &blob) override = 0;
 
-            using engine::write_batch::clear;
+            using write_batch::clear;
 
             virtual void clear() override = 0;
 
@@ -160,23 +155,21 @@ namespace nil {
             // key() and value() of the iterator. This invalidation happens even before
             // the write batch update finishes. The state may recover after next() is
             // called.
-            virtual engine::iterator *new_iterator_with_base(column_family_handle *column_family,
-                                                             engine::iterator *base_iterator) = 0;
+            virtual iterator *new_iterator_with_base(column_family_handle *column_family, iterator *base_iterator) = 0;
 
             // default column family
-            virtual engine::iterator *new_iterator_with_base(engine::iterator *base_iterator) = 0;
+            virtual iterator *new_iterator_with_base(iterator *base_iterator) = 0;
 
             // Similar to database::get() but will only read the key from this batch.
             // If the batch does not have enough data to resolve merge operations,
             // merge_in_progress status may be returned.
-            virtual engine::status_type get_from_batch(column_family_handle *column_family, const db_options &options,
-                                                       const engine::slice &key, std::string *value) = 0;
+            virtual status_type get_from_batch(column_family_handle *column_family, const db_options &options,
+                                               const slice &key, std::string *value) = 0;
 
             // Similar to previous function but does not require a column_family.
             // Note:  An invalid_argument status will be returned if there are any merge
             // operators for this key.  Use previous method instead.
-            virtual engine::status_type get_from_batch(const db_options &options, const engine::slice &key,
-                                                       std::string *value) {
+            virtual status_type get_from_batch(const db_options &options, const slice &key, std::string *value) {
                 return get_from_batch(nullptr, options, key, value);
             }
 
@@ -190,12 +183,12 @@ namespace nil {
             // but will NOT change which keys are read from the batch (the keys in
             // this batch do not yet belong to any get_snapshot and will be fetched
             // regardless).
-            virtual engine::status_type get_from_batch_and_db(database *db, const read_options &input_read_options,
-                                                              const engine::slice &key, std::string *value) = 0;
+            virtual status_type get_from_batch_and_db(database *db, const read_options &input_read_options,
+                                                      const slice &key, std::string *value) = 0;
 
-            virtual engine::status_type get_from_batch_and_db(database *db, const read_options &input_read_options,
-                                                              column_family_handle *column_family,
-                                                              const engine::slice &key, std::string *value) = 0;
+            virtual status_type get_from_batch_and_db(database *db, const read_options &input_read_options,
+                                                      column_family_handle *column_family, const slice &key,
+                                                      std::string *value) = 0;
 
             // Records the state of the batch for future calls to rollback_to_save_point().
             // May be called multiple times to set multiple save points.
@@ -212,13 +205,13 @@ namespace nil {
             // Returns engine::status_type::ok() on success,
             //         engine::status_type::not_found() if no previous call to set_save_point(),
             //         or other engine::status_type on corruption.
-            virtual engine::status_type rollback_to_save_point() override = 0;
+            virtual status_type rollback_to_save_point() override = 0;
 
             // Pop the most recent save point.
             // If there is no previous call to set_save_point(), engine::status_type::not_found()
             // will be returned.
             // Otherwise returns engine::status_type::ok().
-            virtual engine::status_type pop_save_point() override = 0;
+            virtual status_type pop_save_point() override = 0;
 
             virtual void set_max_bytes(size_t max_bytes) override = 0;
 
