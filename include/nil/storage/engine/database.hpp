@@ -12,8 +12,8 @@
 
 #include <nil/storage/engine/slice.hpp>
 #include <nil/storage/engine/range.hpp>
-#include <nil/storage/engine/read_options.hpp>
-#include <nil/storage/engine/write_options.hpp>
+#include <nil/storage/engine/options/read_options.hpp>
+#include <nil/storage/engine/options/write_options.hpp>
 #include <nil/storage/engine/write_batch.hpp>
 
 #include <nil/storage/engine/column_family_handle.hpp>
@@ -22,7 +22,7 @@ namespace nil {
     namespace engine {
         class database {
         public:
-            virtual ~database();
+            virtual ~database() = default;
 
             virtual column_family_handle *default_column_family() const = 0;
 
