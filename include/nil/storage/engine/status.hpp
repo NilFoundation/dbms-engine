@@ -161,7 +161,8 @@ namespace nil {
                 return status_type(kIOError, msg);
             }
 
-            static status_type merge_in_progress(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
+            static status_type merge_in_progress(const engine::slice &msg,
+                                                 const engine::slice &msg2 = engine::slice()) {
                 return status_type(kMergeInProgress, msg, msg2);
             }
 
@@ -181,7 +182,8 @@ namespace nil {
                 return status_type(kShutdownInProgress, msg);
             }
 
-            static status_type shutdown_in_progress(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
+            static status_type shutdown_in_progress(const engine::slice &msg,
+                                                    const engine::slice &msg2 = engine::slice()) {
                 return status_type(kShutdownInProgress, msg, msg2);
             }
 
@@ -229,7 +231,8 @@ namespace nil {
                 return status_type(kCompactionTooLarge, msg);
             }
 
-            static status_type compaction_too_large(const engine::slice &msg, const engine::slice &msg2 = engine::slice()) {
+            static status_type compaction_too_large(const engine::slice &msg,
+                                                    const engine::slice &msg2 = engine::slice()) {
                 return status_type(kCompactionTooLarge, msg, msg2);
             }
 
@@ -378,7 +381,8 @@ namespace nil {
 
             status_type(code _code, sub_code _subcode, const engine::slice &msg, const engine::slice &msg2);
 
-            status_type(code _code, const engine::slice &msg, const engine::slice &msg2) : status_type(_code, kNone, msg, msg2) {
+            status_type(code _code, const engine::slice &msg, const engine::slice &msg2) :
+                status_type(_code, kNone, msg, msg2) {
             }
 
             static const char *copy_state(const char *state);
@@ -441,5 +445,5 @@ namespace nil {
         inline bool status_type::operator!=(const status_type &rhs) const {
             return !(*this == rhs);
         }
-    }    // namespace dcdb
+    }    // namespace engine
 }    // namespace nil

@@ -10,6 +10,8 @@
 #ifndef STORAGE_ENGINE_RANGE_HPP
 #define STORAGE_ENGINE_RANGE_HPP
 
+#include <nil/storage/engine/slice.hpp>
+
 namespace nil {
     namespace engine {
         // A range of keys

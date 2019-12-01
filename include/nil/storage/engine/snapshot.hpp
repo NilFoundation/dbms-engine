@@ -56,5 +56,5 @@ namespace nil {
             database *db_;
             const snapshot *snapshot_;
         };
-    }    // namespace dcdb
+    }    // namespace engine
 }    // namespace nil

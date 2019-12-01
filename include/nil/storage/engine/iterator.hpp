@@ -26,7 +26,6 @@
 
 namespace nil {
     namespace engine {
-
         class iterator {
         public:
             iterator() {

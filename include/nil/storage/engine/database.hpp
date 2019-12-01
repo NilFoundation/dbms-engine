@@ -12,6 +12,7 @@
 
 #include <nil/storage/engine/slice.hpp>
 #include <nil/storage/engine/range.hpp>
+#include <nil/storage/engine/iterator.hpp>
 #include <nil/storage/engine/options/read_options.hpp>
 #include <nil/storage/engine/options/write_options.hpp>
 #include <nil/storage/engine/write_batch.hpp>
@@ -198,6 +199,27 @@ namespace nil {
                                        bool *value_found = nullptr) {
                 return key_may_exist(options, default_column_family(), key, value, value_found);
             }
+
+            // Return a heap-allocated iterator over the contents of the database.
+            // The result of new_iterator() is initially invalid (caller must
+            // call one of the seek methods on the iterator before using it).
+            //
+            // Caller should delete the iterator when it is no longer needed.
+            // The returned iterator should be deleted before this db is deleted.
+            virtual iterator *new_iterator(const read_options &options,
+                                           engine::column_family_handle *column_family) = 0;
+
+            virtual iterator *new_iterator(const read_options &options) {
+                return new_iterator(options, default_column_family());
+            }
+
+            // Returns iterators from a consistent database state across multiple
+            // column families. Iterators are heap allocated and need to be deleted
+            // before the db is deleted
+            virtual engine::status_type
+                new_iterators(const read_options &options,
+                              const std::vector<engine::column_family_handle *> &column_families,
+                              std::vector<iterator *> *iterators) = 0;
         };
     }    // namespace engine
 }    // namespace nil
