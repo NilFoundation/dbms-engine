@@ -126,25 +126,5 @@ namespace nil {
                 return nullptr;
             }
         };
-
-        // Return a new filter policy that uses a bloom filter with approximately
-        // the specified number of bits per key.
-        //
-        // bits_per_key: bits per key in bloom filter. A good value for bits_per_key
-        // is 10, which yields a filter with ~ 1% false positive rate.
-        // use_block_based_builder: use block based filter rather than full filter.
-        // If you want to builder full filter, it needs to be set to false.
-        //
-        // Callers must delete the result after any database that is using the
-        // result has been closed.
-        //
-        // Note: if you are using a custom comparator that ignores some parts
-        // of the keys being compared, you must not use new_bloom_filter_policy()
-        // and must provide your own filter_policy that also ignores the
-        // corresponding parts of the keys.  For example, if the comparator
-        // ignores trailing spaces, it would be incorrect to use a
-        // filter_policy (like new_bloom_filter_policy) that does not ignore
-        // trailing spaces in keys.
-        extern const filter_policy *new_bloom_filter_policy(int bits_per_key, bool use_block_based_builder = false);
-    }    // namespace dcdb
-}
+    }    // namespace engine
+}    // namespace nil
