@@ -29,14 +29,14 @@ namespace nil {
             //   < 0 iff "a" < "b",
             //   == 0 iff "a" == "b",
             //   > 0 iff "a" > "b"
-            virtual int compare(const engine::slice &a, const engine::slice &b) const = 0;
+            virtual int compare(const slice &a, const slice &b) const = 0;
 
             // Compares two slices for equality. The following invariant should always
             // hold (and is the default implementation):
             //   equal(a, b) iff compare(a, b) == 0
             // Overwrite only if equality comparisons can be done more efficiently than
             // three-way comparisons.
-            virtual bool equal(const engine::slice &a, const engine::slice &b) const {
+            virtual bool equal(const slice &a, const slice &b) const {
                 return compare(a, b) == 0;
             }
 
@@ -58,7 +58,7 @@ namespace nil {
             // If *start < limit, changes *start to a short string in [start,limit).
             // Simple comparator implementations may return with *start unchanged,
             // i.e., an implementation of this method that does nothing is correct.
-            virtual void find_shortest_separator(std::string *start, const engine::slice &limit) const = 0;
+            virtual void find_shortest_separator(std::string *start, const slice &limit) const = 0;
 
             // Changes *key to a short string >= *key.
             // Simple comparator implementations may return with *key unchanged,
@@ -72,7 +72,7 @@ namespace nil {
             }
 
             // given two keys, determine if t is the successor of s
-            virtual bool is_same_length_immediate_successor(const engine::slice &s, const engine::slice &t) const {
+            virtual bool is_same_length_immediate_successor(const slice &s, const slice &t) const {
                 return false;
             }
 

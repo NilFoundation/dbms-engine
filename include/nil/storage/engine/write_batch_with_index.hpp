@@ -60,9 +60,9 @@ namespace nil {
 
             virtual void seek_to_last() = 0;
 
-            virtual void seek(const engine::slice &key) = 0;
+            virtual void seek(const slice &key) = 0;
 
-            virtual void seek_for_prev(const engine::slice &key) = 0;
+            virtual void seek_for_prev(const slice &key) = 0;
 
             virtual void next() = 0;
 
@@ -72,7 +72,7 @@ namespace nil {
             // write_batch_with_index
             virtual write_entry entry() const = 0;
 
-            virtual engine::status_type status() const = 0;
+            virtual status_type status() const = 0;
         };
 
         // A write_batch_with_index with a binary searchable index built for all the keys
@@ -86,14 +86,14 @@ namespace nil {
         public:
             using write_batch::insert;
 
-            virtual status_type insert(column_family_handle *column_family, const engine::slice &key,
+            virtual status_type insert(column_family_handle *column_family, const slice &key,
                                        const slice &value) override = 0;
 
             virtual status_type insert(const slice &key, const slice &value) override = 0;
 
             using write_batch::merge;
 
-            virtual status_type merge(column_family_handle *column_family, const engine::slice &key,
+            virtual status_type merge(column_family_handle *column_family, const slice &key,
                                       const slice &value) override = 0;
 
             virtual status_type merge(const slice &key, const slice &value) override = 0;
@@ -202,15 +202,15 @@ namespace nil {
             //
             // Calling rollback_to_save_point invalidates any open iterators on this batch.
             //
-            // Returns engine::status_type::ok() on success,
-            //         engine::status_type::not_found() if no previous call to set_save_point(),
-            //         or other engine::status_type on corruption.
+            // Returns status_type::ok() on success,
+            //         status_type::not_found() if no previous call to set_save_point(),
+            //         or other status_type on corruption.
             virtual status_type rollback_to_save_point() override = 0;
 
             // Pop the most recent save point.
-            // If there is no previous call to set_save_point(), engine::status_type::not_found()
+            // If there is no previous call to set_save_point(), status_type::not_found()
             // will be returned.
-            // Otherwise returns engine::status_type::ok().
+            // Otherwise returns status_type::ok().
             virtual status_type pop_save_point() override = 0;
 
             virtual void set_max_bytes(size_t max_bytes) override = 0;
