@@ -295,5 +295,5 @@ namespace nil {
             void operator=(const transaction_db &);
         };
 
-    }    // namespace dcdb
+    }    // namespace engine
 }    // namespace nil
