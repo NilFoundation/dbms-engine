@@ -37,6 +37,7 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/storage/engine/slice/slice_transform.hpp
 
      include/nil/storage/engine/transaction/transaction.hpp
+     include/nil/storage/engine/transaction/transaction_db.hpp
      include/nil/storage/engine/transaction/transaction_db_mutex.hpp
 
      include/nil/storage/engine/write_batch/write_batch.hpp
