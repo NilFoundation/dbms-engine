@@ -14,8 +14,8 @@
 #include <string>
 #include <vector>
 
-#include <nil/storage/engine/slice/slice.hpp>
-#include <nil/storage/engine/slice/slice_transform.hpp>
+#include <nil/storage/engine/slice.hpp>
+#include <nil/storage/engine/slice_transform.hpp>
 
 namespace nil {
     namespace engine {
@@ -93,7 +93,7 @@ namespace nil {
             // be used by a single thread that is doing the compaction run, and this
             // call does not need to be thread-safe.  However, multiple filters may be
             // in existence and operating concurrently.
-            virtual bool filter(int level, const engine::slice &key, const engine::slice &existing_value, std::string *new_value,
+            virtual bool filter(int level, const slice &key, const slice &existing_value, std::string *new_value,
                                 bool *value_changed) const {
                 return false;
             }
@@ -107,7 +107,7 @@ namespace nil {
             // may not realize there is a write conflict and may allow a Transaction to
             // commit that should have failed.  Instead, it is better to implement any
             // merge filtering inside the merge_operator.
-            virtual bool filter_merge_operand(int level, const engine::slice &key, const engine::slice &operand) const {
+            virtual bool filter_merge_operand(int level, const slice &key, const slice &operand) const {
                 return false;
             }
 
@@ -150,7 +150,7 @@ namespace nil {
             // is a write conflict and may allow a Transaction to commit that should have
             // failed. Instead, it is better to implement any merge filtering inside the
             // merge_operator.
-            virtual decision filter_v2(int level, const engine::slice &key, value_type vt, const engine::slice &existing_value,
+            virtual decision filter_v2(int level, const slice &key, value_type vt, const slice &existing_value,
                                        std::string *new_value, std::string *skip_until) const {
                 switch (vt) {
                     case value_type::kValue: {
@@ -199,6 +199,5 @@ namespace nil {
             // Returns a name that identifies this compaction filter factory.
             virtual const char *name() const = 0;
         };
-
-    }    // namespace dcdb
+    }    // namespace engine
 }    // namespace nil
