@@ -206,8 +206,7 @@ namespace nil {
             //
             // Caller should delete the iterator when it is no longer needed.
             // The returned iterator should be deleted before this db is deleted.
-            virtual iterator *new_iterator(const read_options &options,
-                                           engine::column_family_handle *column_family) = 0;
+            virtual iterator *new_iterator(const read_options &options, column_family_handle *column_family) = 0;
 
             virtual iterator *new_iterator(const read_options &options) {
                 return new_iterator(options, default_column_family());
@@ -216,10 +215,9 @@ namespace nil {
             // Returns iterators from a consistent database state across multiple
             // column families. Iterators are heap allocated and need to be deleted
             // before the db is deleted
-            virtual engine::status_type
-                new_iterators(const read_options &options,
-                              const std::vector<engine::column_family_handle *> &column_families,
-                              std::vector<iterator *> *iterators) = 0;
+            virtual engine::status_type new_iterators(const read_options &options,
+                                                      const std::vector<column_family_handle *> &column_families,
+                                                      std::vector<iterator *> *iterators) = 0;
         };
     }    // namespace engine
 }    // namespace nil

@@ -27,7 +27,7 @@ namespace nil {
             virtual engine::sequence_number get_sequence_number() const = 0;
 
         protected:
-            virtual ~snapshot();
+            virtual ~snapshot() = default;
         };
 
         // Simple RAII wrapper class for get_snapshot.

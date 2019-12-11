@@ -90,7 +90,7 @@ namespace nil {
         // You can choose filter type in new_bloom_filter_policy
         class filter_policy {
         public:
-            virtual ~filter_policy();
+            virtual ~filter_policy() = default;
 
             // Return the name of this policy.  Note that if the filter encoding
             // changes in an incompatible way, the name returned by this method
