@@ -27,7 +27,8 @@ namespace nil {
             }
 
             // Store the mapping "key->value" in the database.
-            virtual status_type insert(column_family_handle *column_family, const slice &key, const engine::slice &value) = 0;
+            virtual status_type insert(column_family_handle *column_family, const slice &key,
+                                       const engine::slice &value) = 0;
 
             virtual status_type insert(const slice &key, const slice &value) = 0;
 
@@ -55,7 +56,8 @@ namespace nil {
 
             // merge "value" with the existing value of "key" in the database.
             // "key->merge(existing, value)"
-            virtual status_type merge(column_family_handle *column_family, const slice &key, const engine::slice &value) = 0;
+            virtual status_type merge(column_family_handle *column_family, const slice &key,
+                                      const engine::slice &value) = 0;
 
             virtual status_type merge(const slice &key, const slice &value) = 0;
 

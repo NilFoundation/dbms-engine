@@ -17,7 +17,7 @@
 #include <vector>
 
 namespace nil {
-    namespace dcdb {
+    namespace engine {
 
         class log_file;
 
@@ -96,11 +96,9 @@ namespace nil {
         // beginning of any gap in sequences
         class transaction_log_iterator {
         public:
-            transaction_log_iterator() {
-            }
+            transaction_log_iterator() = default;
 
-            virtual ~transaction_log_iterator() {
-            }
+            virtual ~transaction_log_iterator() = default;
 
             // An iterator is either positioned at a write_batch or not valid.
             // This method returns true if the iterator is valid.
@@ -134,5 +132,5 @@ namespace nil {
                 }
             };
         };
-    }    // namespace dcdb
+    }    // namespace engine
 }    //  namespace nil
