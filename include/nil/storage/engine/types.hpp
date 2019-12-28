@@ -51,20 +51,5 @@ namespace nil {
                 type = entry_type::kEntryPut;
             }
         };
-
-        // Parse slice representing internal key to full_key
-        // Parsed full_key is valid for as long as the memory pointed to by
-        // internal_key is alive.
-        bool parse_full_key(const slice &internal_key, full_key *fkey) {
-            parsed_internal_key ikey;
-            if (!ParseInternalKey(internal_key, &ikey)) {
-                return false;
-            }
-            fkey->user_key = ikey.user_key;
-            fkey->sequence = ikey.sequence;
-            fkey->type = GetEntryType(ikey.type);
-            return true;
-        }
-
     }    // namespace engine
 }    // namespace nil

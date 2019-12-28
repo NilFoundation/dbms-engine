@@ -65,7 +65,7 @@ namespace nil {
 
         struct batch_result {
             engine::sequence_number sequence = 0;
-            std::unique_ptr<write_batch> write_batch_ptr;
+            std::unique_ptr<engine::write_batch> write_batch_ptr;
 
             // add empty __ctor and __dtor for the rule of five
             // However, preserve the original semantics and prohibit copying

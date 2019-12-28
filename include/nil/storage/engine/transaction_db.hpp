@@ -97,10 +97,6 @@ namespace nil {
             size_t wp_commit_cache_bits = static_cast<size_t>(23);
 
             friend class write_prepared_txn_db;
-
-            friend class WritePreparedTransactionTestBase;
-
-            friend class MySQLStyleTransactionTest;
         };
 
         struct transaction_options {
