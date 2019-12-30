@@ -12,7 +12,7 @@
 
 #include <string>
 
-#include <nil/storage/engine/options/column_family_options.hpp>
+#include <nil/storage/engine/column_family/column_family_options.hpp>
 
 namespace nil {
     namespace engine {

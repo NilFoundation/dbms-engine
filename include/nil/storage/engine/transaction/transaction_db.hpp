@@ -6,9 +6,9 @@
 
 #include <nil/storage/engine/database.hpp>
 
-#include <nil/storage/engine/column_family_descriptor.hpp>
+#include <nil/storage/engine/column_family/column_family_descriptor.hpp>
 #include <nil/storage/engine/comparator.hpp>
-#include <nil/storage/engine/transaction.hpp>
+#include <nil/storage/engine/transaction/transaction.hpp>
 
 // Database with transaction support.
 //

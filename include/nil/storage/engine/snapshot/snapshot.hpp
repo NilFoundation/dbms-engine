@@ -11,6 +11,7 @@
 
 #include <nil/storage/engine/types.hpp>
 #include <nil/storage/engine/database.hpp>
+#include <nil/storage/engine/snapshot/snapshotter.hpp>
 
 namespace nil {
     namespace engine {
@@ -35,16 +36,16 @@ namespace nil {
         // release the get_snapshot.
         class managed_snapshot {
         public:
-            explicit managed_snapshot(database *db) : db_(db), snapshot_(db->get_snapshot()) {
+            explicit managed_snapshot(snapshotter *s) : s_(s), snapshot_(s->get_snapshot()) {
             }
 
             // Instead of creating a get_snapshot, take ownership of the input snapshot.
-            managed_snapshot(database *db, const snapshot *_snapshot) : db_(db), snapshot_(_snapshot) {
+            managed_snapshot(snapshotter *s, const snapshot *_snapshot) : s_(s), snapshot_(_snapshot) {
             }
 
             ~managed_snapshot() {
                 if (snapshot_) {
-                    db_->release_snapshot(snapshot_);
+                    s_->release_snapshot(snapshot_);
                 }
             }
 
@@ -53,7 +54,7 @@ namespace nil {
             }
 
         private:
-            database *db_;
+            snapshotter *s_;
             const snapshot *snapshot_;
         };
     }    // namespace engine
