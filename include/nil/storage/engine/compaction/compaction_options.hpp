@@ -3,6 +3,10 @@
 
 namespace nil {
     namespace engine {
+        struct compact_range_options {
+
+        };
+
         struct compaction_options {
 
         };

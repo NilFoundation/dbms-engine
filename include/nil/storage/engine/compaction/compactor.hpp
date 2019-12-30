@@ -44,12 +44,10 @@ namespace nil {
             //
             // @see GetDataBaseMetaData
             // @see get_column_family_meta_data
-            virtual engine::status_type compact_files(const compaction_options &compact_opts,
-                                                      engine::column_family_handle *column_family,
-                                                      const std::vector<std::string> &input_file_names,
-                                                      int output_level, int output_path_id = -1,
-                                                      std::vector<std::string> *output_file_names = nullptr,
-                                                      compaction_job_info *compaction_job_inf = nullptr) = 0;
+            virtual engine::status_type
+                compact_files(const compaction_options &compact_opts, engine::column_family_handle *column_family,
+                              const std::vector<std::string> &input_file_names, int output_level, int output_path_id,
+                              std::vector<std::string> *output_file_names, compaction_job_info *compaction_job_inf) = 0;
         };
     }    // namespace engine
 }    // namespace nil
