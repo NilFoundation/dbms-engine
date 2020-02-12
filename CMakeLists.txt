@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.11)
 
 cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0028 NEW)
-cmake_policy(SET CMP0048 OLD)
+cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
 cmake_policy(SET CMP0079 OLD)
 
@@ -12,7 +12,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
 include(CMConfig)
 include(CMSetupVersion)
 
-cm_workspace(nil)
+cm_workspace(storage)
 
 macro(cm_find_package NAME)
     if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
@@ -26,18 +26,65 @@ cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
-cm_project(${CMAKE_WORKSPACE_NAME} engine)
+cm_project(engine WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
+
+list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
+     include/nil/storage/engine/column_family/column_family_descriptor.hpp
+     include/nil/storage/engine/column_family/column_family_handle.hpp
+     include/nil/storage/engine/column_family/column_family_options.hpp
+
+     include/nil/storage/engine/slice/slice.hpp
+     include/nil/storage/engine/slice/slice_transform.hpp
+
+     include/nil/storage/engine/transaction/transaction.hpp
+     include/nil/storage/engine/transaction/transaction_db.hpp
+     include/nil/storage/engine/transaction/transaction_db_mutex.hpp
+
+     include/nil/storage/engine/write_batch/write_batch.hpp
+     include/nil/storage/engine/write_batch/write_batch_with_index.hpp
+
+     include/nil/storage/engine/write_batch
+     include/nil/storage/engine/compaction_filter.hpp
+     include/nil/storage/engine/comparator.hpp
+     include/nil/storage/engine/database.hpp
+     include/nil/storage/engine/filter_policy.hpp
+     include/nil/storage/engine/iterator.hpp
+     include/nil/storage/engine/logging.hpp
+     include/nil/storage/engine/merge_operator.hpp
+     include/nil/storage/engine/status.hpp
+     include/nil/storage/engine/types.hpp)
+
+list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES
+     src/environment.cpp)
+
+list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
+     ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS}
+     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES}
+     )
+
+list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
+     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES}
+     )
 
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
 add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
 
-set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES EXPORT_NAME ${CURRENT_PROJECT_NAME})
+set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
+                      EXPORT_NAME ${CURRENT_PROJECT_NAME})
+
+target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+
+                      ${Boost_LIBRARIES})
 
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                           "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>")
+                           "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
+
+                           ${Boost_INCLUDE_DIRS})
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INCLUDE include NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-add_subdirectory(test)
+if(BUILD_TESTS)
+    add_subdirectory(test)
+endif()
