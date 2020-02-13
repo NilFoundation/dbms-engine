@@ -9,8 +9,8 @@
 
 // A database can be configured with a custom filter_policy object.
 // This object is responsible for creating a small filter from a set
-// of keys.  These filters are stored in rocksdb and are consulted
-// automatically by rocksdb to decide whether or not to read some
+// of keys.  These filters are stored in engine and are consulted
+// automatically by engine to decide whether or not to read some
 // information from disk. In many cases, a filter can cut down the
 // number of disk seeks form a handful to a single disk seek per
 // database::get() call.

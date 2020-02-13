@@ -251,7 +251,7 @@ namespace nil {
                 return off;
             }
 
-            // private: make these public for rocksdbjni access
+            // private: make these public for enginejni access
             const char *data_;
             size_t size_;
 

@@ -94,24 +94,24 @@ namespace nil {
                 return status_type::not_supported("refresh() is not supported");
             }
 
-            // Property "rocksdb.iterator.is-key-pinned":
+            // Property "engine.iterator.is-key-pinned":
             //   If returning "1", this means that the engine::slice returned by key() is valid
             //   as long as the iterator is not deleted.
             //   It is guaranteed to always return "1" if
             //      - iterator created with read_options::pin_data = true
             //      - database tables were created with
             //        block_based_table_options::use_delta_encoding = false.
-            // Property "rocksdb.iterator.super-version-number":
+            // Property "engine.iterator.super-version-number":
             //   LSM version used by the iterator. The same format as database Property
             //   kCurrentSuperVersionNumber. See its comment for more information.
-            // Property "rocksdb.iterator.internal-key":
+            // Property "engine.iterator.internal-key":
             //   get the user-key portion of the internal key at which the iteration
             //   stopped.
             virtual status_type get_property(const std::string &prop_name, std::string *prop) {
                 if (prop == nullptr) {
                     return status_type::invalid_argument("prop is nullptr");
                 }
-                if (prop_name == "rocksdb.iterator.is-key-pinned") {
+                if (prop_name == "engine.iterator.is-key-pinned") {
                     *prop = "0";
                     return status_type();
                 }

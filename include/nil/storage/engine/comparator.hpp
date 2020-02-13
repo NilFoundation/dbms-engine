@@ -18,7 +18,7 @@ namespace nil {
 
         // A comparator object provides a total order across slices that are
         // used as keys in an sstable or a database.  A comparator implementation
-        // must be thread-safe since rocksdb may invoke its methods concurrently
+        // must be thread-safe since engine may invoke its methods concurrently
         // from multiple threads.
         class comparator {
         public:
@@ -48,7 +48,7 @@ namespace nil {
             // the comparator implementation changes in a way that will cause
             // the relative ordering of any two keys to change.
             //
-            // Names starting with "rocksdb." are reserved and should not be used
+            // Names starting with "engine." are reserved and should not be used
             // by any clients of this package.
             virtual const char *name() const = 0;
 

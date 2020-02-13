@@ -32,7 +32,7 @@ namespace nil {
         // the following interfaces:
         //  a) associative_merge_operator - for most simple semantics (always take
         //    two values, and merge them into one value, which is then insert back
-        //    into rocksdb); numeric addition and string concatenation are examples;
+        //    into engine); numeric addition and string concatenation are examples;
         //
         //  b) merge_operator - the generic class for all the more abstract / complex
         //    operations; one method (full_merge_v2) to merge a insert/remove value with a
@@ -44,7 +44,7 @@ namespace nil {
         // associative_merge_operator is simpler to implement. merge_operator is simply
         // more powerful.
         //
-        // Refer to rocksdb-merge wiki for more details and example implementations.
+        // Refer to engine-merge wiki for more details and example implementations.
         //
         class merge_operator {
         public:
@@ -242,7 +242,7 @@ namespace nil {
             // Note: the merge operands are passed to this function in the reversed order
             // relative to how they were merged (passed to full_merge or full_merge_v2)
             // for performance reasons, see also:
-            // https://github.com/facebook/rocksdb/issues/3865
+            // https://github.com/facebook/engine/issues/3865
             virtual bool should_merge(const std::vector<engine::slice> &operands) const {
                 return false;
             }
