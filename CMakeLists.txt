@@ -28,6 +28,10 @@ include(CMSetupVersion)
 
 cm_project(engine WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
+option(BUILD_DOXYGEN_DOCS "Build with configuring Doxygen documentation compiler" TRUE)
+
+set(DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_LIST_DIR}/docs" CACHE STRING "Specify doxygen output directory")
+
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/storage/engine/column_family/column_family_descriptor.hpp
      include/nil/storage/engine/column_family/column_family_handle.hpp
@@ -59,12 +63,10 @@ list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES
 
 list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
      ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS}
-     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES}
-     )
+     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES})
 
 list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES}
-     )
+     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES})
 
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
@@ -88,3 +90,6 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INCLUDE includ
 if(BUILD_TESTS)
     add_subdirectory(test)
 endif()
+
+configure_file(${CMAKE_CURRENT_LIST_DIR}/docs/doxygen/engine.doxyfile.in
+               ${CMAKE_BINARY_DIR}/engine.doxyfile @ONLY)
