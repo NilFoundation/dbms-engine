@@ -9,6 +9,8 @@
 #ifndef STORAGE_ENGINE_COLUMN_FAMILY_HANDLE_HPP
 #define STORAGE_ENGINE_COLUMN_FAMILY_HANDLE_HPP
 
+#include <nil/storage/engine/comparator.hpp>
+
 #include <nil/storage/engine/column_family/column_family_descriptor.hpp>
 
 namespace nil {

@@ -9,11 +9,15 @@
 #ifndef STORAGE_ENGINE_DATABASE_HPP
 #define STORAGE_ENGINE_DATABASE_HPP
 
+#include <vector>
+
 #include <nil/storage/engine/slice.hpp>
 #include <nil/storage/engine/range.hpp>
 #include <nil/storage/engine/iterator.hpp>
 #include <nil/storage/engine/write_batch.hpp>
+
 #include <nil/storage/engine/column_family/column_family_handle.hpp>
+
 #include <nil/storage/engine/options/read_options.hpp>
 #include <nil/storage/engine/options/write_options.hpp>
 
