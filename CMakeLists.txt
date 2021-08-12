@@ -11,9 +11,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
 
 include(CMConfig)
 
-if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "storage"))
-    cm_workspace(storage)
-endif()
+cm_workspace(dbms)
 
 macro(cm_find_package NAME)
     if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
@@ -30,33 +28,10 @@ include(CMSetupVersion)
 cm_project(engine WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-     include/nil/storage/engine/column_family/column_family_descriptor.hpp
-     include/nil/storage/engine/column_family/column_family_handle.hpp
-     include/nil/storage/engine/column_family/column_family_options.hpp
+     include/nil/dbms/engine/schema.hpp
+     include/nil/dbms/engine/interval.hpp)
 
-     include/nil/storage/engine/slice/slice.hpp
-     include/nil/storage/engine/slice/slice_transform.hpp
-
-     include/nil/storage/engine/transaction/transaction.hpp
-     include/nil/storage/engine/transaction/transaction_db.hpp
-     include/nil/storage/engine/transaction/transaction_db_mutex.hpp
-
-     include/nil/storage/engine/write_batch/write_batch.hpp
-     include/nil/storage/engine/write_batch/write_batch_with_index.hpp
-
-     include/nil/storage/engine/write_batch
-     include/nil/storage/engine/compaction_filter.hpp
-     include/nil/storage/engine/comparator.hpp
-     include/nil/storage/engine/database.hpp
-     include/nil/storage/engine/filter_policy.hpp
-     include/nil/storage/engine/iterator.hpp
-     include/nil/storage/engine/logging.hpp
-     include/nil/storage/engine/merge_operator.hpp
-     include/nil/storage/engine/status.hpp
-     include/nil/storage/engine/types.hpp)
-
-list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES
-     src/environment.cpp)
+list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
      ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS}
