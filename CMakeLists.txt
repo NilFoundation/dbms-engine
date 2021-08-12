@@ -1,18 +1,17 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 2.8.12)
 
 cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0028 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
-cmake_policy(SET CMP0079 OLD)
+cmake_policy(SET CMP0079 NEW)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
      "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
 
 include(CMConfig)
-include(CMSetupVersion)
 
-cm_workspace(storage)
+cm_workspace(dbms)
 
 macro(cm_find_package NAME)
     if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
@@ -33,33 +32,10 @@ option(BUILD_DOXYGEN_DOCS "Build with configuring Doxygen documentation compiler
 set(DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_LIST_DIR}/docs" CACHE STRING "Specify doxygen output directory")
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-     include/nil/storage/engine/column_family/column_family_descriptor.hpp
-     include/nil/storage/engine/column_family/column_family_handle.hpp
-     include/nil/storage/engine/column_family/column_family_options.hpp
+     include/nil/dbms/engine/schema.hpp
+     include/nil/dbms/engine/interval.hpp)
 
-     include/nil/storage/engine/slice/slice.hpp
-     include/nil/storage/engine/slice/slice_transform.hpp
-
-     include/nil/storage/engine/transaction/transaction.hpp
-     include/nil/storage/engine/transaction/transaction_db.hpp
-     include/nil/storage/engine/transaction/transaction_db_mutex.hpp
-
-     include/nil/storage/engine/write_batch/write_batch.hpp
-     include/nil/storage/engine/write_batch/write_batch_with_index.hpp
-
-     include/nil/storage/engine/write_batch
-     include/nil/storage/engine/compaction_filter.hpp
-     include/nil/storage/engine/comparator.hpp
-     include/nil/storage/engine/database.hpp
-     include/nil/storage/engine/filter_policy.hpp
-     include/nil/storage/engine/iterator.hpp
-     include/nil/storage/engine/logging.hpp
-     include/nil/storage/engine/merge_operator.hpp
-     include/nil/storage/engine/status.hpp
-     include/nil/storage/engine/types.hpp)
-
-list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES
-     src/environment.cpp)
+list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
      ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS}

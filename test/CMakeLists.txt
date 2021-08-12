@@ -8,7 +8,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${Boost_LIBRARIES})
 
-macro(define_storage_test name)
+macro(define_engine_test name)
     cm_test(NAME ${name}_test SOURCES ${name}.cpp)
 
     target_include_directories(${name}_test PRIVATE
@@ -25,9 +25,8 @@ macro(define_storage_test name)
 endmacro()
 
 set(TESTS_NAMES
-    "engine"
-    )
+    "engine")
 
 foreach(TEST_NAME ${TESTS_NAMES})
-    define_storage_test(${TEST_NAME})
+    define_engine_test(${TEST_NAME})
 endforeach()
