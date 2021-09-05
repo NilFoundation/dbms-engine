@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -24,7 +23,7 @@ namespace nil {
 
         /*
          * A slice_transform is a generic pluggable way of transforming one string
-         * to another. Its primary use-case is in configuring rocksdb
+         * to another. Its primary use-case is in configuring engine
          * to store prefix blooms by setting prefix_extractor in
          * column_family_options.
          */
@@ -54,7 +53,7 @@ namespace nil {
             // prefix size of 4.
             //
             // Wiki documentation here:
-            // https://github.com/facebook/rocksdb/wiki/Prefix-Seek-API-Changes
+            // https://github.com/facebook/engine/wiki/Prefix-Seek-API-Changes
             //
             virtual bool in_domain(const slice &key) const = 0;
 

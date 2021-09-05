@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -9,6 +8,8 @@
 
 #ifndef STORAGE_ENGINE_COLUMN_FAMILY_HANDLE_HPP
 #define STORAGE_ENGINE_COLUMN_FAMILY_HANDLE_HPP
+
+#include <nil/storage/engine/comparator.hpp>
 
 #include <nil/storage/engine/column_family/column_family_descriptor.hpp>
 

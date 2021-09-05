@@ -1,18 +1,19 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 2.8.12)
 
 cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0028 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
-cmake_policy(SET CMP0079 OLD)
+cmake_policy(SET CMP0079 NEW)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
      "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
 
 include(CMConfig)
-include(CMSetupVersion)
 
-cm_workspace(storage)
+if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "storage"))
+    cm_workspace(storage)
+endif()
 
 macro(cm_find_package NAME)
     if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
@@ -90,6 +91,3 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INCLUDE includ
 if(BUILD_TESTS)
     add_subdirectory(test)
 endif()
-
-configure_file(${CMAKE_CURRENT_LIST_DIR}/docs/doxygen/engine.doxyfile.in
-               ${CMAKE_BINARY_DIR}/engine.doxyfile @ONLY)
